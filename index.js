@@ -12,12 +12,35 @@ const { initSessionStore } = require('./server/session_store');
 
 const app = express();
 
-// -------------------- SECURITY / UTILS --------------------
-app.use(helmet());
+// -------------------- SECURITY / CSP / UTILS --------------------
+app.use(
+  helmet({
+    contentSecurityPolicy: {
+      useDefaults: true,
+      directives: {
+        "default-src": ["'self'"],
+        "img-src": ["'self'", "data:", "https:"],
+        "script-src": ["'self'", "'unsafe-inline'", "'unsafe-eval'"],
+        "style-src": ["'self'", "'unsafe-inline'"],
+        "connect-src": [
+          "'self'",
+          "https://investonline-buddy.onrender.com"
+        ],
+        // CRITICAL FIX: allow your sites to embed the widget iframe
+        "frame-ancestors": [
+          "'self'",
+          "https://www.investonline.in",
+          "https://beta.investonline.in"
+        ]
+      }
+    }
+  })
+);
+
 app.use(express.json({ limit: '64kb' }));
 app.use(morgan('tiny'));
 
-// -------------------- CORS (supports multiple domains) --------------------
+// -------------------- CORS (supports multiple domain origins) --------------------
 const allowedOrigins = (process.env.ALLOWED_ORIGIN || "")
   .split(",")
   .map(s => s.trim())
@@ -29,56 +52,11 @@ console.log("Parsed allowedOrigins:", allowedOrigins);
 app.use(
   cors({
     origin: function (origin, callback) {
-      // allow curl/postman/mobile apps with no origin
-      if (!origin) return callback(null, true);
+      if (!origin) return callback(null, true); // allow server-to-server, curl, postman
 
       if (allowedOrigins.includes(origin)) {
         return callback(null, true);
       }
 
       console.log("❌ Blocked by CORS:", origin);
-      return callback(new Error("Not allowed by CORS"));
-    }
-  })
-);
-
-// -------------------- SESSION STORE --------------------
-initSessionStore(); // Redis or in-memory based on env
-
-// -------------------- WIDGET FRONTEND ROUTE --------------------
-app.get("/widget", (req, res) => {
-  res.sendFile(path.join(__dirname, "server", "widget.html"));
-});
-
-// -------------------- MAIN CHAT ROUTE --------------------
-app.post('/chat', async (req, res) => {
-  try {
-    const { session_id, message, page = '/', lang = 'en' } = req.body;
-
-    if (!session_id || !message) {
-      return res.status(400).json({ error: 'session_id and message required' });
-    }
-
-    const reply = await handleChat({ session_id, message, page, lang });
-    res.json(reply);
-
-  } catch (err) {
-    console.error("❌ Chat Error:", err);
-    res.status(500).json({ error: 'internal_error' });
-  }
-});
-
-// -------------------- HEALTH CHECK --------------------
-app.get('/health', (req, res) => health(req, res));
-
-// -------------------- FEEDBACK ROUTE --------------------
-app.post('/feedback', (req, res) => {
-  console.log('📩 User Feedback:', req.body);
-  res.json({ status: 'ok' });
-});
-
-// -------------------- START SERVER --------------------
-const PORT = process.env.PORT || 8080;
-app.listen(PORT, () => {
-  console.log(`🚀 InvestOnline Buddy running on ${PORT}`);
-});
+      return callback(new Error("Not allowed by CORS"))
