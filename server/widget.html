@@ -1,0 +1,148 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1" />
+<title>InvestOnline Buddy</title>
+<style>
+  :root{
+    --brand:#F58220;
+    --brand-600:#e06f05;
+    --bg:#f6f7fb;
+    --muted:#6b7280;
+    --card:#ffffff;
+    --accent:#2563eb;
+  }
+  html,body{height:100%;margin:0;font-family:Inter,system-ui,-apple-system,"Segoe UI",Roboto,"Helvetica Neue",Arial;}
+  body{background:var(--bg);display:flex;flex-direction:column;overflow:hidden}
+  .shell{width:100%;height:100%;display:flex;flex-direction:column;box-shadow:0 6px 18px rgba(16,24,40,0.08);border-radius:10px;overflow:hidden;background:linear-gradient(180deg,#fff,#fbfdff)}
+  .header{display:flex;align-items:center;gap:12px;padding:14px 16px;background:var(--card);border-bottom:1px solid #eef2f7}
+  .avatar-wrap{width:44px;height:44px;border-radius:10px;overflow:hidden;flex:0 0 44px;display:flex;align-items:center;justify-content:center;background:#fff}
+  .title-block{display:flex;flex-direction:column}
+  .title{font-weight:700;color:#0f172a;font-size:16px}
+  .subtitle{font-size:12px;color:var(--muted)}
+  .chat{flex:1;overflow:auto;padding:18px;display:flex;flex-direction:column;gap:10px}
+  .msg{max-width:78%;padding:12px 14px;border-radius:12px;line-height:1.35;font-size:14px;box-shadow:0 1px 0 rgba(16,24,40,0.02)}
+  .bot{align-self:flex-start;background:var(--card);border:1px solid #eef2f7;color:#0f172a}
+  .user{align-self:flex-end;background:var(--brand);color:#fff}
+  .chips{display:flex;gap:8px;flex-wrap:wrap;margin-top:6px}
+  .chip{background:rgba(245,130,32,0.08);border:1px solid rgba(245,130,32,0.12);color:var(--brand-600);padding:8px 12px;border-radius:20px;font-size:13px;cursor:pointer;transition:all .15s}
+  .chip:hover{transform:translateY(-2px);box-shadow:0 6px 18px rgba(245,130,32,0.08)}
+  .typing{display:flex;align-items:center;gap:6px}
+  .dot{width:7px;height:7px;border-radius:50%;background:#b9c3d3;animation:typing 1.2s infinite}
+  .dot:nth-child(2){animation-delay:.15s}.dot:nth-child(3){animation-delay:.3s}
+  @keyframes typing{0%{opacity:.2;transform:translateY(0)}50%{opacity:1;transform:translateY(-3px)}100%{opacity:.2;transform:translateY(0)}}
+  .input-area{display:flex;gap:10px;padding:12px;border-top:1px solid #edf2f7;background:var(--card)}
+  .input{flex:1;padding:12px 14px;border-radius:999px;border:1px solid #e6eef7;background:#fff;font-size:14px;outline:none}
+  .btn{background:var(--brand);border:none;color:#fff;padding:10px 14px;border-radius:999px;cursor:pointer;font-weight:600;box-shadow:0 6px 18px rgba(245,130,32,0.12)}
+  .btn:active{transform:translateY(1px)}
+</style>
+</head>
+<body>
+  <div class="shell">
+    <div class="header">
+      <div class="avatar-wrap">
+        <svg width="44" height="44" viewBox="0 0 120 120" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <rect width="120" height="120" rx="18" fill="#fff"/>
+          <g transform="translate(20,18)">
+            <circle cx="40" cy="26" r="20" fill="#FEECE0"/>
+            <path d="M20 62c0-9 9-16 20-16s20 7 20 16v6H20v-6z" fill="#E9F0FF"/>
+            <path d="M31 18c3-4 9-5 13-3 5 2 7 7 6 12-1 3-3 5-6 6-7 2-15-3-16-10-1-3 1-7 3-9z" fill="#1F2937" opacity="0.85"/>
+            <path d="M36 46c0 0-6 3-6 10 0 2 10 2 12 0 0-7-6-10-6-10z" fill="#F58220" />
+          </g>
+        </svg>
+      </div>
+      <div class="title-block">
+        <div class="title">InvestOnline Buddy</div>
+        <div class="subtitle">Ask about investments, KYC & onboarding</div>
+      </div>
+    </div>
+
+    <div class="chat" id="chat">
+      <div class="msg bot">Hi — I'm InvestOnline Buddy. How can I help you today?</div>
+      <div class="chips" id="welcomeChips">
+        <div class="chip" onclick="pick('Start Registration')">Start Registration</div>
+        <div class="chip" onclick="pick('Documents Needed')">Documents Needed</div>
+        <div class="chip" onclick="pick('Talk to Support')">Talk to Support</div>
+      </div>
+    </div>
+
+    <div class="input-area">
+      <input id="userInput" class="input" placeholder="Type your question..." />
+      <button class="btn" id="sendBtn">Send</button>
+    </div>
+  </div>
+
+<script>
+const chatEl = document.getElementById('chat');
+const inputEl = document.getElementById('userInput');
+const sendBtn = document.getElementById('sendBtn');
+
+function appendMessage(text, who='bot'){
+  const d=document.createElement('div');
+  d.className='msg '+(who==='bot'?'bot':'user');
+  d.innerText=text;
+  chatEl.appendChild(d);
+  chatEl.scrollTop=chatEl.scrollHeight;
+}
+
+function appendChips(list){
+  const wrap=document.createElement('div');
+  wrap.className='chips';
+  list.forEach(s=>{
+    const c=document.createElement('div');
+    c.className='chip';
+    c.innerText=s;
+    c.onclick=()=>{ inputEl.value=s; sendMessage(); };
+    wrap.appendChild(c);
+  });
+  chatEl.appendChild(wrap);
+  chatEl.scrollTop=chatEl.scrollHeight;
+}
+
+function showTyping(){
+  const t=document.createElement('div');
+  t.className='msg bot';
+  t.id='typing';
+  t.innerHTML='<div class="typing"><div class="dot"></div><div class="dot"></div><div class="dot"></div></div>';
+  chatEl.appendChild(t);
+  chatEl.scrollTop=chatEl.scrollHeight;
+}
+function hideTyping(){ const t=document.getElementById('typing'); if(t) t.remove(); }
+
+async function sendMessage(){
+  const text=inputEl.value.trim();
+  if(!text) return;
+  appendMessage(text,'user');
+  inputEl.value='';
+  hideElement('welcomeChips');
+  showTyping();
+
+  const sessionId='web-'+Math.random().toString(36).slice(2,10);
+  const page=new URLSearchParams(location.search).get('page')||'/';
+
+  try{
+    const res=await fetch('https://investonline-buddy.onrender.com/chat',{
+      method:'POST',
+      headers:{'Content-Type':'application/json'},
+      body:JSON.stringify({session_id:sessionId,message:text,page})
+    });
+    const j=await res.json();
+    hideTyping();
+    appendMessage(j.reply||'Sorry, something went wrong.','bot');
+    if(j.suggested) appendChips(j.suggested);
+  } catch(err){
+    hideTyping();
+    appendMessage('Unable to reach server. Please try again later.','bot');
+    console.error(err);
+  }
+}
+
+function pick(s){ inputEl.value=s; sendMessage(); }
+function hideElement(id){ const el=document.getElementById(id); if(el) el.style.display='none'; }
+
+sendBtn.addEventListener('click',sendMessage);
+inputEl.addEventListener('keydown',e=>{ if(e.key==='Enter') sendMessage(); });
+</script>
+</body>
+</html>
