@@ -26,7 +26,6 @@ app.use(
           "'self'",
           "https://investonline-buddy.onrender.com"
         ],
-        // CRITICAL FIX: allow your sites to embed the widget iframe
         "frame-ancestors": [
           "'self'",
           "https://www.investonline.in",
@@ -40,7 +39,7 @@ app.use(
 app.use(express.json({ limit: '64kb' }));
 app.use(morgan('tiny'));
 
-// -------------------- CORS (supports multiple domain origins) --------------------
+// -------------------- CORS --------------------
 const allowedOrigins = (process.env.ALLOWED_ORIGIN || "")
   .split(",")
   .map(s => s.trim())
@@ -52,11 +51,52 @@ console.log("Parsed allowedOrigins:", allowedOrigins);
 app.use(
   cors({
     origin: function (origin, callback) {
-      if (!origin) return callback(null, true); // allow server-to-server, curl, postman
-
-      if (allowedOrigins.includes(origin)) {
-        return callback(null, true);
-      }
+      if (!origin) return callback(null, true);
+      if (allowedOrigins.includes(origin)) return callback(null, true);
 
       console.log("❌ Blocked by CORS:", origin);
-      return callback(new Error("Not allowed by CORS"))
+      return callback(new Error("Not allowed by CORS"));
+    }
+  })
+);
+
+// -------------------- SESSION STORE --------------------
+initSessionStore();
+
+// -------------------- SERVE WIDGET FRONTEND --------------------
+app.get("/widget", (req, res) => {
+  res.sendFile(path.join(__dirname, "server", "widget.html"));
+});
+
+// -------------------- CHAT ROUTE --------------------
+app.post('/chat', async (req, res) => {
+  try {
+    const { session_id, message, page = '/', lang = 'en' } = req.body;
+
+    if (!session_id || !message) {
+      return res.status(400).json({ error: 'session_id and message required' });
+    }
+
+    const reply = await handleChat({ session_id, message, page, lang });
+    res.json(reply);
+
+  } catch (err) {
+    console.error("❌ Chat Error:", err);
+    res.status(500).json({ error: 'internal_error' });
+  }
+});
+
+// -------------------- HEALTH CHECK --------------------
+app.get('/health', (req, res) => health(req, res));
+
+// -------------------- FEEDBACK --------------------
+app.post('/feedback', (req, res) => {
+  console.log('📩 User Feedback:', req.body);
+  res.json({ status: 'ok' });
+});
+
+// -------------------- START SERVER --------------------
+const PORT = process.env.PORT || 8080;
+app.listen(PORT, ()
+});
+
