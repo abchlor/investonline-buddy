@@ -1,0 +1,16 @@
+{
+  "quick_replies": ["Start Registration", "What is KYC?", "Documents Needed", "Talk to Support"],
+  "onboarding": {
+    "register": "To start registration: you'll need PAN, Aadhaar (for e-KYC) or alternate address proof, bank details and a cancelled cheque. Registration typically takes 6-8 minutes. Would you like the registration page?",
+    "kyc": "KYC (Know Your Customer) verifies your identity and is mandatory for investing. You can do instant e-KYC with Aadhaar (OTP) or upload documents (24-48 hours). Which would you prefer?",
+    "time": "Most users complete registration in 6-8 minutes using Aadhaar e-KYC. Manual upload takes 24-48 hours for verification."
+  },
+  "documents": {
+    "pan": "PAN is mandatory to invest. You only need the PAN number — not the physical card. If you don't have PAN, you can apply at the official PAN portals.",
+    "aadhaar": "Aadhaar is recommended for instant e-KYC. If you use Aadhaar e-KYC we'll request an OTP to your Aadhaar linked mobile. Aadhaar is not mandatory — manual KYC is available.",
+    "list": "Documents needed: PAN, Aadhaar (or other ID), address proof (utility bill/passport), bank details and cancelled cheque or bank statement. A passport photo is required for manual KYC."
+  },
+  "quick_intents": {
+    "forgot password": "Use the 'Forgot Password' link on the login page and follow OTP instructions. If you don't receive OTP, check spam or contact support."
+  }
+}
