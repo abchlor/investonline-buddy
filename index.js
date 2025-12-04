@@ -1,3 +1,8 @@
+app.get("/widget", (req, res) => {
+  res.sendFile(__dirname + "/server/widget.html");
+});
+
+
 require('dotenv').config();
 const express = require('express');
 const cors = require('cors');
