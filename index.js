@@ -23,6 +23,9 @@ const allowedOrigins = (process.env.ALLOWED_ORIGIN || "")
   .map(s => s.trim())
   .filter(Boolean);
 
+console.log("ALLOWED_ORIGIN ENV RAW:", process.env.ALLOWED_ORIGIN);
+console.log("Parsed allowedOrigins:", allowedOrigins);
+
 app.use(
   cors({
     origin: function (origin, callback) {
