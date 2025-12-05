@@ -1,155 +1,150 @@
-const { getSession, setSession } = require('./session_store');
-const flows = require('../flows/flows.json');
-const { callOpenAI } = require('./llm');
-const { matchScriptedResponse, containsInvestmentAdviceRequest } = require('./utils');
+/**
+ * server/chat_handler.js
+ *
+ * Exports: handleChat({ session_id, message, page, lang })
+ *
+ * Lightweight intent matcher using flows/flows.json
+ * - end-chat
+ * - session rate limiting per-session
+ * - intent match by keyword includes
+ * - fallback -> support block
+ *
+ * This keeps signature/recaptcha already enforced by index.js middleware.
+ */
 
-const SYSTEM_INSTRUCTIONS = `
-You are InvestOnline Buddy — an official onboarding and support assistant for InvestOnline.in.
+const fs = require("fs");
+const path = require("path");
 
-Allowed topics:
-- Registration, onboarding, KYC, SIP
-- Mutual fund flows supported by InvestOnline
-- InvestOnline website, tools, calculators
-- Blogs, articles, contact support
+const FLOWS_PATH = path.join(__dirname, "..", "flows", "flows.json");
+let flows = JSON.parse(fs.readFileSync(FLOWS_PATH, "utf8"));
 
-Website reference:
-- Blogs: https://www.investonline.in/blogs
-- SIP Calculator: https://www.investonline.in/sip-calculator
-- Lumpsum Calculator: https://www.investonline.in/lumpsum-calculator
-- Contact: https://www.investonline.in/contact-us
-- Registration: https://www.investonline.in/register
+// In-memory session tracking (per-server). If you have session_store, that remains initialized elsewhere.
+const sessions = new Map();
 
-Rules:
-- Do NOT provide investment advice.
-- Do NOT recommend funds.
-- Do NOT answer outside InvestOnline scope.
-- If asked an off-topic question, answer:
-  "I can help only with InvestOnline-related queries. Please ask me something about our services."
-`;
+const END_CHAT_KEYWORDS = ["end chat", "stop", "close chat"];
+const SESSION_MSG_LIMIT = 120; // per session lifetime cap
+const MIN_INTER_MESSAGE_MS = 200; // automation detection per-session
 
-const BLOCKED = [
-  "weather","movie","song","recipe","cricket","football",
-  "bollywood","hollywood","math","joke","politics","celebrity"
-];
+function now() {
+  return Date.now();
+}
 
-const isIrrelevant = m =>
-  BLOCKED.some(w => m.toLowerCase().includes(w));
+function touchSession(sessionId) {
+  let s = sessions.get(sessionId);
+  if (!s) {
+    s = {
+      createdAt: now(),
+      lastMessageAt: 0,
+      messageCount: 0,
+      token: Math.random().toString(36).slice(2, 8)
+    };
+    sessions.set(sessionId, s);
+  }
+  s.lastMessageAt = now();
+  s.messageCount = (s.messageCount || 0) + 1;
+  return s;
+}
 
-// helper: parse LLM lines "Question? | Button Label"
-function parseSuggestionLines(raw) {
-  if (!raw) return [];
-  const lines = raw.split('\n').map(l => l.trim()).filter(Boolean);
-  const labels = [];
-  for (const ln of lines) {
-    const parts = ln.split('|');
-    if (parts.length >= 2) {
-      labels.push(parts[1].trim());
-    } else {
-      // fallback: use the whole line as label (safe)
-      labels.push(ln);
+function clearSession(sessionId) {
+  sessions.delete(sessionId);
+}
+
+function matchIntentText(text) {
+  if (!text || typeof text !== "string") return null;
+  const lower = text.toLowerCase();
+
+  // check direct end commands
+  if (END_CHAT_KEYWORDS.includes(lower.trim())) {
+    return { type: "end_chat" };
+  }
+
+  // check flows.intents
+  const intents = flows.intents || {};
+  for (const [key, def] of Object.entries(intents)) {
+    const kws = def.keywords || [];
+    for (const kw of kws) {
+      if (!kw) continue;
+      if (lower.includes(kw.toLowerCase())) {
+        return { type: "intent", key, def };
+      }
     }
   }
-  return labels.slice(0, 3);
+
+  // check site level
+  if (flows.site) {
+    for (const [k, def] of Object.entries(flows.site)) {
+      const kws = def.keywords || [];
+      for (const kw of kws) {
+        if (!kw) continue;
+        if (lower.includes(kw.toLowerCase())) {
+          return { type: "site", key: k, def };
+        }
+      }
+    }
+  }
+
+  return null;
 }
 
-// Generate 3 action-chip labels using a tiny LLM prompt (gpt-4o-mini)
-async function generateActionChips(replyText) {
-  const prompt = `Generate up to 3 short follow-up suggestions strictly related to InvestOnline features and pages based on this reply:
+/**
+ * handleChat
+ * input:
+ *  - session_id: string
+ *  - message: string OR { text: string } (existing clients send string)
+ *  - page, lang optional
+ */
+async function handleChat({ session_id, message, page, lang, req }) {
+  // normalize message text
+  const text = typeof message === "string" ? message : (message && message.text) || "";
 
-"${replyText}"
+  // session basic validation
+  const sessionId = session_id || `anon_${Math.random().toString(36).slice(2,8)}`;
+  const session = touchSession(sessionId);
 
-Return ONLY lines in this exact format:
-Question? | Button Label
-
-Examples:
-How do I complete e-KYC? | Complete e-KYC
-Which documents are needed? | Required Documents
-
-Do NOT include general finance topics or external sites.`;
-
-  // callOpenAI enforces gpt-4o-mini in your llm.js
-  try {
-    const raw = await callOpenAI(prompt);
-    const labels = parseSuggestionLines(raw);
-    return labels;
-  } catch (e) {
-    console.error("Suggestion LLM error:", e);
-    return [];
-  }
-}
-
-async function handleChat({ session_id, message, page = "/", lang = "en" }) {
-  const session = (await getSession(session_id)) || { turns: [] };
-  session.turns.push({ role: 'user', text: message, ts: Date.now(), page });
-
-  // A) Off-topic filter
-  if (isIrrelevant(message)) {
-    const reply = "I can help only with InvestOnline-related queries. Please ask me something about our services.";
-    session.turns.push({ role: 'bot', text: reply });
-    await setSession(session_id, session);
-    return { reply, suggested: flows.quick_replies };
+  // per-session throttle
+  if (session.messageCount > SESSION_MSG_LIMIT) {
+    clearSession(sessionId);
+    return { error: "session_rate_limited", reply: "You've hit the message limit for this session. Start a new chat." };
   }
 
-  // B) Investment-advice blocking
-  if (containsInvestmentAdviceRequest(message)) {
-    const reply =
-      "I can't provide specific investment advice here. Would you like to open the AI Research Assistant instead?";
-    session.turns.push({ role: 'bot', text: reply });
-    await setSession(session_id, session);
-    return { reply, suggested: ["Open Research Assistant", "General info about SIP"] };
+  // per-session automation detection: messages too close together
+  const delta = now() - (session.lastMessageAt || 0);
+  if (delta < MIN_INTER_MESSAGE_MS) {
+    clearSession(sessionId);
+    return { error: "automated_activity", reply: "Looks like automated activity. Session closed." };
   }
 
-  // C) Page-aware (simple)
-  if (page.includes("sip") && message.toLowerCase().includes("how")) {
-    const reply =
-      "You're on the SIP page. SIP allows monthly investing. Want help calculating an amount or starting a SIP?";
-    session.turns.push({ role: "bot", text: reply });
-    await setSession(session_id, session);
-
-    // generate chips
-    const chips = await generateActionChips(reply);
-    const suggested = chips.length ? chips : ["Open SIP Calculator", "Benefits of SIP"];
-    return { reply, suggested };
+  // End chat handling
+  if (END_CHAT_KEYWORDS.includes(text.trim().toLowerCase())) {
+    clearSession(sessionId);
+    return { reply: "Session ended. Start again anytime." };
   }
 
-  // D) Scripted response (flows + site-wide search)
-  const scripted = matchScriptedResponse(message, flows);
-  if (scripted) {
-    const reply = scripted.response;
-    session.turns.push({ role: 'bot', text: reply });
-    await setSession(session_id, session);
+  // Intent matching
+  const match = matchIntentText(text);
+  if (match) {
+    if (match.type === "end_chat") {
+      clearSession(sessionId);
+      return { reply: "Session ended. Start again anytime." };
+    }
 
-    // Generate action chips (LLM). If it fails, use scripted suggestions.
-    const chips = await generateActionChips(reply);
-    const suggested = chips.length ? chips : (scripted.suggested || flows.quick_replies);
-    return { reply, suggested };
+    if (match.type === "intent") {
+      const def = match.def;
+      const resp = def.response || "";
+      const suggested = def.suggested || [];
+      return { reply: resp, suggested };
+    }
+
+    if (match.type === "site") {
+      const def = match.def;
+      return { reply: def.response || flows.global && flows.global.fallback_message, suggested: def.suggested || [] };
+    }
   }
 
-  // E) LLM fallback (domain-restricted) — full answer + suggestions
-  const context = session.turns.slice(-6)
-    .map(t => `${t.role === "user" ? "User" : "Bot"}: ${t.text}`)
-    .join("\n");
-
-  const prompt = `
-${SYSTEM_INSTRUCTIONS}
-
-Context:
-${context}
-
-User: ${message}
-
-Reply concisely and strictly according to the rules.`;
-
-  const llmResp = await callOpenAI(prompt);
-
-  session.turns.push({ role: 'bot', text: llmResp });
-  await setSession(session_id, session);
-
-  // generate action chips for the LLM reply
-  const chips = await generateActionChips(llmResp);
-  const suggested = chips.length ? chips : flows.quick_replies;
-
-  return { reply: llmResp, suggested };
+  // fallback
+  const fallback = (flows.global && flows.global.fallback_message) || "Sorry, I don't have that information.";
+  const support = (flows.global && flows.global.support_block) || {};
+  return { reply: `${fallback}\nEmail: ${support.email}\nPhone: ${support.phone_primary}` };
 }
 
 module.exports = { handleChat };
