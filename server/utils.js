@@ -1,139 +1,122 @@
-// ---------------------------------------------------------
-// 1. Block investment advice requests
-// ---------------------------------------------------------
-function containsInvestmentAdviceRequest(text) {
-  const adviceKeywords = [
-    "which fund",
-    "recommend",
-    "suggest a fund",
-    "best mutual fund",
-    "best sip",
-    "what should i invest",
-    "should i invest",
-    "give advice",
-    "portfolio advice"
-  ];
+/**
+ * server/utils.js
+ *
+ * - verifySignature(secret, timestamp, body, signatureHex)
+ * - verifyRecaptcha(secret, token)
+ * - rateLimitMiddleware()  -> IP-based
+ * - detectAutomationMiddleware() -> payload heuristics
+ *
+ * uses node-fetch
+ */
 
-  const t = text.toLowerCase();
-  return adviceKeywords.some(k => t.includes(k));
+const crypto = require("crypto");
+const fetch = require("node-fetch");
+
+const IP_RATE_LIMIT_PER_MIN = parseInt(process.env.IP_RATE_LIMIT_PER_MINUTE || "60", 10);
+const IP_RATE_LIMIT_PER_HOUR = parseInt(process.env.IP_RATE_LIMIT_PER_HOUR || "1200", 10);
+
+const ipMap = new Map();
+
+/**
+ * verifySignature
+ * expects HMAC-SHA256 hex over `${timestamp}.${bodyString}`
+ * Returns boolean
+ */
+function verifySignature(secret, timestamp, body, signatureHex) {
+  if (!secret) return false;
+  const ts = parseInt(timestamp, 10);
+  if (isNaN(ts)) return false;
+
+  // allow 5 minute skew
+  const now = Date.now();
+  if (Math.abs(now - ts) > 1000 * 60 * 5) return false;
+
+  const bodyString = typeof body === "string" ? body : JSON.stringify(body || {});
+  const payload = `${timestamp}.${bodyString}`;
+  const h = crypto.createHmac("sha256", secret).update(payload).digest("hex");
+
+  try {
+    return crypto.timingSafeEqual(Buffer.from(h, "hex"), Buffer.from(signatureHex, "hex"));
+  } catch (e) {
+    return false;
+  }
 }
 
-// ---------------------------------------------------------
-// 2. Normalize text for matching
-// ---------------------------------------------------------
-function normalize(txt) {
-  return txt
-    .toLowerCase()
-    .replace(/[^\w\s]/g, "")
-    .trim();
+/**
+ * verifyRecaptcha
+ * Returns score (0..1) or throws
+ */
+async function verifyRecaptcha(secret, token) {
+  if (!secret) throw new Error("Recaptcha secret not configured");
+  const url = "https://www.google.com/recaptcha/api/siteverify";
+  const params = new URLSearchParams();
+  params.append("secret", secret);
+  params.append("response", token);
+
+  const resp = await fetch(url, { method: "POST", body: params });
+  if (!resp.ok) throw new Error("Recaptcha request failed");
+  const data = await resp.json();
+  if (!data.success) {
+    throw new Error("Recaptcha verification failed");
+  }
+  return data.score || 0;
 }
 
-// ---------------------------------------------------------
-// 3. Flexible intent + site-section matcher
-// ---------------------------------------------------------
-function matchScriptedResponse(message, flows) {
-  const msg = normalize(message);
-
-  // A) QUICK INTENTS
-  if (flows.quick_intents) {
-    for (const key in flows.quick_intents) {
-      const normKey = normalize(key);
-      if (msg.includes(normKey)) {
-        return {
-          response: flows.quick_intents[key],
-          suggested: flows.quick_replies || []
-        };
-      }
+/**
+ * rateLimitMiddleware
+ * simple IP windowing (in-memory). For production, use Redis.
+ */
+function rateLimitMiddleware() {
+  return (req, res, next) => {
+    const ip = (req.ip || req.headers["x-forwarded-for"] || req.connection.remoteAddress || "unknown").split(",")[0].trim();
+    const now = Date.now();
+    let rec = ipMap.get(ip);
+    if (!rec) {
+      rec = { minuteTs: now, hourTs: now, minuteCount: 0, hourCount: 0 };
+      ipMap.set(ip, rec);
     }
-  }
-
-  // B) MAIN INTENTS (KYC, SIP, login, support, etc.)
-  if (flows.intents) {
-    for (const name in flows.intents) {
-      const intent = flows.intents[name];
-      const allKeywords = [
-        ...(intent.keywords || []),
-        ...(intent.synonyms || [])
-      ].map(normalize);
-
-      const matched = allKeywords.some(kw => msg.includes(kw));
-
-      if (matched) {
-        return {
-          response: intent.response,
-          suggested: intent.suggested || flows.quick_replies || []
-        };
-      }
+    // reset windows
+    if (now - rec.minuteTs > 60000) {
+      rec.minuteTs = now;
+      rec.minuteCount = 0;
     }
-  }
-
-  // C) SITE-LEVEL INTENTS (blogs, tools, contact)
-  if (flows.site) {
-    for (const name in flows.site) {
-      const intent = flows.site[name];
-      const allKeywords = [
-        ...(intent.keywords || []),
-        ...(intent.synonyms || [])
-      ].map(normalize);
-
-      if (allKeywords.some(kw => msg.includes(kw))) {
-        return {
-          response: intent.response,
-          suggested: intent.suggested || flows.quick_replies || []
-        };
-      }
+    if (now - rec.hourTs > 3600000) {
+      rec.hourTs = now;
+      rec.hourCount = 0;
     }
-  }
+    rec.minuteCount += 1;
+    rec.hourCount += 1;
+    if (rec.minuteCount > IP_RATE_LIMIT_PER_MIN || rec.hourCount > IP_RATE_LIMIT_PER_HOUR) {
+      return res.status(429).json({ error: "Too many requests" });
+    }
+    next();
+  };
+}
 
-  // D) FALLBACK RULES (for common phrases not covered in intents)
-  const t = msg;
-
-  if (/register|sign up|open account/.test(t)) {
-    return {
-      response: flows.onboarding.register,
-      suggested: flows.quick_replies
-    };
-  }
-
-  if (/kyc|ekyc|what is kyc/.test(t)) {
-    return {
-      response: flows.onboarding.kyc,
-      suggested: flows.quick_replies
-    };
-  }
-
-  if (/pan|pan card/.test(t)) {
-    return {
-      response: flows.documents.pan,
-      suggested: flows.quick_replies
-    };
-  }
-
-  if (/aadhaar|aadhar/.test(t)) {
-    return {
-      response: flows.documents.aadhaar,
-      suggested: flows.quick_replies
-    };
-  }
-
-  if (/documents|what documents/.test(t)) {
-    return {
-      response: flows.documents.list,
-      suggested: flows.quick_replies
-    };
-  }
-
-  if (/how long|time to register|how long takes/.test(t)) {
-    return {
-      response: flows.onboarding.time,
-      suggested: flows.quick_replies
-    };
-  }
-
-  return null; // no intent matched → LLM fallback
+/**
+ * detectAutomationMiddleware
+ * lightweight payload and header heuristics
+ */
+function detectAutomationMiddleware() {
+  return (req, res, next) => {
+    // payload length
+    const raw = req.body;
+    if (raw && typeof raw === "string" && raw.length > 1500 * 10) {
+      return res.status(400).json({ error: "Payload too large" });
+    }
+    // suspicious User-Agent (missing or extremely short)
+    const ua = (req.headers["user-agent"] || "").toString();
+    if (!ua || ua.length < 8) {
+      // Strict mode: block if UA is missing
+      return res.status(403).json({ error: "Client not allowed" });
+    }
+    next();
+  };
 }
 
 module.exports = {
-  containsInvestmentAdviceRequest,
-  matchScriptedResponse
+  verifySignature,
+  verifyRecaptcha,
+  rateLimitMiddleware,
+  detectAutomationMiddleware
 };
