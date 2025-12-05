@@ -81,7 +81,7 @@ app.use(detectAutomationMiddleware()); // payload heuristics
 
 // ---- Landing page at / (simple) ----
 app.get("/", (req, res) => {
-  res.sendFile(path.join(__dirname, "server", "landing.html"));
+  res.sendFile(path.join(__dirname, "server", "widget.html"));
 });
 
 // ---- Session start: issues a signed, encrypted session token and a short-lived client_key ----
