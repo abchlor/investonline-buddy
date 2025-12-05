@@ -11,8 +11,28 @@ const { initSessionStore } = require("./server/session_store");
 
 const app = express();
 
-// ---- Basic security ----
-app.use(helmet());
+// ---- Basic security with IFRAME support ----
+app.use(
+  helmet({
+    contentSecurityPolicy: false,  // Disable default CSP
+    frameguard: false              // Disable X-Frame-Options
+  })
+);
+
+// Custom CSP and frame-ancestors headers
+app.use((req, res, next) => {
+  // Allow iframe embedding from your domains
+  res.setHeader(
+    'Content-Security-Policy',
+    "frame-ancestors 'self' https://beta.investonline.in https://www.investonline.in https://investonline.in"
+  );
+  
+  // Fallback for older browsers
+  res.removeHeader('X-Frame-Options');
+  
+  next();
+});
+
 app.use(express.json({ limit: "64kb" }));
 app.use(morgan("tiny"));
 
@@ -27,12 +47,19 @@ console.log("Allowed origins:", allowedOrigins);
 app.use(
   cors({
     origin: function (origin, callback) {
+      // Allow requests with no origin (like mobile apps or same-origin)
       if (!origin) return callback(null, true);
-      if (allowedOrigins.includes(origin)) return callback(null, true);
+      
+      if (allowedOrigins.includes(origin)) {
+        return callback(null, true);
+      }
 
       console.log("❌ Blocked by CORS:", origin);
       callback(new Error("Not allowed by CORS"));
-    }
+    },
+    credentials: true,  // Important for cookies/sessions
+    methods: ['GET', 'POST', 'OPTIONS'],
+    allowedHeaders: ['Content-Type', 'Authorization']
   })
 );
 
@@ -74,4 +101,5 @@ app.post("/feedback", (req, res) => {
 const PORT = process.env.PORT || 8080;
 app.listen(PORT, () => {
   console.log(`InvestOnline Buddy running on ${PORT}`);
+  console.log(`Iframe embedding allowed for: ${allowedOrigins.join(', ')}`);
 });
