@@ -1,3 +1,24 @@
+// ---------------------------------------------------------------------------
+// 1. Detect Investment Advice Requests (kept from your original code)
+// ---------------------------------------------------------------------------
+function containsInvestmentAdviceRequest(text) {
+  const advKeywords = [
+    "recommend",
+    "which fund",
+    "advice",
+    "suggest a fund",
+    "which sip",
+    "what should i invest",
+    "best fund",
+    "should i invest"
+  ];
+  const t = text.toLowerCase();
+  return advKeywords.some(k => t.includes(k));
+}
+
+// ---------------------------------------------------------------------------
+// 2. Helpers for normalizing text
+// ---------------------------------------------------------------------------
 function normalize(text) {
   return text
     .toLowerCase()
@@ -5,10 +26,13 @@ function normalize(text) {
     .trim();
 }
 
+// ---------------------------------------------------------------------------
+// 3. Improved fuzzy intent matcher (new logic)
+// ---------------------------------------------------------------------------
 function matchScriptedResponse(message, flows) {
   const msg = normalize(message);
 
-  // 1) Exact quick-intents (existing behavior preserved)
+  // ---- (A) Quick intents (simple keyword matches)
   if (flows.quick_intents) {
     for (const key of Object.keys(flows.quick_intents)) {
       if (msg.includes(normalize(key))) {
@@ -17,7 +41,7 @@ function matchScriptedResponse(message, flows) {
     }
   }
 
-  // 2) Intent-based fuzzy matching
+  // ---- (B) Fuzzy intents with keywords + synonyms
   if (flows.intents) {
     for (const intentName in flows.intents) {
       const intent = flows.intents[intentName];
@@ -33,17 +57,36 @@ function matchScriptedResponse(message, flows) {
     }
   }
 
-  // 3) Legacy onboard/document matching (keep your existing flows)
+  // -----------------------------------------------------------------------
+  // (C) Legacy fallback rules (keeps your existing flows working)
+  // -----------------------------------------------------------------------
   const t = msg;
 
-  if (/register|sign up|open account/.test(t)) return flows.onboarding.register;
-  if (/kyc|ekyc|what is kyc/.test(t)) return flows.onboarding.kyc;
-  if (/pan|pan card/.test(t)) return flows.documents.pan;
-  if (/aadhaar|aadhar/.test(t)) return flows.documents.aadhaar;
-  if (/documents|what documents/.test(t)) return flows.documents.list;
-  if (/how long|time to register|how long takes/.test(t)) return flows.onboarding.time;
+  // Registration cycle
+  if (/register|sign up|open account/.test(t)) return flows.onboarding?.register;
+
+  // KYC variations
+  if (/kyc|ekyc|what is kyc/.test(t)) return flows.onboarding?.kyc;
+
+  // PAN
+  if (/pan|pan card/.test(t)) return flows.documents?.pan;
+
+  // Aadhaar
+  if (/aadhaar|aadhar/.test(t)) return flows.documents?.aadhaar;
+
+  // Document list
+  if (/documents|what documents/.test(t)) return flows.documents?.list;
+
+  // Time to register
+  if (/how long|time to register|how long takes/.test(t)) return flows.onboarding?.time;
 
   return null;
 }
 
-module.exports = { containsInvestmentAdviceRequest, matchScriptedResponse };
+// ---------------------------------------------------------------------------
+// 4. Export both functions
+// ---------------------------------------------------------------------------
+module.exports = {
+  containsInvestmentAdviceRequest,
+  matchScriptedResponse
+};
