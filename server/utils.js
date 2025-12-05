@@ -1,35 +1,44 @@
-// ---------------------------
-// 1. Detect investment advice
-// ---------------------------
+// ---------------------------------------------------------
+// 1. Block investment advice requests
+// ---------------------------------------------------------
 function containsInvestmentAdviceRequest(text) {
-  const advKeywords = [
-    "recommend", "which fund", "advice", "suggest a fund",
-    "which sip", "what should i invest", "best fund", "should i invest"
+  const adviceKeywords = [
+    "which fund",
+    "recommend",
+    "suggest a fund",
+    "best mutual fund",
+    "best sip",
+    "what should i invest",
+    "should i invest",
+    "give advice",
+    "portfolio advice"
   ];
+
   const t = text.toLowerCase();
-  return advKeywords.some(k => t.includes(k));
+  return adviceKeywords.some(k => t.includes(k));
 }
 
-// ---------------------------
-// 2. Normalizer
-// ---------------------------
-function normalize(text) {
-  return text
+// ---------------------------------------------------------
+// 2. Normalize text for matching
+// ---------------------------------------------------------
+function normalize(txt) {
+  return txt
     .toLowerCase()
     .replace(/[^\w\s]/g, "")
     .trim();
 }
 
-// ---------------------------
-// 3. Fuzzy intent + site search
-// ---------------------------
+// ---------------------------------------------------------
+// 3. Flexible intent + site-section matcher
+// ---------------------------------------------------------
 function matchScriptedResponse(message, flows) {
   const msg = normalize(message);
 
-  // A) quick intents
+  // A) QUICK INTENTS
   if (flows.quick_intents) {
     for (const key in flows.quick_intents) {
-      if (msg.includes(normalize(key))) {
+      const normKey = normalize(key);
+      if (msg.includes(normKey)) {
         return {
           response: flows.quick_intents[key],
           suggested: flows.quick_replies || []
@@ -38,13 +47,18 @@ function matchScriptedResponse(message, flows) {
     }
   }
 
-  // B) intents (KYC, SIP, login, support etc.)
+  // B) MAIN INTENTS (KYC, SIP, login, support, etc.)
   if (flows.intents) {
     for (const name in flows.intents) {
       const intent = flows.intents[name];
-      const keywords = [...(intent.keywords || []), ...(intent.synonyms || [])].map(normalize);
+      const allKeywords = [
+        ...(intent.keywords || []),
+        ...(intent.synonyms || [])
+      ].map(normalize);
 
-      if (keywords.some(k => msg.includes(k))) {
+      const matched = allKeywords.some(kw => msg.includes(kw));
+
+      if (matched) {
         return {
           response: intent.response,
           suggested: intent.suggested || flows.quick_replies || []
@@ -53,13 +67,16 @@ function matchScriptedResponse(message, flows) {
     }
   }
 
-  // C) site-wide search (blogs, calculators, contact)
+  // C) SITE-LEVEL INTENTS (blogs, tools, contact)
   if (flows.site) {
     for (const name in flows.site) {
       const intent = flows.site[name];
-      const keywords = [...(intent.keywords || []), ...(intent.synonyms || [])].map(normalize);
+      const allKeywords = [
+        ...(intent.keywords || []),
+        ...(intent.synonyms || [])
+      ].map(normalize);
 
-      if (keywords.some(k => msg.includes(k))) {
+      if (allKeywords.some(kw => msg.includes(kw))) {
         return {
           response: intent.response,
           suggested: intent.suggested || flows.quick_replies || []
@@ -68,28 +85,52 @@ function matchScriptedResponse(message, flows) {
     }
   }
 
-  // D) legacy fallback
+  // D) FALLBACK RULES (for common phrases not covered in intents)
   const t = msg;
 
-  if (/register|sign up|open account/.test(t))
-    return { response: flows.onboarding.register, suggested: flows.quick_replies };
+  if (/register|sign up|open account/.test(t)) {
+    return {
+      response: flows.onboarding.register,
+      suggested: flows.quick_replies
+    };
+  }
 
-  if (/kyc|ekyc|what is kyc/.test(t))
-    return { response: flows.onboarding.kyc, suggested: flows.quick_replies };
+  if (/kyc|ekyc|what is kyc/.test(t)) {
+    return {
+      response: flows.onboarding.kyc,
+      suggested: flows.quick_replies
+    };
+  }
 
-  if (/pan|pan card/.test(t))
-    return { response: flows.documents.pan, suggested: flows.quick_replies };
+  if (/pan|pan card/.test(t)) {
+    return {
+      response: flows.documents.pan,
+      suggested: flows.quick_replies
+    };
+  }
 
-  if (/aadhaar|aadhar/.test(t))
-    return { response: flows.documents.aadhaar, suggested: flows.quick_replies };
+  if (/aadhaar|aadhar/.test(t)) {
+    return {
+      response: flows.documents.aadhaar,
+      suggested: flows.quick_replies
+    };
+  }
 
-  if (/documents|what documents/.test(t))
-    return { response: flows.documents.list, suggested: flows.quick_replies };
+  if (/documents|what documents/.test(t)) {
+    return {
+      response: flows.documents.list,
+      suggested: flows.quick_replies
+    };
+  }
 
-  if (/how long|time to register|how long takes/.test(t))
-    return { response: flows.onboarding.time, suggested: flows.quick_replies };
+  if (/how long|time to register|how long takes/.test(t)) {
+    return {
+      response: flows.onboarding.time,
+      suggested: flows.quick_replies
+    };
+  }
 
-  return null;
+  return null; // no intent matched → LLM fallback
 }
 
 module.exports = {
