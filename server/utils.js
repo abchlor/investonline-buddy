@@ -38,7 +38,7 @@ function matchScriptedResponse(message, flows) {
     }
   }
 
-  // B) intents (KYC, SIP, login)
+  // B) intents (KYC, SIP, login, support etc.)
   if (flows.intents) {
     for (const name in flows.intents) {
       const intent = flows.intents[name];
