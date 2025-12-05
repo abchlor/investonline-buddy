@@ -1,24 +1,18 @@
-// ---------------------------------------------------------------------------
-// 1. Detect Investment Advice Requests (kept from your original code)
-// ---------------------------------------------------------------------------
+// ---------------------------
+// 1. Detect investment advice
+// ---------------------------
 function containsInvestmentAdviceRequest(text) {
   const advKeywords = [
-    "recommend",
-    "which fund",
-    "advice",
-    "suggest a fund",
-    "which sip",
-    "what should i invest",
-    "best fund",
-    "should i invest"
+    "recommend", "which fund", "advice", "suggest a fund",
+    "which sip", "what should i invest", "best fund", "should i invest"
   ];
   const t = text.toLowerCase();
   return advKeywords.some(k => t.includes(k));
 }
 
-// ---------------------------------------------------------------------------
-// 2. Helpers for normalizing text
-// ---------------------------------------------------------------------------
+// ---------------------------
+// 2. Normalizer
+// ---------------------------
 function normalize(text) {
   return text
     .toLowerCase()
@@ -26,66 +20,78 @@ function normalize(text) {
     .trim();
 }
 
-// ---------------------------------------------------------------------------
-// 3. Improved fuzzy intent matcher (new logic)
-// ---------------------------------------------------------------------------
+// ---------------------------
+// 3. Fuzzy intent + site search
+// ---------------------------
 function matchScriptedResponse(message, flows) {
   const msg = normalize(message);
 
-  // ---- (A) Quick intents (simple keyword matches)
+  // A) quick intents
   if (flows.quick_intents) {
-    for (const key of Object.keys(flows.quick_intents)) {
+    for (const key in flows.quick_intents) {
       if (msg.includes(normalize(key))) {
-        return flows.quick_intents[key];
+        return {
+          response: flows.quick_intents[key],
+          suggested: flows.quick_replies || []
+        };
       }
     }
   }
 
-  // ---- (B) Fuzzy intents with keywords + synonyms
+  // B) intents (KYC, SIP, login)
   if (flows.intents) {
-    for (const intentName in flows.intents) {
-      const intent = flows.intents[intentName];
-      const keywords = (intent.keywords || []).map(normalize);
-      const synonyms = (intent.synonyms || []).map(normalize);
-      const triggers = [...keywords, ...synonyms];
+    for (const name in flows.intents) {
+      const intent = flows.intents[name];
+      const keywords = [...(intent.keywords || []), ...(intent.synonyms || [])].map(normalize);
 
-      for (const t of triggers) {
-        if (msg.includes(t)) {
-          return intent.response;
-        }
+      if (keywords.some(k => msg.includes(k))) {
+        return {
+          response: intent.response,
+          suggested: intent.suggested || flows.quick_replies || []
+        };
       }
     }
   }
 
-  // -----------------------------------------------------------------------
-  // (C) Legacy fallback rules (keeps your existing flows working)
-  // -----------------------------------------------------------------------
+  // C) site-wide search (blogs, calculators, contact)
+  if (flows.site) {
+    for (const name in flows.site) {
+      const intent = flows.site[name];
+      const keywords = [...(intent.keywords || []), ...(intent.synonyms || [])].map(normalize);
+
+      if (keywords.some(k => msg.includes(k))) {
+        return {
+          response: intent.response,
+          suggested: intent.suggested || flows.quick_replies || []
+        };
+      }
+    }
+  }
+
+  // D) legacy fallback
   const t = msg;
 
-  // Registration cycle
-  if (/register|sign up|open account/.test(t)) return flows.onboarding?.register;
+  if (/register|sign up|open account/.test(t))
+    return { response: flows.onboarding.register, suggested: flows.quick_replies };
 
-  // KYC variations
-  if (/kyc|ekyc|what is kyc/.test(t)) return flows.onboarding?.kyc;
+  if (/kyc|ekyc|what is kyc/.test(t))
+    return { response: flows.onboarding.kyc, suggested: flows.quick_replies };
 
-  // PAN
-  if (/pan|pan card/.test(t)) return flows.documents?.pan;
+  if (/pan|pan card/.test(t))
+    return { response: flows.documents.pan, suggested: flows.quick_replies };
 
-  // Aadhaar
-  if (/aadhaar|aadhar/.test(t)) return flows.documents?.aadhaar;
+  if (/aadhaar|aadhar/.test(t))
+    return { response: flows.documents.aadhaar, suggested: flows.quick_replies };
 
-  // Document list
-  if (/documents|what documents/.test(t)) return flows.documents?.list;
+  if (/documents|what documents/.test(t))
+    return { response: flows.documents.list, suggested: flows.quick_replies };
 
-  // Time to register
-  if (/how long|time to register|how long takes/.test(t)) return flows.onboarding?.time;
+  if (/how long|time to register|how long takes/.test(t))
+    return { response: flows.onboarding.time, suggested: flows.quick_replies };
 
   return null;
 }
 
-// ---------------------------------------------------------------------------
-// 4. Export both functions
-// ---------------------------------------------------------------------------
 module.exports = {
   containsInvestmentAdviceRequest,
   matchScriptedResponse
