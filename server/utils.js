@@ -1,22 +1,48 @@
-function containsInvestmentAdviceRequest(text) {
-  const advKeywords = ['recommend', 'which fund', 'advice', 'suggest a fund', 'which sip', 'what should i invest', 'best fund', 'should i invest'];
-  const t = text.toLowerCase();
-  return advKeywords.some(k => t.includes(k));
+function normalize(text) {
+  return text
+    .toLowerCase()
+    .replace(/[^\w\s]/g, "")
+    .trim();
 }
 
-function matchScriptedResponse(text, flows) {
-  const t = text.toLowerCase().trim();
-  // 1. exact matches for quick intents
+function matchScriptedResponse(message, flows) {
+  const msg = normalize(message);
+
+  // 1) Exact quick-intents (existing behavior preserved)
+  if (flows.quick_intents) {
+    for (const key of Object.keys(flows.quick_intents)) {
+      if (msg.includes(normalize(key))) {
+        return flows.quick_intents[key];
+      }
+    }
+  }
+
+  // 2) Intent-based fuzzy matching
+  if (flows.intents) {
+    for (const intentName in flows.intents) {
+      const intent = flows.intents[intentName];
+      const keywords = (intent.keywords || []).map(normalize);
+      const synonyms = (intent.synonyms || []).map(normalize);
+      const triggers = [...keywords, ...synonyms];
+
+      for (const t of triggers) {
+        if (msg.includes(t)) {
+          return intent.response;
+        }
+      }
+    }
+  }
+
+  // 3) Legacy onboard/document matching (keep your existing flows)
+  const t = msg;
+
   if (/register|sign up|open account/.test(t)) return flows.onboarding.register;
-  if (/kyc|what is kyc/.test(t)) return flows.onboarding.kyc;
+  if (/kyc|ekyc|what is kyc/.test(t)) return flows.onboarding.kyc;
   if (/pan|pan card/.test(t)) return flows.documents.pan;
   if (/aadhaar|aadhar/.test(t)) return flows.documents.aadhaar;
   if (/documents|what documents/.test(t)) return flows.documents.list;
   if (/how long|time to register|how long takes/.test(t)) return flows.onboarding.time;
-  // fallback: check for keywords in each flow entry
-  for (const k of Object.keys(flows.quick_intents || {})) {
-    if (t.includes(k)) return flows.quick_intents[k];
-  }
+
   return null;
 }
 
