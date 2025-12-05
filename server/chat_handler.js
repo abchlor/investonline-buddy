@@ -3,98 +3,104 @@ const flows = require('../flows/flows.json');
 const { callOpenAI } = require('./llm');
 const { matchScriptedResponse, containsInvestmentAdviceRequest } = require('./utils');
 
-// Strict system guardrails for InvestOnline
 const SYSTEM_INSTRUCTIONS = `
 You are InvestOnline Buddy — an official onboarding and support assistant for InvestOnline.in.
 
-You MUST stay within this scope:
-- InvestOnline website, app, login, account creation
-- KYC, SIP, onboarding process, documentation
-- Mutual fund processes supported by InvestOnline only
-- FAQs, forms, service features, portal/app navigation
+Allowed topics:
+- Registration, onboarding, KYC, SIP
+- Mutual fund flows supported by InvestOnline
+- InvestOnline website, tools, calculators
+- Blogs, articles, contact support
 
-If user asks ANYTHING outside this scope, reply exactly:
-"I can help only with InvestOnline-related queries. Please ask me something about our services."
+Website reference:
+- Blogs: https://www.investonline.in/blogs
+- SIP Calculator: https://www.investonline.in/sip-calculator
+- Lumpsum Calculator: https://www.investonline.in/lumpsum-calculator
+- Contact: https://www.investonline.in/contact-us
+- Registration: https://www.investonline.in/register
 
-Do NOT:
-- give investment advice
-- recommend specific mutual funds
-- generate content unrelated to InvestOnline
-- answer personal finance questions outside InvestOnline processes
-- guess facts; answer only what InvestOnline supports
+Rules:
+- Do NOT provide investment advice.
+- Do NOT recommend funds.
+- Do NOT answer outside InvestOnline scope.
+- If asked an off-topic question, answer:
+  "I can help only with InvestOnline-related queries. Please ask me something about our services."
 `;
 
-// Off-topic keyword filter
-const BLOCKED_KEYWORDS = [
-  "weather","movie","song","recipe","cooking","football","cricket",
-  "bollywood","hollywood","music","math","joke","riddle","politics",
-  "celebrity","sports","news","random","science","geography","history"
+const BLOCKED = [
+  "weather","movie","song","recipe","cricket","football",
+  "bollywood","hollywood","math","joke","politics","celebrity"
 ];
 
-function isIrrelevant(text) {
-  const m = text.toLowerCase();
-  return BLOCKED_KEYWORDS.some(w => m.includes(w));
-}
+const isIrrelevant = m =>
+  BLOCKED.some(w => m.toLowerCase().includes(w));
 
-async function handleChat({ session_id, message, page, lang }) {
+async function handleChat({ session_id, message, page = "/", lang = "en" }) {
   const session = (await getSession(session_id)) || { turns: [] };
   session.turns.push({ role: 'user', text: message, ts: Date.now(), page });
 
-  // 0) Off-topic suppression BEFORE anything else
+  // A) Off-topic filter
   if (isIrrelevant(message)) {
-    const fallback = "I can help only with InvestOnline-related queries. Please ask me something about our services.";
-    session.turns.push({ role: 'bot', text: fallback });
+    const reply = "I can help only with InvestOnline-related queries. Please ask me something about our services.";
+    session.turns.push({ role: 'bot', text: reply });
     await setSession(session_id, session);
-    return { reply: fallback, suggested: flows.quick_replies || [] };
+    return { reply, suggested: flows.quick_replies };
   }
 
-  // 1) Safety: Investment advice check
+  // B) Investment-advice blocking
   if (containsInvestmentAdviceRequest(message)) {
-    const redirectText =
-      "I can't provide specific investment advice here. For personalised recommendations, please use our AI Research Assistant or connect with our financial advisor. Would you like me to open the Research Assistant?";
-    session.turns.push({ role: 'bot', text: redirectText });
+    const reply =
+      "I can't provide specific investment advice here. Would you like to open the AI Research Assistant instead?";
+    session.turns.push({ role: 'bot', text: reply });
     await setSession(session_id, session);
-    return {
-      reply: redirectText,
-      suggested: ["Open Research Assistant", "General info about SIP"]
-    };
+    return { reply, suggested: ["Open Research Assistant", "General info about SIP"] };
   }
 
-  // 2) Deterministic scripted responses (your flows.json)
+  // C) Page-aware (optional, easy to expand)
+  if (page.includes("sip") && message.toLowerCase().includes("how")) {
+    const reply =
+      "You're on the SIP page. SIP allows monthly investing. Want help calculating an amount or starting a SIP?";
+    session.turns.push({ role: "bot", text: reply });
+    await setSession(session_id, session);
+    return { reply, suggested: ["Open SIP Calculator", "Benefits of SIP"] };
+  }
+
+  // D) Scripted response (flows + site-wide search)
   const scripted = matchScriptedResponse(message, flows);
   if (scripted) {
-    session.turns.push({ role: 'bot', text: scripted });
+    const reply = scripted.response;
+    const suggested = scripted.suggested;
+
+    session.turns.push({ role: 'bot', text: reply });
     await setSession(session_id, session);
-    return { reply: scripted, suggested: flows.quick_replies || [] };
+
+    return { reply, suggested };
   }
 
-  // 3) LLM fallback (short, controlled context)
-  const context = session.turns
-    .slice(-6)
-    .map(t => `${t.role === 'user' ? 'User' : 'Bot'}: ${t.text}`)
-    .join('\n');
+  // E) LLM fallback (domain-restricted)
+  const context = session.turns.slice(-6)
+    .map(t => `${t.role === "user" ? "User" : "Bot"}: ${t.text}`)
+    .join("\n");
 
-  const prompt =
-`${SYSTEM_INSTRUCTIONS}
+  const prompt = `
+${SYSTEM_INSTRUCTIONS}
 
 Context:
 ${context}
 
 User: ${message}
+Reply concisely and strictly according to the rules.
+`;
 
-Reply:`;
+  const llmResp = await callOpenAI(prompt);
 
-  // 4) Call LLM (mini model enforced)
-  const llmResp = await callOpenAI(prompt, "gpt-4o-mini");
-
-  // Save and return
   session.turns.push({ role: 'bot', text: llmResp });
   await setSession(session_id, session);
 
-  return {
-    reply: llmResp,
-    suggested: flows.quick_replies || []
-  };
+  // F) Optional: AI-generated suggestions (currently OFF)
+  const suggested = flows.quick_replies;
+
+  return { reply: llmResp, suggested };
 }
 
 module.exports = { handleChat };
