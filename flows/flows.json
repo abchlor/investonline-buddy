@@ -1,16 +1,37 @@
 {
   "quick_replies": ["Start Registration", "What is KYC?", "Documents Needed", "Talk to Support"],
+
+  "intents": {
+    "kyc": {
+      "keywords": ["kyc", "ekyc", "update kyc", "kyc check"],
+      "synonyms": ["verify identity", "complete kyc", "kyc process"],
+      "response": "KYC is required for mutual fund investing. You can do instant e-KYC using Aadhaar OTP or upload documents manually (24–48 hours). Want me to show you how?"
+    },
+    "sip": {
+      "keywords": ["sip", "start sip", "monthly sip"],
+      "synonyms": ["systematic investment", "how to do sip"],
+      "response": "A SIP lets you invest monthly in mutual funds. You can set it up from your InvestOnline dashboard. Want help with the steps?"
+    },
+    "login_help": {
+      "keywords": ["login", "sign in", "password"],
+      "synonyms": ["can't login", "forgot password", "login issue"],
+      "response": "If you're having trouble logging in, you can reset your password using your registered mobile/email. Would you like the reset page?"
+    }
+  },
+
   "onboarding": {
-    "register": "To start registration: you'll need PAN, Aadhaar (for e-KYC) or alternate address proof, bank details and a cancelled cheque. Registration typically takes 6-8 minutes. Would you like the registration page?",
-    "kyc": "KYC (Know Your Customer) verifies your identity and is mandatory for investing. You can do instant e-KYC with Aadhaar (OTP) or upload documents (24-48 hours). Which would you prefer?",
-    "time": "Most users complete registration in 6-8 minutes using Aadhaar e-KYC. Manual upload takes 24-48 hours for verification."
+    "register": "To start registration: you'll need PAN, Aadhaar (for e-KYC) or alternate address proof, bank details and a cancelled cheque. Registration typically takes 6–8 minutes. Want to open the registration page?",
+    "kyc": "KYC (Know Your Customer) verifies your identity and is mandatory for investing. You can do instant e-KYC with Aadhaar OTP or upload documents manually. Which method would you prefer?",
+    "time": "Most users complete registration in 6–8 minutes using Aadhaar e-KYC. Manual upload takes 24–48 hours."
   },
+
   "documents": {
-    "pan": "PAN is mandatory to invest. You only need the PAN number — not the physical card. If you don't have PAN, you can apply at the official PAN portals.",
-    "aadhaar": "Aadhaar is recommended for instant e-KYC. If you use Aadhaar e-KYC we'll request an OTP to your Aadhaar linked mobile. Aadhaar is not mandatory — manual KYC is available.",
-    "list": "Documents needed: PAN, Aadhaar (or other ID), address proof (utility bill/passport), bank details and cancelled cheque or bank statement. A passport photo is required for manual KYC."
+    "pan": "PAN is mandatory to invest. You only need the PAN number — not the physical card. If you don't have PAN, you can apply online.",
+    "aadhaar": "Aadhaar enables instant e-KYC via OTP. Aadhaar is not mandatory; manual KYC is available.",
+    "list": "Documents needed: PAN, Aadhaar or alternate ID, address proof, bank details, and a passport photo (manual KYC only)."
   },
+
   "quick_intents": {
-    "forgot password": "Use the 'Forgot Password' link on the login page and follow OTP instructions. If you don't receive OTP, check spam or contact support."
+    "forgot password": "Use the 'Forgot Password' option on the login page and follow OTP instructions."
   }
 }
