@@ -30,13 +30,13 @@
 
     "email_support": {
       "keywords": ["email support", "support email"],
-      "response": "You can email our support team at support@investonline.in.",
+      "response": "You can email us at wealth@investonline.in.",
       "suggested": ["Call support", "Talk to advisor", "Back to Help Center"]
     },
 
     "call_support": {
       "keywords": ["call support", "phone support", "call us"],
-      "response": "You can call our support team at +91-XXXXXXXXXX.",
+      "response": "You can call our support team at 1800-2222-65 or +91-22-4071-3333.",
       "suggested": ["Email support", "Talk to advisor", "Back to Help Center"]
     },
 
@@ -44,6 +44,72 @@
       "keywords": ["talk to advisor", "advisor", "schedule advisor"],
       "response": "You can schedule a call with an advisor using the form at https://www.investonline.in/contact-us.",
       "suggested": ["Call support", "Email support", "Back to Help Center"]
+    },
+
+    "top_performing_funds": {
+      "keywords": ["top funds", "highest return funds", "best mutual funds", "top performing"],
+      "response": "You can check the top-performing mutual funds across categories here: https://www.investonline.in/mutual-funds/top-performing-funds",
+      "suggested": ["Compare mutual funds", "Show NFOs", "SIP calculator"]
+    },
+
+    "compare_schemes": {
+      "keywords": ["compare funds", "compare schemes", "fund comparison"],
+      "response": "You can compare mutual funds side by side on returns, risk and portfolio data here: https://www.investonline.in/mutual-funds/compare-schemes",
+      "suggested": ["Top mutual funds", "What is NAV?", "Show NFOs"]
+    },
+
+    "nfo": {
+      "keywords": ["nfo", "new fund offer", "latest nfo", "upcoming nfo"],
+      "response": "Here are the latest New Fund Offers with details: https://www.investonline.in/mutual-funds/new-fund-offer",
+      "suggested": ["Compare schemes", "Top performing funds", "What is NAV?"]
+    },
+
+    "sip_calculator": {
+      "keywords": ["sip calculator", "calculate sip", "sip maturity amount"],
+      "response": "Use our SIP calculator to plan your investments: https://www.investonline.in/financial-calculators/sip-calculator",
+      "suggested": ["Goal-based SIP calculator", "Benefits of SIP", "Start SIP"]
+    },
+
+    "goal_sip_calculator": {
+      "keywords": ["goal sip calculator", "sip for goal", "calculate sip for target"],
+      "response": "Calculate how much SIP you need for your goal: https://www.investonline.in/financial-calculators/goal-based-sip-calculator",
+      "suggested": ["SIP calculator", "Future value calculator", "Start SIP"]
+    },
+
+    "compounding_calculator": {
+      "keywords": ["compounding calculator", "compound returns", "compound interest"],
+      "response": "See how compounding grows your money: https://www.investonline.in/financial-calculators/compounding-returns-calculator",
+      "suggested": ["Future value calculator", "SIP calculator", "Goal-based SIP"]
+    },
+
+    "future_value_calculator": {
+      "keywords": ["future value", "fv calculator", "value after years"],
+      "response": "Estimate what your investment will grow to: https://www.investonline.in/financial-calculators/future-value-calculator",
+      "suggested": ["Compounding calculator", "SIP calculator", "Goal SIP calculator"]
+    },
+
+    "asset_allocation": {
+      "keywords": ["asset allocation", "portfolio mix", "ideal allocation"],
+      "response": "Get an ideal equity-debt allocation based on your risk level: https://www.investonline.in/financial-calculators/asset-allocation-calculator",
+      "suggested": ["SIP calculator", "Top funds", "Fund comparison"]
+    },
+
+    "start_sip": {
+      "keywords": ["how to start sip", "start sip", "begin sip"],
+      "response": "You can start a SIP from your InvestOnline dashboard by selecting a fund, SIP amount and SIP date.",
+      "suggested": ["SIP calculator", "Benefits of SIP", "Compare mutual funds"]
+    },
+
+    "redeem": {
+      "keywords": ["redeem", "withdraw", "sell units", "redeem mutual fund"],
+      "response": "To redeem, go to your portfolio, choose the fund, enter amount or units and confirm the request.",
+      "suggested": ["Switch funds", "Track my SIP", "Talk to support"]
+    },
+
+    "switch": {
+      "keywords": ["switch fund", "move to another fund", "switch investment"],
+      "response": "A switch lets you move money between funds of the same AMC. Select source fund, target fund and amount.",
+      "suggested": ["Compare funds", "Redeem", "Talk to support"]
     }
   },
 
@@ -56,10 +122,9 @@
     },
 
     "tools": {
-      "keywords": ["calculator", "sip calculator", "lumpsum calculator"],
-      "synonyms": ["investment tools", "tools"],
-      "response": "Here are our investment tools:\n• SIP Calculator: https://www.investonline.in/sip-calculator\n• Lumpsum Calculator: https://www.investonline.in/lumpsum-calculator",
-      "suggested": ["Open SIP calculator", "How SIP amount is calculated?", "Show SIP example"]
+      "keywords": ["calculator", "tools", "sip calculator", "goal calculator", "future value", "compounding", "asset allocation"],
+      "response": "Here are your investment tools:\n• SIP Calculator: https://www.investonline.in/financial-calculators/sip-calculator\n• Goal-Based SIP Calculator: https://www.investonline.in/financial-calculators/goal-based-sip-calculator\n• Compounding Calculator: https://www.investonline.in/financial-calculators/compounding-returns-calculator\n• Future Value Calculator: https://www.investonline.in/financial-calculators/future-value-calculator\n• Asset Allocation Calculator: https://www.investonline.in/financial-calculators/asset-allocation-calculator",
+      "suggested": ["Open SIP calculator", "Compare mutual funds", "Start SIP"]
     },
 
     "contact": {
@@ -84,5 +149,14 @@
 
   "quick_intents": {
     "forgot password": "Use the 'Forgot Password' option on the login page."
+  },
+
+  "global": {
+    "support_block": {
+      "email": "wealth@investonline.in",
+      "phone_primary": "1800-2222-65",
+      "phone_secondary": "+91-22-4071-3333"
+    },
+    "fallback_message": "I can help with mutual funds, SIPs, calculators, redemptions, KYC, and platform questions. For anything else, reach out to our support team."
   }
 }
