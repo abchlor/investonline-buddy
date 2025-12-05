@@ -26,6 +26,24 @@
       "synonyms": ["forgot password", "cant login", "login issue"],
       "response": "If you're unable to log in, you can reset your password using your registered email or mobile number.",
       "suggested": ["Reset password", "Troubleshoot login", "Contact support"]
+    },
+
+    "email_support": {
+      "keywords": ["email support", "support email"],
+      "response": "You can email our support team at support@investonline.in.",
+      "suggested": ["Call support", "Talk to advisor", "Back to Help Center"]
+    },
+
+    "call_support": {
+      "keywords": ["call support", "phone support", "call us"],
+      "response": "You can call our support team at +91-XXXXXXXXXX.",
+      "suggested": ["Email support", "Talk to advisor", "Back to Help Center"]
+    },
+
+    "advisor_support": {
+      "keywords": ["talk to advisor", "advisor", "schedule advisor"],
+      "response": "You can schedule a call with an advisor using the form at https://www.investonline.in/contact-us.",
+      "suggested": ["Call support", "Email support", "Back to Help Center"]
     }
   },
 
@@ -45,7 +63,8 @@
     },
 
     "contact": {
-      "keywords": ["support", "help", "contact"],
+      "keywords": ["support", "help", "contact", "advisor", "call", "email"],
+      "synonyms": ["reach team", "talk to advisor"],
       "response": "You can reach our customer support here: https://www.investonline.in/contact-us",
       "suggested": ["Email support", "Call support", "Talk to advisor"]
     }
