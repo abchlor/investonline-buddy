@@ -10,13 +10,13 @@ const { health } = require("./server/health");
 const { initSessionStore } = require("./server/session_store");
 
 const {
-  verifySignature,
+  verifySignatureWithClientKey,
+  verifyTokenAndPayload,
+  createSessionTokenForClient,
   verifyRecaptcha,
   rateLimitMiddleware,
   detectAutomationMiddleware
 } = require("./server/utils");
-
-const crypto = require("crypto");
 
 const app = express();
 
@@ -37,16 +37,14 @@ app.use((req, res, next) => {
   next();
 });
 
-// parse bodies (keep your original 64kb limit)
 app.use(express.json({ limit: "64kb" }));
 app.use(morgan("tiny"));
 
-// ---- CORS (preserve your allowed origin logic) ----
+// ---- CORS ----
 const allowedOrigins = (process.env.ALLOWED_ORIGIN || "")
   .split(",")
   .map((s) => s.trim())
   .filter(Boolean);
-
 console.log("Allowed origins:", allowedOrigins);
 
 app.use(
@@ -67,74 +65,94 @@ app.use(
       "X-Signature",
       "X-Timestamp",
       "X-Recaptcha-Token",
+      "X-Session-Token",
       "X-Requested-With"
     ]
   })
 );
 
-// ---- Session store init ----
+// ---- Session store init (your existing persistent store) ----
 initSessionStore();
+console.log("Using in-memory session store");
 
-// ---- Security middlewares (Strict option A) ----
+// ---- Global security middlewares (strict mode) ----
 app.use(rateLimitMiddleware()); // IP-based
 app.use(detectAutomationMiddleware()); // payload heuristics
 
-// Origin enforcement middleware (strict)
-function originEnforce(req, res, next) {
-  const origin = req.headers.origin || req.headers.referer || "";
-  if (!origin) {
-    // In strict mode, require origin
-    return res.status(403).json({ error: "Missing origin header" });
-  }
-  const ok = allowedOrigins.some((o) => origin.startsWith(o));
-  if (!ok) return res.status(403).json({ error: "Origin not allowed" });
-  next();
-}
-
-// Signed request + recaptcha check (strict)
-async function signedAndRecaptchaCheck(req, res, next) {
-  const HMAC_SECRET = process.env.HMAC_SECRET || "";
-  const RECAPTCHA_SECRET = process.env.RECAPTCHA_SECRET || "";
-
-  const signature = req.headers["x-signature"];
-  const timestamp = req.headers["x-timestamp"];
-  const recaptchaToken = req.headers["x-recaptcha-token"] || req.body.recaptchaToken;
-
-  if (!signature || !timestamp) {
-    return res.status(401).json({ error: "Missing signature headers" });
-  }
-  if (!recaptchaToken) {
-    return res.status(401).json({ error: "Missing recaptcha token" });
-  }
-  // Verify signature
-  const validSig = verifySignature(HMAC_SECRET, timestamp, req.body, signature);
-  if (!validSig) {
-    return res.status(401).json({ error: "Invalid signature" });
-  }
-
-  // Verify recaptcha (strict) - throws on failure
-  try {
-    const score = await verifyRecaptcha(RECAPTCHA_SECRET, recaptchaToken);
-    if (score < 0.5) {
-      return res.status(429).json({ error: "Bot detection failed" });
-    }
-  } catch (e) {
-    console.error("Recaptcha verify error", e);
-    return res.status(500).json({ error: "Recaptcha verification error" });
-  }
-
-  next();
-}
-
-// ---- Serve widget (preserve) ----
-app.get("/widget", (req, res) => {
-  res.sendFile(path.join(__dirname, "server", "widget.html"));
+// ---- Landing page at / (simple) ----
+app.get("/", (req, res) => {
+  res.sendFile(path.join(__dirname, "server", "landing.html"));
 });
 
-// ---- Chat API (preserve route path, apply strict middlewares) ----
-app.post("/chat", originEnforce, signedAndRecaptchaCheck, async (req, res) => {
+// ---- Session start: issues a signed, encrypted session token and a short-lived client_key ----
+app.post("/session/start", async (req, res) => {
   try {
-    // keep your existing input names for compatibility
+    // Accept optional session_id from frontend or create one
+    const { session_id: requestedSessionId } = req.body || {};
+    const origin = req.headers.origin || "";
+    if (!origin || !allowedOrigins.some(o => origin.startsWith(o))) {
+      return res.status(403).json({ error: "Origin not allowed" });
+    }
+
+    const payload = {
+      session_id: requestedSessionId || `sess_${Date.now().toString(36)}_${Math.random().toString(36).slice(2,8)}`,
+      created_at: Date.now()
+    };
+
+    // create session token and client key
+    const { token, clientKey, expiresAt } = await createSessionTokenForClient(payload);
+    // return token and client_key to widget; clientKey is short-lived
+    return res.json({
+      ok: true,
+      session_token: token,
+      client_key: clientKey,
+      expires_at: expiresAt
+    });
+  } catch (e) {
+    console.error("session/start error", e);
+    return res.status(500).json({ error: "session_error" });
+  }
+});
+
+// ---- Chat endpoint: strict validation for token, signature, recaptcha ----
+app.post("/chat", async (req, res) => {
+  try {
+    // Expected headers:
+    // X-Session-Token: session_token
+    // X-Timestamp: UNIX ms
+    // X-Signature: HMAC using client_key of `${timestamp}.${bodyString}`
+    // X-Recaptcha-Token: recaptcha token from grecaptcha.execute
+
+    const origin = req.headers.origin || req.headers.referer || "";
+    if (!origin || !allowedOrigins.some(o => origin.startsWith(o))) {
+      return res.status(403).json({ error: "Origin not allowed" });
+    }
+
+    const sessionToken = req.headers["x-session-token"] || req.body.session_token;
+    const clientSignature = req.headers["x-signature"];
+    const timestamp = req.headers["x-timestamp"];
+    const recaptchaToken = req.headers["x-recaptcha-token"] || req.body.recaptchaToken;
+
+    if (!sessionToken || !clientSignature || !timestamp || !recaptchaToken) {
+      return res.status(401).json({ error: "missing_headers" });
+    }
+
+    // verify recaptcha first (throws on failure)
+    await verifyRecaptcha(process.env.RECAPTCHA_SECRET || "", recaptchaToken);
+
+    // verify token and obtain stored clientKey and payload
+    const tokenInfo = await verifyTokenAndPayload(sessionToken);
+    if (!tokenInfo || !tokenInfo.clientKey) {
+      return res.status(401).json({ error: "invalid_session_token" });
+    }
+
+    // verify client signature using retrieved clientKey
+    const validSig = await verifySignatureWithClientKey(tokenInfo.clientKey, timestamp, req.body, clientSignature);
+    if (!validSig) {
+      return res.status(401).json({ error: "invalid_signature" });
+    }
+
+    // all good - call existing handler
     const { session_id, message, page = "/", lang = "en" } = req.body;
 
     if (!session_id || !message) {
@@ -143,22 +161,18 @@ app.post("/chat", originEnforce, signedAndRecaptchaCheck, async (req, res) => {
 
     const reply = await handleChat({ session_id, message, page, lang, req });
     return res.json(reply);
+
   } catch (err) {
     console.error("Chat Error:", err);
+    if (err && err.code === 'RECAPTCHA_FAIL') return res.status(429).json({ error: 'recaptcha_failed' });
     return res.status(500).json({ error: "internal_error" });
   }
 });
 
-// ---- Health (preserve) ----
+// ---- Health & others (preserve) ----
 app.get("/health", (req, res) => health(req, res));
+app.post("/feedback", (req, res) => { console.log("User Feedback:", req.body); res.json({ status: "ok" }); });
 
-// ---- Feedback (preserve) ----
-app.post("/feedback", (req, res) => {
-  console.log("User Feedback:", req.body);
-  res.json({ status: "ok" });
-});
-
-// ---- Start server ----
 const PORT = process.env.PORT || 8080;
 app.listen(PORT, () => {
   console.log(`InvestOnline Buddy running on ${PORT}`);
