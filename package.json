@@ -1,20 +1,28 @@
 {
   "name": "investonline-buddy",
   "version": "1.0.0",
-  "description": "Onboarding chatbot for InvestOnline.in (phase 1)",
+  "description": "InvestOnline chatbot with intelligent responses",
   "main": "index.js",
   "scripts": {
     "start": "node index.js",
-    "dev": "NODE_ENV=development node index.js"
+    "dev": "nodemon index.js"
   },
+  "keywords": ["chatbot", "investonline", "mutual funds"],
+  "author": "InvestOnline",
+  "license": "ISC",
   "dependencies": {
-    "axios": "^1.5.0",
-    "cors": "^2.8.5",
-    "dotenv": "^16.1.4",
     "express": "^4.18.2",
-    "helmet": "^7.0.0",
+    "dotenv": "^16.3.1",
+    "helmet": "^7.1.0",
+    "cors": "^2.8.5",
     "morgan": "^1.10.0",
-    "openai": "^4.9.0",
-    "redis": "^5.10.0"
+    "node-fetch": "^2.7.0",
+    "cheerio": "^1.0.0-rc.12"
+  },
+  "devDependencies": {
+    "nodemon": "^3.0.1"
+  },
+  "engines": {
+    "node": ">=14.0.0"
   }
 }
