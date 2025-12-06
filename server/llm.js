@@ -43,7 +43,6 @@ async function fetchPageContent(url, timeoutMs = 8000) {
   try {
     console.log(`🔍 Fetching content from: ${url}`);
     
-    // Add timeout using AbortController
     const controller = new AbortController();
     const timeout = setTimeout(() => controller.abort(), timeoutMs);
     
@@ -88,7 +87,7 @@ async function fetchPageContent(url, timeoutMs = 8000) {
       .replace(/\s+/g, ' ')
       .replace(/\n+/g, ' ')
       .trim()
-      .slice(0, 6000); // Reduced to 6000 chars for faster processing
+      .slice(0, 6000);
 
     const fullContent = `Page Title: ${title}\n\nPage Content: ${content}`;
 
@@ -146,13 +145,13 @@ function findRelevantURLs(query, flows) {
     }
   }
 
-  const uniqueURLs = [...urls].slice(0, 2); // Reduced to 2 URLs max for faster processing
+  const uniqueURLs = [...urls].slice(0, 2);
   console.log(`📚 Found ${uniqueURLs.length} relevant URLs`);
   return uniqueURLs;
 }
 
 // Call GPT with timeout
-async function callGPT(userQuery, context, flows, timeoutMs = 20000) {
+async function callGPT(userQuery, context, flows, relevantURLs = [], timeoutMs = 20000) {
   if (!OPENAI_API_KEY) {
     throw new Error("OPENAI_API_KEY not set");
   }
@@ -163,25 +162,38 @@ async function callGPT(userQuery, context, flows, timeoutMs = 20000) {
 - Help with mutual funds, SIPs, KYC, registration, calculators, and investment queries
 - Provide accurate information from InvestOnline.in content
 - Be concise, friendly, and professional
-- Use 1-2 emojis per response
-- Format with bullet points for lists
-- When mentioning URLs, use this EXACT format: <a href="URL" target="_blank" rel="noopener noreferrer">Link Text</a>
+- Use proper formatting with headings, bullet points, and numbered lists
+- Use 1-2 emojis per response for warmth
+
+**Response Formatting Rules:**
+1. Use **bold** for important terms (wrap in **text**)
+2. Use bullet points (•) or numbered lists for steps
+3. Break content into clear sections with line breaks
+4. Keep paragraphs short (2-3 sentences max)
+5. Add spacing between sections for readability
+
+**Link Formatting Rules:**
+1. NEVER write bare URLs in your response
+2. NEVER use HTML tags in your response (no <a>, <href>, etc.)
+3. Instead, use this format: [Read more](URL)
+4. Example: For KYC info, write: [Complete KYC online](https://www.investonline.in/kyc)
+5. Place "Read more" links at the END of relevant sections
 
 **Critical Rules:**
-1. ONLY use information from InvestOnline.in (provided in Context below)
+1. ONLY use information from InvestOnline.in (provided in Context)
 2. Do NOT make up information
-3. Keep responses under 200 words
-4. For website links, ALWAYS use proper HTML format: <a href="https://www.investonline.in" target="_blank" rel="noopener noreferrer">InvestOnline.in</a>
-5. NEVER write bare URLs like "Go to https://www.investonline.in" - always wrap in <a> tags
-6. End with: SUGGESTED: question1 | question2 | question3 | question4
+3. Keep responses under 250 words
+4. End with: SUGGESTED: question1 | question2 | question3 | question4
 
 **Context from InvestOnline.in:**
-${context || "No page content available. Use general knowledge about InvestOnline services: mutual funds, SIPs, KYC, registration, calculators."}
+${context || "No page content available. Use general knowledge about InvestOnline services."}
+
+**Relevant Page URLs (use these for "Read more" links):**
+${relevantURLs.length > 0 ? relevantURLs.join('\n') : 'No specific URLs available'}
 
 **Contact Info:**
-- Email: wealth@investonline.in
-- Phone: 1800-2222-65
-- Website: https://www.investonline.in`;
+Email: wealth@investonline.in
+Phone: 1800-2222-65`;
 
   try {
     console.log(`🤖 Calling GPT-4o-mini...`);
@@ -203,7 +215,7 @@ ${context || "No page content available. Use general knowledge about InvestOnlin
           { role: "user", content: userQuery }
         ],
         temperature: 0.7,
-        max_tokens: 400,
+        max_tokens: 500,
         top_p: 1,
         frequency_penalty: 0.3,
         presence_penalty: 0.3
@@ -243,26 +255,8 @@ ${context || "No page content available. Use general knowledge about InvestOnlin
       suggested = ["What is KYC?", "How to start SIP?", "Top funds", "SIP Calculator", "Talk to Support"];
     }
 
-    // ✅ FIX MALFORMED LINKS - Multiple passes to catch all issues
-    
-    // Step 1: Fix markdown-style links [text](url)
-    reply = reply.replace(/\[([^\]]+)\]\(([^)]+)\)/g, '<a href="$2" target="_blank" rel="noopener noreferrer">$1</a>');
-    
-    // Step 2: Fix bare URLs that have partial HTML (the main issue)
-    // Pattern: https://www.example.com" target="_blank" rel="noopener noreferrer">Text
-    reply = reply.replace(/(https?:\/\/[^\s"]+)"\s+target="_blank"\s+rel="noopener noreferrer">([^<]+)/gi, '<a href="$1" target="_blank" rel="noopener noreferrer">$2</a>');
-    
-    // Step 3: Fix URLs with trailing )
-    reply = reply.replace(/href="([^"]+)\)"/g, 'href="$1"');
-    
-    // Step 4: Wrap any remaining bare URLs (not already in <a> tags)
-    reply = reply.replace(/(?<!href="|">|<a[^>]*>)(https?:\/\/[^\s<>")\]]+)(?![^<]*<\/a>)/g, '<a href="$1" target="_blank" rel="noopener noreferrer">$1</a>');
-    
-    // Step 5: Clean up double-wrapped links
-    reply = reply.replace(/<a[^>]*>\s*<a[^>]*href="([^"]*)"[^>]*>([^<]+)<\/a>\s*<\/a>/gi, '<a href="$1" target="_blank" rel="noopener noreferrer">$2</a>');
-    
-    // Step 6: Fix links that are missing the opening <a href="
-    reply = reply.replace(/([^"])(https?:\/\/[^\s"]+)"\s+target=/gi, '$1<a href="$2" target=');
+    // ✅ FORMAT THE RESPONSE
+    reply = formatReply(reply);
 
     return { reply, suggested };
 
@@ -276,13 +270,42 @@ ${context || "No page content available. Use general knowledge about InvestOnlin
   }
 }
 
+// Format GPT's reply with proper HTML structure
+function formatReply(text) {
+  if (!text) return text;
+
+  // Convert markdown-style links [text](url) to HTML
+  text = text.replace(/\[([^\]]+)\]\((https?:\/\/[^)]+)\)/g, '<a href="$2" target="_blank" rel="noopener noreferrer" class="read-more">$1</a>');
+
+  // Convert **bold** to <strong>
+  text = text.replace(/\*\*([^*]+)\*\*/g, '<strong>$1</strong>');
+
+  // Convert bullet points
+  text = text.replace(/^[•\-]\s+(.+)$/gm, '<div class="bullet-item">• $1</div>');
+
+  // Convert numbered lists
+  text = text.replace(/^\d+\.\s+(.+)$/gm, '<div class="numbered-item">$&</div>');
+
+  // Add line breaks between paragraphs (double newlines)
+  text = text.replace(/\n\n/g, '<br><br>');
+
+  // Single newlines become <br>
+  text = text.replace(/\n/g, '<br>');
+
+  // Wrap contact info nicely
+  text = text.replace(/Email:\s*([^\s<]+)/g, '<div class="contact-info">📧 Email: <a href="mailto:$1">$1</a></div>');
+  text = text.replace(/Phone:\s*([\d\-+]+)/g, '<div class="contact-info">📞 Phone: <a href="tel:$1">$1</a></div>');
+
+  return text;
+}
+
 // Main function with timeouts
 async function getSmartResponse(userQuery, flows) {
   try {
-    // Step 1: Find URLs (fast)
+    // Step 1: Find URLs
     const relevantURLs = findRelevantURLs(userQuery, flows);
 
-    // Step 2: Fetch content (parallel, with timeout)
+    // Step 2: Fetch content
     let context = "";
     if (relevantURLs.length > 0) {
       const fetchPromises = relevantURLs.map(url => 
@@ -301,8 +324,8 @@ async function getSmartResponse(userQuery, flows) {
       });
     }
 
-    // Step 3: Call GPT (with timeout)
-    const result = await callGPT(userQuery, context, flows, 20000);
+    // Step 3: Call GPT
+    const result = await callGPT(userQuery, context, flows, relevantURLs, 20000);
     return result;
 
   } catch (error) {
