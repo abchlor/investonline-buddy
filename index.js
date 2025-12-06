@@ -115,7 +115,7 @@ app.post("/session/start", async (req, res) => {
 });
 
 // ---- Chat endpoint: strict validation for token, signature, recaptcha ----
-app.post("/chat", async (req, res) => {  // ← Make sure 'async' is here!
+app.post("/chat", async (req, res) => {
   try {
     // === STEP 1: Origin validation ===
     const origin = req.headers.origin || req.headers.referer || "";
@@ -143,7 +143,15 @@ app.post("/chat", async (req, res) => {  // ← Make sure 'async' is here!
 
     if (!sessionToken || !clientSignature || !timestamp || !recaptchaToken) {
       console.log("❌ REJECTED: Missing headers");
-      return res.status(401).json({ error: "missing_headers" });
+      return res.status(401).json({ 
+        error: "missing_headers",
+        missing: {
+          sessionToken: !sessionToken,
+          signature: !clientSignature,
+          timestamp: !timestamp,
+          recaptcha: !recaptchaToken
+        }
+      });
     }
     console.log("✅ PASSED: All headers present");
 
@@ -201,55 +209,13 @@ app.post("/chat", async (req, res) => {  // ← Make sure 'async' is here!
     return res.status(500).json({ error: "internal_error" });
   }
 });
-    const origin = req.headers.origin || req.headers.referer || "";
-    if (!origin || !allowedOrigins.some(o => origin.startsWith(o))) {
-      return res.status(403).json({ error: "Origin not allowed" });
-    }
-
-    const sessionToken = req.headers["x-session-token"] || req.body.session_token;
-    const clientSignature = req.headers["x-signature"];
-    const timestamp = req.headers["x-timestamp"];
-    const recaptchaToken = req.headers["x-recaptcha-token"] || req.body.recaptchaToken;
-
-    if (!sessionToken || !clientSignature || !timestamp || !recaptchaToken) {
-      return res.status(401).json({ error: "missing_headers" });
-    }
-
-    // verify recaptcha first (throws on failure)
-    await verifyRecaptcha(process.env.RECAPTCHA_SECRET || "", recaptchaToken);
-
-    // verify token and obtain stored clientKey and payload
-    const tokenInfo = await verifyTokenAndPayload(sessionToken);
-    if (!tokenInfo || !tokenInfo.clientKey) {
-      return res.status(401).json({ error: "invalid_session_token" });
-    }
-
-    // verify client signature using retrieved clientKey
-    const validSig = await verifySignatureWithClientKey(tokenInfo.clientKey, timestamp, req.body, clientSignature);
-    if (!validSig) {
-      return res.status(401).json({ error: "invalid_signature" });
-    }
-
-    // all good - call existing handler
-    const { session_id, message, page = "/", lang = "en" } = req.body;
-
-    if (!session_id || !message) {
-      return res.status(400).json({ error: "session_id and message required" });
-    }
-
-    const reply = await handleChat({ session_id, message, page, lang, req });
-    return res.json(reply);
-
-  } catch (err) {
-    console.error("Chat Error:", err);
-    if (err && err.code === 'RECAPTCHA_FAIL') return res.status(429).json({ error: 'recaptcha_failed' });
-    return res.status(500).json({ error: "internal_error" });
-  }
-});
 
 // ---- Health & others (preserve) ----
 app.get("/health", (req, res) => health(req, res));
-app.post("/feedback", (req, res) => { console.log("User Feedback:", req.body); res.json({ status: "ok" }); });
+app.post("/feedback", (req, res) => { 
+  console.log("User Feedback:", req.body); 
+  res.json({ status: "ok" }); 
+});
 
 const PORT = process.env.PORT || 8080;
 app.listen(PORT, () => {
