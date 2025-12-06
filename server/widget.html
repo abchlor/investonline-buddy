@@ -8,6 +8,9 @@
 <!-- Load Recaptcha V3 -->
 <script src="https://www.google.com/recaptcha/api.js?render=6LcdNyIsAAAAADuObE98pa6KC4g9HG-FirZ7Ohro"></script>
 
+<!-- Load CryptoJS for HMAC -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/crypto-js/4.1.1/crypto-js.min.js"></script>
+
 <style>
   :root{
     --brand:#F58220;
@@ -16,7 +19,7 @@
     --muted:#6b7280;
     --card:#ffffff;
   }
-  html,body{height:100%;margin:0;font-family:Inter,system-ui;}
+  html,body{height:100%;margin:0;font-family:Inter,system-ui,-apple-system,sans-serif;}
   body{background:var(--bg);display:flex;flex-direction:column;overflow:hidden}
 
   .shell{width:100%;height:100%;display:flex;flex-direction:column;border-radius:10px;overflow:hidden;background:#fff}
@@ -28,12 +31,17 @@
 
   .chat{flex:1;overflow:auto;padding:18px;display:flex;flex-direction:column;gap:10px}
 
-  .msg{max-width:78%;padding:12px 14px;border-radius:12px;font-size:14px;line-height:1.3}
+  .msg{max-width:78%;padding:12px 14px;border-radius:12px;font-size:14px;line-height:1.5}
   .bot{align-self:flex-start;background:#fff;border:1px solid #eef2f7;color:#0f172a}
   .user{align-self:flex-end;background:var(--brand);color:#fff}
 
+  /* Make links in bot messages visible */
+  .bot a{color:var(--brand);text-decoration:underline;font-weight:500}
+  .bot a:hover{color:var(--brand-600)}
+
   .chips{display:flex;gap:8px;flex-wrap:wrap;margin-top:6px}
-  .chip{background:rgba(245,130,32,0.08);border:1px solid rgba(245,130,32,0.12);color:var(--brand-600);padding:8px 12px;border-radius:20px;font-size:13px;cursor:pointer}
+  .chip{background:rgba(245,130,32,0.08);border:1px solid rgba(245,130,32,0.12);color:var(--brand-600);padding:8px 12px;border-radius:20px;font-size:13px;cursor:pointer;transition:all 0.2s}
+  .chip:hover{background:rgba(245,130,32,0.15);transform:translateY(-1px)}
 
   .typing{display:flex;align-items:center;gap:6px}
   .dot{width:7px;height:7px;border-radius:50%;background:#b9c3d3;animation:typing 1.2s infinite}
@@ -46,8 +54,11 @@
   }
 
   .input-area{display:flex;gap:10px;padding:12px;border-top:1px solid #edf2f7;background:#fff}
-  .input{flex:1;padding:12px 14px;border-radius:999px;border:1px solid #e6eef7;font-size:14px}
-  .btn{background:var(--brand);border:none;color:#fff;padding:10px 14px;border-radius:999px;font-weight:600;cursor:pointer}
+  .input{flex:1;padding:12px 14px;border-radius:999px;border:1px solid #e6eef7;font-size:14px;outline:none}
+  .input:focus{border-color:var(--brand)}
+  .btn{background:var(--brand);border:none;color:#fff;padding:10px 20px;border-radius:999px;font-weight:600;cursor:pointer;transition:all 0.2s}
+  .btn:hover{background:var(--brand-600);transform:scale(1.02)}
+  .btn:disabled{background:#ccc;cursor:not-allowed;transform:none}
 </style>
 </head>
 
@@ -56,7 +67,8 @@
   <div class="header">
     <div class="avatar-wrap">
       <svg width="44" height="44" viewBox="0 0 120 120" fill="none">
-        <rect width="120" height="120" rx="18" fill="#fff"/>
+        <rect width="120" height="120" rx="18" fill="#F58220"/>
+        <text x="60" y="80" text-anchor="middle" fill="white" font-size="60" font-weight="bold">IO</text>
       </svg>
     </div>
     <div>
@@ -70,6 +82,7 @@
 
     <div class="chips" id="welcomeChips">
       <div class="chip" onclick="pick('Start Registration')">Start Registration</div>
+      <div class="chip" onclick="pick('What is KYC?')">What is KYC?</div>
       <div class="chip" onclick="pick('Documents Needed')">Documents Needed</div>
       <div class="chip" onclick="pick('Talk to Support')">Talk to Support</div>
     </div>
@@ -88,7 +101,9 @@ const RECAPTCHA_SITE_KEY = "6LcdNyIsAAAAADuObE98pa6KC4g9HG-FirZ7Ohro";
 
 /* STATE */
 let sessionToken = null;
+let clientKey = null;
 let sessionId = `sess_${Date.now().toString(36)}_${Math.random().toString(36).slice(2,8)}`;
+let isProcessing = false;
 
 /* ELEMENTS */
 const chatEl = document.getElementById("chat");
@@ -98,13 +113,20 @@ const sendBtn = document.getElementById("sendBtn");
 function appendMessage(text, who="bot"){
   const d = document.createElement("div");
   d.className = "msg " + who;
-  d.innerText = text;
+  
+  // For bot messages, render HTML (for links)
+  if (who === "bot") {
+    d.innerHTML = text;
+  } else {
+    d.innerText = text;
+  }
+  
   chatEl.appendChild(d);
   chatEl.scrollTop = chatEl.scrollHeight;
 }
 
 function appendChips(list){
-  if(!list) return;
+  if(!list || list.length === 0) return;
   const wrap = document.createElement("div");
   wrap.className = "chips";
   list.forEach(label=>{
@@ -132,9 +154,26 @@ function hideTyping(){
   if(t) t.remove();
 }
 
+function hideElement(id){
+  const el = document.getElementById(id);
+  if(el) el.style.display="none";
+}
+
 function pick(text){
   inputEl.value = text;
   sendMessage();
+}
+
+/* SIGNING FUNCTION - Uses CryptoJS */
+function signRequest(timestamp, bodyObject, clientKeyHex){
+  // Server expects: HMAC-SHA256(clientKey, "timestamp.bodyJSON")
+  const bodyJSON = JSON.stringify(bodyObject);
+  const payload = `${timestamp}.${bodyJSON}`;
+  
+  // Parse hex key and sign
+  const key = CryptoJS.enc.Hex.parse(clientKeyHex.toLowerCase());
+  const hmac = CryptoJS.HmacSHA256(payload, key);
+  return hmac.toString(CryptoJS.enc.Hex);
 }
 
 /* RECAPTCHA TOKEN */
@@ -154,6 +193,7 @@ async function startSession(){
     const j = await res.json();
     if(j.ok){
       sessionToken = j.session_token;
+      clientKey = j.client_key;
       console.log("✅ Session started successfully");
     } else {
       console.error("❌ Session start failed", j);
@@ -166,40 +206,55 @@ async function startSession(){
 /* SEND MESSAGE */
 async function sendMessage(){
   const text = inputEl.value.trim();
-  if(!text) return;
+  if(!text || isProcessing) return;
 
   // Check if session is ready
-  if(!sessionToken){
+  if(!sessionToken || !clientKey){
     console.error("Session not ready. Retrying...");
     await startSession();
-    if(!sessionToken){
+    if(!sessionToken || !clientKey){
       appendMessage("Please wait, initializing...", "bot");
       return;
     }
   }
 
+  isProcessing = true;
+  sendBtn.disabled = true;
+  
   appendMessage(text, "user");
   inputEl.value = "";
   hideElement("welcomeChips");
   showTyping();
 
+  const timestamp = Date.now().toString();
   const requestBody = {
     session_id: sessionId,
     message: text
   };
 
+  // Generate signature
+  const signature = signRequest(timestamp, requestBody, clientKey);
   const recaptchaToken = await getRecaptchaToken(RECAPTCHA_SITE_KEY);
 
   try {
+    // Add 30 second timeout
+    const controller = new AbortController();
+    const timeoutId = setTimeout(() => controller.abort(), 30000);
+
     const res = await fetch(`${WIDGET_API_BASE}/chat`, {
       method: "POST",
+      signal: controller.signal,
       headers: {
         "Content-Type": "application/json",
         "X-Session-Token": sessionToken,
+        "X-Timestamp": timestamp,
+        "X-Signature": signature,
         "X-Recaptcha-Token": recaptchaToken
       },
       body: JSON.stringify(requestBody)
     });
+
+    clearTimeout(timeoutId);
 
     const j = await res.json();
     hideTyping();
@@ -214,26 +269,29 @@ async function sendMessage(){
         await startSession();
         appendMessage("Session refreshed. Please try again.", "bot");
       } else {
-        appendMessage(j.error || "Something went wrong.", "bot");
+        appendMessage(j.error || "Something went wrong. Please try again.", "bot");
         console.error("Chat error:", j);
       }
     }
 
   } catch(err){
     hideTyping();
-    appendMessage("Network issue. Try again later.", "bot");
+    if (err.name === 'AbortError') {
+      appendMessage("⏱️ Request timed out. Please try a simpler question or contact support at 1800-2222-65.", "bot");
+    } else {
+      appendMessage("Network issue. Please check your connection and try again.", "bot");
+    }
     console.error("❌ Chat error", err);
+  } finally {
+    isProcessing = false;
+    sendBtn.disabled = false;
+    inputEl.focus();
   }
-}
-
-function hideElement(id){
-  const el = document.getElementById(id);
-  if(el) el.style.display="none";
 }
 
 sendBtn.addEventListener("click", sendMessage);
 inputEl.addEventListener("keydown", e=>{
-  if(e.key === "Enter") sendMessage();
+  if(e.key === "Enter" && !isProcessing) sendMessage();
 });
 
 /* INIT */
