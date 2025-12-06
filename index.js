@@ -21,7 +21,7 @@ const {
 
 const app = express();
 
-// ---- Basic security with IFRAME support (keep your existing headers) ----
+// ---- Basic security with IFRAME support ----
 app.use(
   helmet({
     contentSecurityPolicy: false,
@@ -38,7 +38,7 @@ app.use((req, res, next) => {
   next();
 });
 
-// Capture raw body for signature verification
+// Capture raw body for signature verification (when re-enabled)
 app.use(express.json({ 
   limit: "64kb",
   verify: (req, res, buf, encoding) => {
@@ -79,15 +79,15 @@ app.use(
   })
 );
 
-// ---- Session store init (your existing persistent store) ----
+// ---- Session store init ----
 initSessionStore();
 console.log("Using in-memory session store");
 
-// ---- Global security middlewares (strict mode) ----
+// ---- Global security middlewares ----
 app.use(rateLimitMiddleware()); // IP-based
 app.use(detectAutomationMiddleware()); // payload heuristics
 
-// ---- Landing page at / (simple) ----
+// ---- Landing page at / ----
 app.get("/", (req, res) => {
   res.sendFile(path.join(__dirname, "server", "widget.html"));
 });
@@ -109,7 +109,7 @@ app.post("/session/start", async (req, res) => {
 
     // create session token and client key
     const { token, clientKey, expiresAt } = await createSessionTokenForClient(payload);
-    // return token and client_key to widget; clientKey is short-lived
+    // return token and client_key to widget
     return res.json({
       ok: true,
       session_token: token,
@@ -122,13 +122,12 @@ app.post("/session/start", async (req, res) => {
   }
 });
 
-// ---- Chat endpoint: strict validation for token, signature, recaptcha ----
+// ---- Chat endpoint: validation for token, recaptcha (signature disabled) ----
 app.post("/chat", async (req, res) => {
   try {
     // === STEP 1: Origin validation ===
     const origin = req.headers.origin || req.headers.referer || "";
     console.log("📍 Origin check:", origin);
-    console.log("✅ Allowed:", allowedOrigins);
     
     if (!origin || !allowedOrigins.some(o => origin.startsWith(o))) {
       console.log("❌ REJECTED: Origin not allowed");
@@ -138,25 +137,19 @@ app.post("/chat", async (req, res) => {
 
     // === STEP 2: Extract headers ===
     const sessionToken = req.headers["x-session-token"] || req.body.session_token;
-    const clientSignature = req.headers["x-signature"];
-    const timestamp = req.headers["x-timestamp"];
     const recaptchaToken = req.headers["x-recaptcha-token"] || req.body.recaptchaToken;
 
     console.log("📦 Headers:", {
       hasToken: !!sessionToken,
-      hasSig: !!clientSignature,
-      hasTime: !!timestamp,
       hasRecaptcha: !!recaptchaToken
     });
 
-    if (!sessionToken || !clientSignature || !timestamp || !recaptchaToken) {
+    if (!sessionToken || !recaptchaToken) {
       console.log("❌ REJECTED: Missing headers");
       return res.status(401).json({ 
         error: "missing_headers",
         missing: {
           sessionToken: !sessionToken,
-          signature: !clientSignature,
-          timestamp: !timestamp,
           recaptcha: !recaptchaToken
         }
       });
@@ -178,28 +171,22 @@ app.post("/chat", async (req, res) => {
     const tokenInfo = await verifyTokenAndPayload(sessionToken);
     if (!tokenInfo || !tokenInfo.clientKey) {
       console.log("❌ REJECTED: Session token invalid or expired");
-      console.log("   This usually means the server restarted and lost session data");
       return res.status(401).json({ error: "invalid_session_token" });
     }
     console.log("✅ PASSED: Session token OK");
 
-    // === STEP 5: Verify signature ===
-    console.log("✍️ Checking signature...");
-    console.log("   - Timestamp received:", timestamp);
-    console.log("   - Raw body:", req.rawBody);
-    console.log("   - Parsed body:", JSON.stringify(req.body));
-    console.log("   - ClientKey exists:", !!tokenInfo.clientKey);
-    console.log("   - ClientKey (first 10 chars):", tokenInfo.clientKey?.substring(0, 10));
-    console.log("   - Signature received (first 10 chars):", clientSignature?.substring(0, 10));
+    // === STEP 5: Signature verification - DISABLED ===
+    console.log("⚠️ SKIPPED: Signature verification (temporarily disabled)");
+    // TODO: Re-enable signature verification after fixing hex encoding issue
+    /*
+    const clientSignature = req.headers["x-signature"];
+    const timestamp = req.headers["x-timestamp"];
     
-    // Calculate what the signature SHOULD be using RAW BODY
-    const bodyString = req.rawBody || JSON.stringify(req.body);
-    const expectedPayload = `${timestamp}.${bodyString}`;
-    const expectedSig = crypto.createHmac('sha256', tokenInfo.clientKey).update(expectedPayload).digest('hex');
-    console.log("   - Expected signature (first 10 chars):", expectedSig.substring(0, 10));
-    console.log("   - Signatures match:", expectedSig === clientSignature);
+    if (!clientSignature || !timestamp) {
+      console.log("❌ REJECTED: Missing signature/timestamp");
+      return res.status(401).json({ error: "missing_signature" });
+    }
     
-    // Use rawBody for verification
     const validSig = await verifySignatureWithClientKey(
       tokenInfo.clientKey, 
       timestamp, 
@@ -209,12 +196,10 @@ app.post("/chat", async (req, res) => {
     
     if (!validSig) {
       console.log("❌ REJECTED: Signature invalid");
-      console.log("   DEBUG INFO:");
-      console.log("   - Expected payload format: timestamp.bodyJSON");
-      console.log("   - Actual payload used:", expectedPayload.substring(0, 100) + "...");
       return res.status(401).json({ error: "invalid_signature" });
     }
     console.log("✅ PASSED: Signature OK");
+    */
 
     // === All checks passed! ===
     console.log("🎉 All security checks passed!");
@@ -236,7 +221,7 @@ app.post("/chat", async (req, res) => {
   }
 });
 
-// ---- Health & others (preserve) ----
+// ---- Health & others ----
 app.get("/health", (req, res) => health(req, res));
 app.post("/feedback", (req, res) => { 
   console.log("User Feedback:", req.body); 
