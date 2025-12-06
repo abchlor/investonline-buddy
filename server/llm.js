@@ -165,14 +165,15 @@ async function callGPT(userQuery, context, flows, timeoutMs = 20000) {
 - Be concise, friendly, and professional
 - Use 1-2 emojis per response
 - Format with bullet points for lists
-- Include relevant URLs
+- When mentioning URLs, use this EXACT format: <a href="URL" target="_blank" rel="noopener noreferrer">Link Text</a>
 
 **Critical Rules:**
 1. ONLY use information from InvestOnline.in (provided in Context below)
 2. Do NOT make up information
 3. Keep responses under 200 words
-4. For URLs, use EXACT format: <a href="URL" target="_blank" rel="noopener noreferrer">text</a>
-5. End with: SUGGESTED: question1 | question2 | question3 | question4
+4. For website links, ALWAYS use proper HTML format: <a href="https://www.investonline.in" target="_blank" rel="noopener noreferrer">InvestOnline.in</a>
+5. NEVER write bare URLs like "Go to https://www.investonline.in" - always wrap in <a> tags
+6. End with: SUGGESTED: question1 | question2 | question3 | question4
 
 **Context from InvestOnline.in:**
 ${context || "No page content available. Use general knowledge about InvestOnline services: mutual funds, SIPs, KYC, registration, calculators."}
@@ -202,7 +203,7 @@ ${context || "No page content available. Use general knowledge about InvestOnlin
           { role: "user", content: userQuery }
         ],
         temperature: 0.7,
-        max_tokens: 400, // Reduced for faster response
+        max_tokens: 400,
         top_p: 1,
         frequency_penalty: 0.3,
         presence_penalty: 0.3
@@ -242,9 +243,26 @@ ${context || "No page content available. Use general knowledge about InvestOnlin
       suggested = ["What is KYC?", "How to start SIP?", "Top funds", "SIP Calculator", "Talk to Support"];
     }
 
-    // Convert plain URLs to proper HTML links (fix malformed links)
-    reply = reply.replace(/href="([^"]+)\)"/g, 'href="$1"'); // Fix trailing )
-    reply = reply.replace(/(https?:\/\/[^\s<>")\]]+)(?!<\/a>)/g, '<a href="$1" target="_blank" rel="noopener noreferrer">$1</a>');
+    // ✅ FIX MALFORMED LINKS - Multiple passes to catch all issues
+    
+    // Step 1: Fix markdown-style links [text](url)
+    reply = reply.replace(/\[([^\]]+)\]\(([^)]+)\)/g, '<a href="$2" target="_blank" rel="noopener noreferrer">$1</a>');
+    
+    // Step 2: Fix bare URLs that have partial HTML (the main issue)
+    // Pattern: https://www.example.com" target="_blank" rel="noopener noreferrer">Text
+    reply = reply.replace(/(https?:\/\/[^\s"]+)"\s+target="_blank"\s+rel="noopener noreferrer">([^<]+)/gi, '<a href="$1" target="_blank" rel="noopener noreferrer">$2</a>');
+    
+    // Step 3: Fix URLs with trailing )
+    reply = reply.replace(/href="([^"]+)\)"/g, 'href="$1"');
+    
+    // Step 4: Wrap any remaining bare URLs (not already in <a> tags)
+    reply = reply.replace(/(?<!href="|">|<a[^>]*>)(https?:\/\/[^\s<>")\]]+)(?![^<]*<\/a>)/g, '<a href="$1" target="_blank" rel="noopener noreferrer">$1</a>');
+    
+    // Step 5: Clean up double-wrapped links
+    reply = reply.replace(/<a[^>]*>\s*<a[^>]*href="([^"]*)"[^>]*>([^<]+)<\/a>\s*<\/a>/gi, '<a href="$1" target="_blank" rel="noopener noreferrer">$2</a>');
+    
+    // Step 6: Fix links that are missing the opening <a href="
+    reply = reply.replace(/([^"])(https?:\/\/[^\s"]+)"\s+target=/gi, '$1<a href="$2" target=');
 
     return { reply, suggested };
 
