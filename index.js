@@ -20,6 +20,8 @@ const {
 
 const app = express();
 
+const crypto = require("crypto");
+
 // ---- Basic security with IFRAME support (keep your existing headers) ----
 app.use(
   helmet({
@@ -175,8 +177,21 @@ app.post("/chat", async (req, res) => {
     }
     console.log("✅ PASSED: Session token OK");
 
-    // === STEP 5: Verify signature ===
+    / === STEP 5: Verify signature ===
     console.log("✍️ Checking signature...");
+    console.log("   - Timestamp received:", timestamp);
+    console.log("   - Body received:", JSON.stringify(req.body));
+    console.log("   - ClientKey exists:", !!tokenInfo.clientKey);
+    console.log("   - ClientKey (first 10 chars):", tokenInfo.clientKey?.substring(0, 10));
+    console.log("   - Signature received (first 10 chars):", clientSignature?.substring(0, 10));
+    
+    // Calculate what the signature SHOULD be
+    const bodyString = JSON.stringify(req.body);
+    const expectedPayload = `${timestamp}.${bodyString}`;
+    const expectedSig = crypto.createHmac('sha256', tokenInfo.clientKey).update(expectedPayload).digest('hex');
+    console.log("   - Expected signature (first 10 chars):", expectedSig.substring(0, 10));
+    console.log("   - Signatures match:", expectedSig === clientSignature);
+    
     const validSig = await verifySignatureWithClientKey(
       tokenInfo.clientKey, 
       timestamp, 
@@ -186,6 +201,9 @@ app.post("/chat", async (req, res) => {
     
     if (!validSig) {
       console.log("❌ REJECTED: Signature invalid");
+      console.log("   DEBUG INFO:");
+      console.log("   - Expected payload format: timestamp.bodyJSON");
+      console.log("   - Actual payload used:", expectedPayload.substring(0, 100) + "...");
       return res.status(401).json({ error: "invalid_signature" });
     }
     console.log("✅ PASSED: Signature OK");
