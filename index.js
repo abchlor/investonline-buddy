@@ -117,12 +117,90 @@ app.post("/session/start", async (req, res) => {
 // ---- Chat endpoint: strict validation for token, signature, recaptcha ----
 app.post("/chat", async (req, res) => {
   try {
-    // Expected headers:
-    // X-Session-Token: session_token
-    // X-Timestamp: UNIX ms
-    // X-Signature: HMAC using client_key of `${timestamp}.${bodyString}`
-    // X-Recaptcha-Token: recaptcha token from grecaptcha.execute
+    // === STEP 1: Origin validation ===
+    const origin = req.headers.origin || req.headers.referer || "";
+    console.log("📍 Origin check:", origin);
+    console.log("✅ Allowed:", allowedOrigins);
+    
+    if (!origin || !allowedOrigins.some(o => origin.startsWith(o))) {
+      console.log("❌ REJECTED: Origin not allowed");
+      return res.status(403).json({ error: "Origin not allowed" });
+    }
+    console.log("✅ PASSED: Origin OK");
 
+    // === STEP 2: Extract headers ===
+    const sessionToken = req.headers["x-session-token"] || req.body.session_token;
+    const clientSignature = req.headers["x-signature"];
+    const timestamp = req.headers["x-timestamp"];
+    const recaptchaToken = req.headers["x-recaptcha-token"] || req.body.recaptchaToken;
+
+    console.log("📦 Headers:", {
+      hasToken: !!sessionToken,
+      hasSig: !!clientSignature,
+      hasTime: !!timestamp,
+      hasRecaptcha: !!recaptchaToken
+    });
+
+    if (!sessionToken || !clientSignature || !timestamp || !recaptchaToken) {
+      console.log("❌ REJECTED: Missing headers");
+      return res.status(401).json({ error: "missing_headers" });
+    }
+    console.log("✅ PASSED: All headers present");
+
+    // === STEP 3: Verify reCAPTCHA ===
+    console.log("🔐 Checking reCAPTCHA...");
+    try {
+      await verifyRecaptcha(process.env.RECAPTCHA_SECRET || "", recaptchaToken);
+      console.log("✅ PASSED: reCAPTCHA OK");
+    } catch (recaptchaErr) {
+      console.log("❌ REJECTED: reCAPTCHA failed -", recaptchaErr.message);
+      return res.status(429).json({ error: 'recaptcha_failed' });
+    }
+
+    // === STEP 4: Verify session token ===
+    console.log("🎫 Checking session token...");
+    const tokenInfo = await verifyTokenAndPayload(sessionToken);
+    if (!tokenInfo || !tokenInfo.clientKey) {
+      console.log("❌ REJECTED: Session token invalid or expired");
+      console.log("   This usually means the server restarted and lost session data");
+      return res.status(401).json({ error: "invalid_session_token" });
+    }
+    console.log("✅ PASSED: Session token OK");
+
+    // === STEP 5: Verify signature ===
+    console.log("✍️ Checking signature...");
+    const validSig = await verifySignatureWithClientKey(
+      tokenInfo.clientKey, 
+      timestamp, 
+      req.body, 
+      clientSignature
+    );
+    
+    if (!validSig) {
+      console.log("❌ REJECTED: Signature invalid");
+      return res.status(401).json({ error: "invalid_signature" });
+    }
+    console.log("✅ PASSED: Signature OK");
+
+    // === All checks passed! ===
+    console.log("🎉 All security checks passed!");
+    const { session_id, message, page = "/", lang = "en" } = req.body;
+
+    if (!session_id || !message) {
+      return res.status(400).json({ error: "session_id and message required" });
+    }
+
+    const reply = await handleChat({ session_id, message, page, lang, req });
+    return res.json(reply);
+
+  } catch (err) {
+    console.error("💥 Chat Error:", err);
+    if (err && err.code === 'RECAPTCHA_FAIL') {
+      return res.status(429).json({ error: 'recaptcha_failed' });
+    }
+    return res.status(500).json({ error: "internal_error" });
+  }
+});
     const origin = req.headers.origin || req.headers.referer || "";
     if (!origin || !allowedOrigins.some(o => origin.startsWith(o))) {
       return res.status(403).json({ error: "Origin not allowed" });
