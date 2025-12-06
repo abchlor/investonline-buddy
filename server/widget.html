@@ -137,38 +137,40 @@ function pick(text){
   sendMessage();
 }
 
-/* CRYPTO HELPERS */
-function hexToBytes(hex){
-  const out=[];
-  for(let i=0;i<hex.length;i+=2){
-    out.push(parseInt(hex.substring(i,i+2),16));
-  }
-  return new Uint8Array(out);
-}
-function bytesToHex(bytes){
-  return Array.from(bytes, b=>b.toString(16).padStart(2,"0")).join("");
-}
-
-/* CORRECT SIGNING FUNCTION - MATCHES SERVER EXPECTATION */
-async function signRequest(timestamp, bodyObject, clientKey){
+/* IMPROVED SIGNING FUNCTION - Matches Node.js crypto.createHmac exactly */
+async function signRequest(timestamp, bodyObject, clientKeyHex){
   // Server expects: HMAC-SHA256(clientKey, "timestamp.bodyJSON")
   const bodyJSON = JSON.stringify(bodyObject);
   const payload = `${timestamp}.${bodyJSON}`;
   
+  console.log("🔐 Frontend Signing:");
+  console.log("   - Timestamp:", timestamp);
+  console.log("   - Body:", bodyJSON);
+  console.log("   - ClientKey (hex, first 10):", clientKeyHex?.substring(0, 10));
+  console.log("   - Payload to sign:", payload.substring(0, 100) + "...");
+  
   const encoder = new TextEncoder();
   const data = encoder.encode(payload);
   
-  const keyData = hexToBytes(clientKey);
+  // Convert hex string to Uint8Array properly
+  const keyBytes = new Uint8Array(clientKeyHex.match(/.{1,2}/g).map(byte => parseInt(byte, 16)));
+  
   const cryptoKey = await crypto.subtle.importKey(
     "raw",
-    keyData,
+    keyBytes,
     { name: "HMAC", hash: "SHA-256" },
     false,
     ["sign"]
   );
 
   const sigBuffer = await crypto.subtle.sign("HMAC", cryptoKey, data);
-  return bytesToHex(new Uint8Array(sigBuffer));
+  const sigHex = Array.from(new Uint8Array(sigBuffer))
+    .map(b => b.toString(16).padStart(2, '0'))
+    .join('');
+  
+  console.log("   - Generated signature (first 10):", sigHex.substring(0, 10));
+  
+  return sigHex;
 }
 
 /* RECAPTCHA TOKEN */
@@ -190,6 +192,8 @@ async function startSession(){
       sessionToken = j.session_token;
       clientKey = j.client_key;
       console.log("✅ Session started successfully");
+      console.log("   - Session token received");
+      console.log("   - Client key (first 10):", clientKey?.substring(0, 10));
     } else {
       console.error("❌ Session start failed", j);
     }
