@@ -8,9 +8,6 @@
 <!-- Load Recaptcha V3 -->
 <script src="https://www.google.com/recaptcha/api.js?render=6LcdNyIsAAAAADuObE98pa6KC4g9HG-FirZ7Ohro"></script>
 
-<!-- Load CryptoJS for HMAC signing -->
-<script src="https://cdnjs.cloudflare.com/ajax/libs/crypto-js/4.1.1/crypto-js.min.js"></script>
-
 <style>
   :root{
     --brand:#F58220;
@@ -140,27 +137,48 @@ function pick(text){
   sendMessage();
 }
 
-/* SIGNING FUNCTION using CryptoJS - Matches Node.js crypto exactly */
-function signRequest(timestamp, bodyObject, clientKeyHex){
+/* SIGNING FUNCTION using Native Web Crypto API - Matches Node.js exactly */
+async function signRequest(timestamp, bodyObject, clientKeyHex){
   const bodyJSON = JSON.stringify(bodyObject);
   const payload = `${timestamp}.${bodyJSON}`;
   
-  console.log("🔐 Frontend Signing with CryptoJS:");
+  console.log("🔐 Frontend Signing with Native Web Crypto:");
   console.log("   - Timestamp:", timestamp);
   console.log("   - Body:", bodyJSON);
-  console.log("   - ClientKey (hex, original):", clientKeyHex);
-  console.log("   - ClientKey (hex, lowercase):", clientKeyHex?.toLowerCase());
+  console.log("   - ClientKey (hex):", clientKeyHex);
   console.log("   - Payload to sign:", payload);
   
-  // Convert hex string to WordArray (CryptoJS format)
-  // CRITICAL: Normalize to lowercase to match Node.js
-  const key = CryptoJS.enc.Hex.parse(clientKeyHex.toLowerCase());
+  // Convert hex string to Uint8Array (raw bytes)
+  const keyBytes = new Uint8Array(
+    clientKeyHex.match(/.{1,2}/g).map(byte => parseInt(byte, 16))
+  );
   
-  // Create HMAC-SHA256 signature
-  const hmac = CryptoJS.HmacSHA256(payload, key);
+  console.log("   - KeyBytes length:", keyBytes.length);
+  console.log("   - KeyBytes (first 5):", Array.from(keyBytes.slice(0, 5)));
+  
+  // Import key for HMAC
+  const cryptoKey = await crypto.subtle.importKey(
+    "raw",
+    keyBytes,
+    { name: "HMAC", hash: "SHA-256" },
+    false,
+    ["sign"]
+  );
+  
+  // Convert payload to bytes
+  const encoder = new TextEncoder();
+  const payloadBytes = encoder.encode(payload);
+  
+  // Generate HMAC signature
+  const signatureBuffer = await crypto.subtle.sign(
+    "HMAC",
+    cryptoKey,
+    payloadBytes
+  );
   
   // Convert to hex string
-  const signature = hmac.toString(CryptoJS.enc.Hex);
+  const signatureArray = Array.from(new Uint8Array(signatureBuffer));
+  const signature = signatureArray.map(b => b.toString(16).padStart(2, '0')).join('');
   
   console.log("   - Generated signature:", signature);
   console.log("   - Generated signature (first 10):", signature.substring(0, 10));
@@ -188,7 +206,7 @@ async function startSession(){
       clientKey = j.client_key;
       console.log("✅ Session started successfully");
       console.log("   - Session token received");
-      console.log("   - Client key (first 10):", clientKey?.substring(0, 10));
+      console.log("   - Client key:", clientKey);
     } else {
       console.error("❌ Session start failed", j);
     }
@@ -223,8 +241,8 @@ async function sendMessage(){
     message: text
   };
 
-  // Generate signature - NO AWAIT needed, signRequest is synchronous now
-  const signature = signRequest(timestamp, requestBody, clientKey);
+  // Generate signature
+  const signature = await signRequest(timestamp, requestBody, clientKey);
   const recaptchaToken = await getRecaptchaToken(RECAPTCHA_SITE_KEY);
 
   try {
