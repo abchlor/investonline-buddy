@@ -89,6 +89,7 @@ const RECAPTCHA_SITE_KEY = "6LcdNyIsAAAAADuObE98pa6KC4g9HG-FirZ7Ohro";
 /* STATE */
 let sessionToken = null;
 let clientKey = null;
+let sessionId = `sess_${Date.now().toString(36)}_${Math.random().toString(36).slice(2,8)}`;
 
 /* ELEMENTS */
 const chatEl = document.getElementById("chat");
@@ -131,6 +132,11 @@ function hideTyping(){
   if(t) t.remove();
 }
 
+function pick(text){
+  inputEl.value = text;
+  sendMessage();
+}
+
 /* CRYPTO HELPERS */
 function hexToBytes(hex){
   const out=[];
@@ -143,11 +149,15 @@ function bytesToHex(bytes){
   return Array.from(bytes, b=>b.toString(16).padStart(2,"0")).join("");
 }
 
-/* SIGNING FUNCTION */
-async function signMessage(message, timestamp, clientKey, sessionToken){
+/* CORRECT SIGNING FUNCTION - MATCHES SERVER EXPECTATION */
+async function signRequest(timestamp, bodyObject, clientKey){
+  // Server expects: HMAC-SHA256(clientKey, "timestamp.bodyJSON")
+  const bodyJSON = JSON.stringify(bodyObject);
+  const payload = `${timestamp}.${bodyJSON}`;
+  
   const encoder = new TextEncoder();
-  const data = encoder.encode(`${message}:${timestamp}:${sessionToken}`);
-
+  const data = encoder.encode(payload);
+  
   const keyData = hexToBytes(clientKey);
   const cryptoKey = await crypto.subtle.importKey(
     "raw",
@@ -172,18 +182,19 @@ async function startSession(){
     const res = await fetch(`${WIDGET_API_BASE}/session/start`, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: "{}"
+      body: JSON.stringify({ session_id: sessionId })
     });
 
     const j = await res.json();
     if(j.ok){
       sessionToken = j.session_token;
       clientKey = j.client_key;
+      console.log("✅ Session started successfully");
     } else {
-      console.error("Session start failed", j);
+      console.error("❌ Session start failed", j);
     }
   } catch (err){
-    console.error("Session error", err);
+    console.error("❌ Session error", err);
   }
 }
 
@@ -192,13 +203,29 @@ async function sendMessage(){
   const text = inputEl.value.trim();
   if(!text) return;
 
+  // Check if session is ready
+  if(!sessionToken || !clientKey){
+    console.error("Session not ready. Retrying...");
+    await startSession();
+    if(!sessionToken || !clientKey){
+      appendMessage("Please wait, initializing...", "bot");
+      return;
+    }
+  }
+
   appendMessage(text, "user");
   inputEl.value = "";
   hideElement("welcomeChips");
   showTyping();
 
   const timestamp = Date.now().toString();
-  const signature = await signMessage(text, timestamp, clientKey, sessionToken);
+  const requestBody = {
+    session_id: sessionId,
+    message: text
+  };
+
+  // Generate signature with correct format
+  const signature = await signRequest(timestamp, requestBody, clientKey);
   const recaptchaToken = await getRecaptchaToken(RECAPTCHA_SITE_KEY);
 
   try {
@@ -211,18 +238,31 @@ async function sendMessage(){
         "X-Signature": signature,
         "X-Recaptcha-Token": recaptchaToken
       },
-      body: JSON.stringify({ message: text })
+      body: JSON.stringify(requestBody)
     });
 
     const j = await res.json();
     hideTyping();
-    appendMessage(j.reply || "Something went wrong.", "bot");
-    appendChips(j.suggested);
+
+    if(res.ok){
+      appendMessage(j.reply || "Got it!", "bot");
+      appendChips(j.suggested);
+    } else {
+      // Handle 401 - session expired
+      if(res.status === 401 && j.error === "invalid_session_token"){
+        console.log("Session expired, refreshing...");
+        await startSession();
+        appendMessage("Session refreshed. Please try again.", "bot");
+      } else {
+        appendMessage(j.error || "Something went wrong.", "bot");
+        console.error("Chat error:", j);
+      }
+    }
 
   } catch(err){
     hideTyping();
     appendMessage("Network issue. Try again later.", "bot");
-    console.error("Chat error", err);
+    console.error("❌ Chat error", err);
   }
 }
 
