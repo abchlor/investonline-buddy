@@ -41,17 +41,15 @@ function clearSession(sessionId, tokenId) {
   }
 }
 
-// Quick keyword matching for simple queries (fast path - no GPT needed)
+// Quick keyword matching for simple queries (fast path)
 function matchSimpleIntent(text) {
   if (!text || typeof text !== "string") return null;
   const lower = text.toLowerCase().trim();
   
-  // Check for end chat
   if (END_CHAT_KEYWORDS.some(kw => lower.includes(kw))) {
     return { type: "end_chat" };
   }
 
-  // Very simple queries that don't need GPT
   const simpleMatches = {
     "email": "email_support",
     "email support": "email_support",
@@ -73,17 +71,12 @@ function matchSimpleIntent(text) {
   return null;
 }
 
-// Format response with clickable links
 function formatResponse(text) {
   if (!text) return text;
-  
-  // Convert plain URLs to clickable HTML links
   return text.replace(/(https?:\/\/[^\s<]+)/g, '<a href="$1" target="_blank" rel="noopener noreferrer">$1</a>');
 }
 
-// Get response for simple intents without GPT
 function getSimpleResponse(intent, flows) {
-  // Check intents
   if (flows.intents && flows.intents[intent]) {
     const def = flows.intents[intent];
     return {
@@ -92,7 +85,6 @@ function getSimpleResponse(intent, flows) {
     };
   }
   
-  // Check site
   if (flows.site && flows.site[intent]) {
     const def = flows.site[intent];
     return {
@@ -108,10 +100,8 @@ async function handleChat({ session_id, message, page, lang, req }) {
   const text = typeof message === "string" ? message : (message && message.text) || "";
   const sessionId = session_id || `anon_${Math.random().toString(36).slice(2, 8)}`;
   
-  // Get or create session
   const s = touchSession(sessionId);
 
-  // Check message count limit
   if (s.messageCount > SESSION_MSG_LIMIT) {
     clearSession(sessionId);
     return { 
@@ -121,13 +111,11 @@ async function handleChat({ session_id, message, page, lang, req }) {
     };
   }
 
-  // Check for rapid-fire messages (bot detection)
   const currentTime = now();
   const delta = currentTime - (s.lastMessageAt || 0);
   
-  // Only check if this is NOT the first message
   if (s.messageCount > 0 && delta < MIN_INTER_MESSAGE_MS) {
-    console.log(`⚠️ Rapid messages detected: ${delta}ms between messages for session ${sessionId}`);
+    console.log(`⚠️ Rapid messages detected: ${delta}ms`);
     clearSession(sessionId);
     return { 
       error: "automated_activity", 
@@ -136,11 +124,9 @@ async function handleChat({ session_id, message, page, lang, req }) {
     };
   }
 
-  // Update session tracking
   s.messageCount = (s.messageCount || 0) + 1;
   s.lastMessageAt = currentTime;
 
-  // Handle end chat
   const simpleMatch = matchSimpleIntent(text);
   if (simpleMatch && simpleMatch.type === "end_chat") {
     const tokenId = req && req.body && req.body.token_id;
@@ -151,61 +137,45 @@ async function handleChat({ session_id, message, page, lang, req }) {
     };
   }
 
-  // Handle simple intents (fast path - no GPT)
   if (simpleMatch && simpleMatch.type === "simple") {
-    console.log(`⚡ Fast path for simple intent: ${simpleMatch.intent}`);
+    console.log(`⚡ Fast path for: ${simpleMatch.intent}`);
     const response = getSimpleResponse(simpleMatch.intent, flows);
     if (response) {
       return response;
     }
   }
 
-  // Use GPT-4o-mini for intelligent responses (main path)
+  // Use GPT with reduced timeout (15 seconds total)
   try {
-    console.log(`🤖 Processing query: "${text.slice(0, 50)}..."`);
+    console.log(`🤖 Processing: "${text.slice(0, 50)}..."`);
     
-    // Set a total timeout for the entire operation (25 seconds)
     const timeoutPromise = new Promise((_, reject) => 
-      setTimeout(() => reject(new Error('Request timeout - please try a simpler question')), 25000)
+      setTimeout(() => reject(new Error('Request timeout')), 15000) // Reduced from 25s to 15s
     );
     
     const responsePromise = getSmartResponse(text, flows);
     
-    // Race between response and timeout
     const result = await Promise.race([responsePromise, timeoutPromise]);
     
-    // Store in session context for potential follow-ups
     s.context = s.context || [];
-    s.context.push({ 
-      query: text, 
-      response: result.reply.slice(0, 100) // Store truncated response
-    });
-    if (s.context.length > 5) s.context.shift(); // Keep last 5 interactions
+    s.context.push({ query: text, response: result.reply.slice(0, 100) });
+    if (s.context.length > 5) s.context.shift();
     
-    console.log(`✅ Response generated with ${result.suggested.length} suggestions`);
+    console.log(`✅ Response ready`);
     return result;
 
   } catch (gptError) {
-    console.error("❌ Response generation failed:", gptError.message);
+    console.error("❌ Response failed:", gptError.message);
     
-    // User-friendly fallback response
     const fallback = (flows.global && flows.global.fallback_message) || 
-      "I can help with mutual funds, SIPs, calculators, redemptions, KYC, and registration.";
+      "I can help with mutual funds, SIPs, calculators, KYC, and registration. 💰";
     
     const support = flows.global?.support_block || {
       email: "wealth@investonline.in",
       phone_primary: "1800-2222-65"
     };
     
-    // Determine error type
-    let errorMessage = fallback;
-    if (gptError.message.includes('timeout')) {
-      errorMessage = "⏱️ That's taking a bit long. Let me give you our contact info instead!\n\n" + fallback;
-    } else if (gptError.message.includes('API')) {
-      errorMessage = "I'm having trouble connecting right now. Here's how to reach our support team:\n\n" + fallback;
-    }
-    
-    const reply = `${errorMessage}\n\n📧 Email: <a href="mailto:${support.email}">${support.email}</a>\n📞 Phone: ${support.phone_primary}`;
+    const reply = `${fallback}<br><br><div class="contact-info">📧 Email: <a href="mailto:${support.email}">${support.email}</a></div><div class="contact-info">📞 Phone: ${support.phone_primary}</div>`;
     
     return { 
       reply,
@@ -213,7 +183,7 @@ async function handleChat({ session_id, message, page, lang, req }) {
         "What is KYC?",
         "How to register?",
         "SIP Calculator",
-        "Top Performing Funds",
+        "Top Funds",
         "Talk to Support"
       ]
     };
