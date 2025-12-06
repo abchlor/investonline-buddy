@@ -4,6 +4,7 @@ const cors = require("cors");
 const helmet = require("helmet");
 const morgan = require("morgan");
 const path = require("path");
+const crypto = require("crypto");
 
 const { handleChat } = require("./server/chat_handler");
 const { health } = require("./server/health");
@@ -19,8 +20,6 @@ const {
 } = require("./server/utils");
 
 const app = express();
-
-const crypto = require("crypto");
 
 // ---- Basic security with IFRAME support (keep your existing headers) ----
 app.use(
@@ -177,7 +176,7 @@ app.post("/chat", async (req, res) => {
     }
     console.log("✅ PASSED: Session token OK");
 
-    / === STEP 5: Verify signature ===
+    // === STEP 5: Verify signature ===
     console.log("✍️ Checking signature...");
     console.log("   - Timestamp received:", timestamp);
     console.log("   - Body received:", JSON.stringify(req.body));
