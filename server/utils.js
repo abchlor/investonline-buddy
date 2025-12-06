@@ -23,9 +23,21 @@ if (!ENC_KEY_B64) {
 }
 const ENC_KEY = Buffer.from(ENC_KEY_B64, 'base64'); // 32 bytes expected
 
-// In-memory map: tokenId -> { clientKey, expiresAt, payload }
-// Replace with Redis for persistence and distributed deployments
-const sessionKeyStore = new Map();
+// Use the persistent session store instead of in-memory Map
+const { getSession, setSession } = require('./session_store');
+
+const sessionKeyStore = {
+  async set(tokenId, data) {
+    await setSession(`token:${tokenId}`, data);
+  },
+  async get(tokenId) {
+    return await getSession(`token:${tokenId}`);
+  },
+  async delete(tokenId) {
+    await setSession(`token:${tokenId}`, null);
+  }
+};
+
 
 // Helpers: AES-GCM encrypt/decrypt for token payload
 function aesGcmEncrypt(plaintext) {
@@ -70,7 +82,7 @@ async function createSessionTokenForClient(payloadObj) {
   // clientKey: random 32 bytes hex used only between this client and server for request signatures
   const clientKey = crypto.randomBytes(24).toString('hex'); // 48 chars
   // Store mapping
-  sessionKeyStore.set(tokenId, { clientKey, expiresAt, payload: payloadObj });
+  await sessionKeyStore.set(tokenId, { clientKey, expiresAt, payload: payloadObj });
 
   // return token and clientKey to client
   return { token, clientKey, expiresAt };
@@ -102,10 +114,10 @@ async function verifyTokenAndPayload(token) {
     return null;
   }
   const tokenId = payload.tokenId;
-  const store = sessionKeyStore.get(tokenId);
+  const store = await sessionKeyStore.get(tokenId);
   if (!store) return null;
   if (Date.now() > store.expiresAt) {
-    sessionKeyStore.delete(tokenId);
+    await sessionKeyStore.delete(tokenId);
     return null;
   }
   return { payload: payload.payload, clientKey: store.clientKey, expiresAt: store.expiresAt, tokenId };
@@ -197,8 +209,8 @@ function detectAutomationMiddleware() {
 }
 
 // Utility: invalidate tokenId (used for end chat)
-function invalidateToken(tokenId) {
-  sessionKeyStore.delete(tokenId);
+async function invalidateToken(tokenId) {
+  await sessionKeyStore.delete(tokenId);
 }
 
 module.exports = {
