@@ -115,7 +115,7 @@ app.post("/session/start", async (req, res) => {
 });
 
 // ---- Chat endpoint: strict validation for token, signature, recaptcha ----
-app.post("/chat", async (req, res) => {
+app.post("/chat", async (req, res) => {  // ← Make sure 'async' is here!
   try {
     // === STEP 1: Origin validation ===
     const origin = req.headers.origin || req.headers.referer || "";
