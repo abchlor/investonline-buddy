@@ -88,7 +88,6 @@ const RECAPTCHA_SITE_KEY = "6LcdNyIsAAAAADuObE98pa6KC4g9HG-FirZ7Ohro";
 
 /* STATE */
 let sessionToken = null;
-let clientKey = null;
 let sessionId = `sess_${Date.now().toString(36)}_${Math.random().toString(36).slice(2,8)}`;
 
 /* ELEMENTS */
@@ -127,6 +126,7 @@ function showTyping(){
   chatEl.appendChild(t);
   chatEl.scrollTop=chatEl.scrollHeight;
 }
+
 function hideTyping(){
   const t = document.getElementById("typing");
   if(t) t.remove();
@@ -135,55 +135,6 @@ function hideTyping(){
 function pick(text){
   inputEl.value = text;
   sendMessage();
-}
-
-/* SIGNING FUNCTION using Native Web Crypto API - Matches Node.js exactly */
-async function signRequest(timestamp, bodyObject, clientKeyHex){
-  const bodyJSON = JSON.stringify(bodyObject);
-  const payload = `${timestamp}.${bodyJSON}`;
-  
-  console.log("🔐 Frontend Signing with Native Web Crypto:");
-  console.log("   - Timestamp:", timestamp);
-  console.log("   - Body:", bodyJSON);
-  console.log("   - ClientKey (hex):", clientKeyHex);
-  console.log("   - Payload to sign:", payload);
-  
-  // Convert hex string to Uint8Array (raw bytes)
-  const keyBytes = new Uint8Array(
-    clientKeyHex.match(/.{1,2}/g).map(byte => parseInt(byte, 16))
-  );
-  
-  console.log("   - KeyBytes length:", keyBytes.length);
-  console.log("   - KeyBytes (first 5):", Array.from(keyBytes.slice(0, 5)));
-  
-  // Import key for HMAC
-  const cryptoKey = await crypto.subtle.importKey(
-    "raw",
-    keyBytes,
-    { name: "HMAC", hash: "SHA-256" },
-    false,
-    ["sign"]
-  );
-  
-  // Convert payload to bytes
-  const encoder = new TextEncoder();
-  const payloadBytes = encoder.encode(payload);
-  
-  // Generate HMAC signature
-  const signatureBuffer = await crypto.subtle.sign(
-    "HMAC",
-    cryptoKey,
-    payloadBytes
-  );
-  
-  // Convert to hex string
-  const signatureArray = Array.from(new Uint8Array(signatureBuffer));
-  const signature = signatureArray.map(b => b.toString(16).padStart(2, '0')).join('');
-  
-  console.log("   - Generated signature:", signature);
-  console.log("   - Generated signature (first 10):", signature.substring(0, 10));
-  
-  return signature;
 }
 
 /* RECAPTCHA TOKEN */
@@ -203,10 +154,7 @@ async function startSession(){
     const j = await res.json();
     if(j.ok){
       sessionToken = j.session_token;
-      clientKey = j.client_key;
       console.log("✅ Session started successfully");
-      console.log("   - Session token received");
-      console.log("   - Client key:", clientKey);
     } else {
       console.error("❌ Session start failed", j);
     }
@@ -221,10 +169,10 @@ async function sendMessage(){
   if(!text) return;
 
   // Check if session is ready
-  if(!sessionToken || !clientKey){
+  if(!sessionToken){
     console.error("Session not ready. Retrying...");
     await startSession();
-    if(!sessionToken || !clientKey){
+    if(!sessionToken){
       appendMessage("Please wait, initializing...", "bot");
       return;
     }
@@ -235,14 +183,11 @@ async function sendMessage(){
   hideElement("welcomeChips");
   showTyping();
 
-  const timestamp = Date.now().toString();
   const requestBody = {
     session_id: sessionId,
     message: text
   };
 
-  // Generate signature
-  const signature = await signRequest(timestamp, requestBody, clientKey);
   const recaptchaToken = await getRecaptchaToken(RECAPTCHA_SITE_KEY);
 
   try {
@@ -251,8 +196,6 @@ async function sendMessage(){
       headers: {
         "Content-Type": "application/json",
         "X-Session-Token": sessionToken,
-        "X-Timestamp": timestamp,
-        "X-Signature": signature,
         "X-Recaptcha-Token": recaptchaToken
       },
       body: JSON.stringify(requestBody)
