@@ -7,8 +7,7 @@
  * - verifyRecaptcha(secret, token) -> score (throws on failure)
  * - rateLimitMiddleware, detectAutomationMiddleware (IP & heuristics)
  *
- * NOTE: This uses an in-memory store `sessionKeyStore` to map tokenId -> clientKey.
- * Replace sessionKeyStore with Redis or your session_store for production.
+ * NOTE: This uses persistent session store for token storage.
  */
 
 const crypto = require("crypto");
@@ -37,7 +36,6 @@ const sessionKeyStore = {
     await setSession(`token:${tokenId}`, null);
   }
 };
-
 
 // Helpers: AES-GCM encrypt/decrypt for token payload
 function aesGcmEncrypt(plaintext) {
@@ -79,7 +77,7 @@ async function createSessionTokenForClient(payloadObj) {
   const signature = hmacSign(encrypted);
   const token = `${encrypted}.${signature}`; // final token
 
-  // clientKey: random 32 bytes hex used only between this client and server for request signatures
+  // clientKey: random 24 bytes hex used only between this client and server for request signatures
   const clientKey = crypto.randomBytes(24).toString('hex'); // 48 chars
   // Store mapping
   await sessionKeyStore.set(tokenId, { clientKey, expiresAt, payload: payloadObj });
@@ -127,17 +125,30 @@ async function verifyTokenAndPayload(token) {
 // signatureHex expected hex of HMAC-SHA256(`${timestamp}.${bodyString}`) using clientKey.
 async function verifySignatureWithClientKey(clientKey, timestamp, body, signatureHex) {
   if (!clientKey || !timestamp || !signatureHex) return false;
+  
   // replay protection: allow 5 minutes skew
   const ts = parseInt(timestamp, 10);
   if (isNaN(ts)) return false;
   if (Math.abs(Date.now() - ts) > 1000 * 60 * 5) return false;
 
-  const bodyString = typeof body === 'string' ? body : JSON.stringify(body || {});
+  // CRITICAL: body should be the RAW string as sent by client
+  const bodyString = typeof body === 'string' ? body : JSON.stringify(body);
   const payload = `${timestamp}.${bodyString}`;
+  
+  console.log("🔍 Server signature verification:");
+  console.log("   - Payload:", payload);
+  console.log("   - ClientKey (first 10):", clientKey.substring(0, 10));
+  
   const h = crypto.createHmac('sha256', clientKey).update(payload).digest('hex');
+  
+  console.log("   - Calculated signature:", h);
+  console.log("   - Received signature:  ", signatureHex);
+  console.log("   - Match:", h === signatureHex);
+  
   try {
     return crypto.timingSafeEqual(Buffer.from(h, 'hex'), Buffer.from(signatureHex, 'hex'));
   } catch (e) {
+    console.log("   - timingSafeEqual error:", e.message);
     return false;
   }
 }
