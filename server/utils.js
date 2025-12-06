@@ -206,18 +206,29 @@ function rateLimitMiddleware() {
 }
 
 /**
- * detectAutomationMiddleware: simple heuristics
+ * detectAutomationMiddleware: simple heuristics (relaxed for iframe compatibility)
  */
 function detectAutomationMiddleware() {
   return (req, res, next) => {
     const raw = req.body;
-    if (raw && typeof raw === 'string' && raw.length > 1500 * 10) {
+    // Only block extremely large payloads
+    if (raw && typeof raw === 'string' && raw.length > 50000) {
+      console.log("❌ Blocked: Payload too large");
       return res.status(400).json({ error: 'Payload too large' });
     }
+    
     const ua = (req.headers['user-agent'] || '').toString();
-    if (!ua || ua.length < 8) {
+    
+    // Only block obvious bots (curl, wget, etc.), allow browsers and iframes
+    const suspiciousBots = ['curl', 'wget', 'python-requests', 'go-http-client', 'bot'];
+    const isSuspicious = suspiciousBots.some(bot => ua.toLowerCase().includes(bot));
+    
+    if (isSuspicious) {
+      console.log("❌ Blocked suspicious bot:", ua);
       return res.status(403).json({ error: 'Client not allowed' });
     }
+    
+    // Allow empty or short user agents (can happen in iframes)
     next();
   };
 }
