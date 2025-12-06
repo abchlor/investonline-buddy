@@ -38,7 +38,14 @@ app.use((req, res, next) => {
   next();
 });
 
-app.use(express.json({ limit: "64kb" }));
+// Capture raw body for signature verification
+app.use(express.json({ 
+  limit: "64kb",
+  verify: (req, res, buf, encoding) => {
+    req.rawBody = buf.toString(encoding || 'utf8');
+  }
+}));
+
 app.use(morgan("tiny"));
 
 // ---- CORS ----
@@ -179,22 +186,24 @@ app.post("/chat", async (req, res) => {
     // === STEP 5: Verify signature ===
     console.log("✍️ Checking signature...");
     console.log("   - Timestamp received:", timestamp);
-    console.log("   - Body received:", JSON.stringify(req.body));
+    console.log("   - Raw body:", req.rawBody);
+    console.log("   - Parsed body:", JSON.stringify(req.body));
     console.log("   - ClientKey exists:", !!tokenInfo.clientKey);
     console.log("   - ClientKey (first 10 chars):", tokenInfo.clientKey?.substring(0, 10));
     console.log("   - Signature received (first 10 chars):", clientSignature?.substring(0, 10));
     
-    // Calculate what the signature SHOULD be
-    const bodyString = JSON.stringify(req.body);
+    // Calculate what the signature SHOULD be using RAW BODY
+    const bodyString = req.rawBody || JSON.stringify(req.body);
     const expectedPayload = `${timestamp}.${bodyString}`;
     const expectedSig = crypto.createHmac('sha256', tokenInfo.clientKey).update(expectedPayload).digest('hex');
     console.log("   - Expected signature (first 10 chars):", expectedSig.substring(0, 10));
     console.log("   - Signatures match:", expectedSig === clientSignature);
     
+    // Use rawBody for verification
     const validSig = await verifySignatureWithClientKey(
       tokenInfo.clientKey, 
       timestamp, 
-      req.body, 
+      req.rawBody || req.body,
       clientSignature
     );
     
