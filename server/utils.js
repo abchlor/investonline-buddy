@@ -6,8 +6,6 @@
  * - verifySignatureWithClientKey(clientKey, timestamp, body, signatureHex) -> boolean
  * - verifyRecaptcha(secret, token) -> score (throws on failure)
  * - rateLimitMiddleware, detectAutomationMiddleware (IP & heuristics)
- *
- * NOTE: This uses persistent session store for token storage.
  */
 
 const crypto = require("crypto");
@@ -135,18 +133,23 @@ async function verifySignatureWithClientKey(clientKey, timestamp, body, signatur
   const bodyString = typeof body === 'string' ? body : JSON.stringify(body);
   const payload = `${timestamp}.${bodyString}`;
   
+  // Normalize clientKey and signature to lowercase for consistent hex comparison
+  const normalizedKey = clientKey.toLowerCase();
+  const normalizedSig = signatureHex.toLowerCase();
+  
   console.log("🔍 Server signature verification:");
   console.log("   - Payload:", payload);
-  console.log("   - ClientKey (first 10):", clientKey.substring(0, 10));
+  console.log("   - ClientKey (original):", clientKey);
+  console.log("   - ClientKey (normalized):", normalizedKey);
   
-  const h = crypto.createHmac('sha256', clientKey).update(payload).digest('hex');
+  const h = crypto.createHmac('sha256', normalizedKey).update(payload).digest('hex');
   
   console.log("   - Calculated signature:", h);
-  console.log("   - Received signature:  ", signatureHex);
-  console.log("   - Match:", h === signatureHex);
+  console.log("   - Received signature:  ", normalizedSig);
+  console.log("   - Match:", h === normalizedSig);
   
   try {
-    return crypto.timingSafeEqual(Buffer.from(h, 'hex'), Buffer.from(signatureHex, 'hex'));
+    return crypto.timingSafeEqual(Buffer.from(h, 'hex'), Buffer.from(normalizedSig, 'hex'));
   } catch (e) {
     console.log("   - timingSafeEqual error:", e.message);
     return false;
