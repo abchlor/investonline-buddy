@@ -228,6 +228,10 @@ app.post("/feedback", (req, res) => {
   res.json({ status: "ok" }); 
 });
 
+app.get("/widget", (req, res) => {
+  res.sendFile(path.join(__dirname, "server", "widget.html"));
+});
+
 const PORT = process.env.PORT || 8080;
 app.listen(PORT, () => {
   console.log(`InvestOnline Buddy running on ${PORT}`);
