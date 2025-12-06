@@ -5,70 +5,61 @@
 <meta name="viewport" content="width=device-width,initial-scale=1" />
 <title>InvestOnline Buddy</title>
 
-<!-- reCAPTCHA v3 -->
-<script src="https://www.google.com/recaptcha/api.js?render=6LcdNyIsAAAAADuObE98pa6KC4g9HG-FirZ7Ohro"></script>
+<!-- Load Recaptcha V3 -->
+<script src="https://www.google.com/recaptcha/api.js?render= 6LcdNyIsAAAAADuObE98pa6KC4g9HG-FirZ7Ohro"></script>
 
 <style>
-/* --- your entire CSS kept as-is (no change) --- */
-:root{
-  --brand:#F58220;
-  --brand-600:#e06f05;
-  --bg:#f6f7fb;
-  --muted:#6b7280;
-  --card:#ffffff;
-  --accent:#2563eb;
-}
-html,body{height:100%;margin:0;font-family:Inter,system-ui,-apple-system,"Segoe UI",Roboto,"Helvetica Neue",Arial;}
-body{background:var(--bg);display:flex;flex-direction:column;overflow:hidden}
-.shell{width:100%;height:100%;display:flex;flex-direction:column;box-shadow:0 6px 18px rgba(16,24,40,0.08);border-radius:10px;overflow:hidden;background:linear-gradient(180deg,#fff,#fbfdff)}
-.header{display:flex;align-items:center;gap:12px;padding:14px 16px;background:var(--card);border-bottom:1px solid #eef2f7}
-.avatar-wrap{width:44px;height:44px;border-radius:10px;overflow:hidden;flex:0 0 44px;display:flex;align-items:center;justify-content:center;background:#fff}
-.title-block{display:flex;flex-direction:column}
-.title{font-weight:700;color:#0f172a;font-size:16px}
-.subtitle{font-size:12px;color:var(--muted)}
-.chat{flex:1;overflow:auto;padding:18px;display:flex;flex-direction:column;gap:10px}
-.msg{max-width:78%;padding:12px 14px;border-radius:12px;line-height:1.35;font-size:14px;box-shadow:0 1px 0 rgba(16,24,40,0.02)}
-.bot{align-self:flex-start;background:var(--card);border:1px solid #eef2f7;color:#0f172a}
-.user{align-self:flex-end;background:var(--brand);color:#fff}
-.chips{display:flex;gap:8px;flex-wrap:wrap;margin-top:6px}
-.chip{
-  background:rgba(245,130,32,0.08);
-  border:1px solid rgba(245,130,32,0.12);
-  color:var(--brand-600);
-  padding:8px 12px;
-  border-radius:20px;
-  font-size:13px;
-  cursor:pointer;
-  transition:all .15s;
-}
-.chip:hover{transform:translateY(-2px);box-shadow:0 6px 18px rgba(245,130,32,0.08)}
-.typing{display:flex;align-items:center;gap:6px}
-.dot{width:7px;height:7px;border-radius:50%;background:#b9c3d3;animation:typing 1.2s infinite}
-.dot:nth-child(2){animation-delay:.15s}
-.dot:nth-child(3){animation-delay:.3s}
-@keyframes typing{
- 0%{opacity:.2;transform:translateY(0)}
- 50%{opacity:1;transform:translateY(-3px)}
- 100%{opacity:.2;transform:translateY(0)}
-}
-.input-area{display:flex;gap:10px;padding:12px;border-top:1px solid #edf2f7;background:var(--card)}
-.input{flex:1;padding:12px 14px;border-radius:999px;border:1px solid #e6eef7;background:#fff;font-size:14px;outline:none}
-.btn{background:var(--brand);border:none;color:#fff;padding:10px 14px;border-radius:999px;cursor:pointer;font-weight:600;box-shadow:0 6px 18px rgba(245,130,32,0.12)}
-.btn:active{transform:translateY(1px)}
+  :root{
+    --brand:#F58220;
+    --brand-600:#e06f05;
+    --bg:#f6f7fb;
+    --muted:#6b7280;
+    --card:#ffffff;
+  }
+  html,body{height:100%;margin:0;font-family:Inter,system-ui;}
+  body{background:var(--bg);display:flex;flex-direction:column;overflow:hidden}
+
+  .shell{width:100%;height:100%;display:flex;flex-direction:column;border-radius:10px;overflow:hidden;background:#fff}
+
+  .header{display:flex;align-items:center;gap:12px;padding:14px 16px;background:var(--card);border-bottom:1px solid #eef2f7}
+  .avatar-wrap{width:44px;height:44px;border-radius:10px;overflow:hidden;flex:0 0 44px;background:#fff;display:flex;align-items:center;justify-content:center}
+  .title{font-weight:700;color:#0f172a;font-size:16px}
+  .subtitle{font-size:12px;color:var(--muted)}
+
+  .chat{flex:1;overflow:auto;padding:18px;display:flex;flex-direction:column;gap:10px}
+
+  .msg{max-width:78%;padding:12px 14px;border-radius:12px;font-size:14px;line-height:1.3}
+  .bot{align-self:flex-start;background:#fff;border:1px solid #eef2f7;color:#0f172a}
+  .user{align-self:flex-end;background:var(--brand);color:#fff}
+
+  .chips{display:flex;gap:8px;flex-wrap:wrap;margin-top:6px}
+  .chip{background:rgba(245,130,32,0.08);border:1px solid rgba(245,130,32,0.12);color:var(--brand-600);padding:8px 12px;border-radius:20px;font-size:13px;cursor:pointer}
+
+  .typing{display:flex;align-items:center;gap:6px}
+  .dot{width:7px;height:7px;border-radius:50%;background:#b9c3d3;animation:typing 1.2s infinite}
+  .dot:nth-child(2){animation-delay:.15s}
+  .dot:nth-child(3){animation-delay:.3s}
+  @keyframes typing{
+    0%{opacity:.2;transform:translateY(0)}
+    50%{opacity:1;transform:translateY(-3px)}
+    100%{opacity:.2;transform:translateY(0)}
+  }
+
+  .input-area{display:flex;gap:10px;padding:12px;border-top:1px solid #edf2f7;background:#fff}
+  .input{flex:1;padding:12px 14px;border-radius:999px;border:1px solid #e6eef7;font-size:14px}
+  .btn{background:var(--brand);border:none;color:#fff;padding:10px 14px;border-radius:999px;font-weight:600;cursor:pointer}
 </style>
 </head>
 
 <body>
 <div class="shell">
-
   <div class="header">
     <div class="avatar-wrap">
-      <!-- (unchanged SVG avatar) -->
-      <svg width="44" height="44" viewBox="0 0 120 120">
+      <svg width="44" height="44" viewBox="0 0 120 120" fill="none">
         <rect width="120" height="120" rx="18" fill="#fff"/>
       </svg>
     </div>
-    <div class="title-block">
+    <div>
       <div class="title">InvestOnline Buddy</div>
       <div class="subtitle">Ask about investments, KYC & onboarding</div>
     </div>
@@ -76,6 +67,7 @@ body{background:var(--bg);display:flex;flex-direction:column;overflow:hidden}
 
   <div class="chat" id="chat">
     <div class="msg bot">Hi — I'm InvestOnline Buddy. How can I help you today?</div>
+
     <div class="chips" id="welcomeChips">
       <div class="chip" onclick="pick('Start Registration')">Start Registration</div>
       <div class="chip" onclick="pick('Documents Needed')">Documents Needed</div>
@@ -90,171 +82,162 @@ body{background:var(--bg);display:flex;flex-direction:column;overflow:hidden}
 </div>
 
 <script>
-/* ==========================================================
-   CONFIG
-========================================================== */
+/* CONFIG */
 const WIDGET_API_BASE = "https://investonline-buddy.onrender.com";
-const RECAPTCHA_SITE_KEY = "6LcdNyIsAAAAADuObE98pa6KC4g9HG-FirZ7Ohro";
+const RECAPTCHA_SITE_KEY = " 6LcdNyIsAAAAADuObE98pa6KC4g9HG-FirZ7Ohro";
 
-/* ===================================================================
-   SESSION VARIABLES (stored only in RAM)
-=================================================================== */
-let sessionId = "web-" + Math.random().toString(36).slice(2,10);
+/* STATE */
 let sessionToken = null;
 let clientKey = null;
-let tokenExpiresAt = null;
 
-/* ==========================================================
-   DOM HELPERS
-========================================================== */
+/* ELEMENTS */
 const chatEl = document.getElementById("chat");
 const inputEl = document.getElementById("userInput");
 const sendBtn = document.getElementById("sendBtn");
 
 function appendMessage(text, who="bot"){
   const d = document.createElement("div");
-  d.className = "msg " + (who === "bot" ? "bot" : "user");
+  d.className = "msg " + who;
   d.innerText = text;
   chatEl.appendChild(d);
   chatEl.scrollTop = chatEl.scrollHeight;
 }
 
 function appendChips(list){
-  if(!list || !list.length) return;
+  if(!list) return;
   const wrap = document.createElement("div");
   wrap.className = "chips";
-  for(const label of list){
+  list.forEach(label=>{
     const c = document.createElement("div");
     c.className = "chip";
     c.innerText = label;
-    c.onclick = () => { inputEl.value = label; sendMessage(); };
+    c.onclick = ()=>{ inputEl.value = label; sendMessage(); };
     wrap.appendChild(c);
-  }
+  });
   chatEl.appendChild(wrap);
   chatEl.scrollTop = chatEl.scrollHeight;
 }
 
 function showTyping(){
-  const t = document.createElement("div");
-  t.className = "msg bot";
-  t.id = "typing";
-  t.innerHTML = '<div class="typing"><div class="dot"></div><div class="dot"></div><div class="dot"></div></div>';
+  const t=document.createElement('div');
+  t.className='msg bot';
+  t.id='typing';
+  t.innerHTML='<div class="typing"><div class="dot"></div><div class="dot"></div><div class="dot"></div></div>';
   chatEl.appendChild(t);
-  chatEl.scrollTop = chatEl.scrollHeight;
+  chatEl.scrollTop=chatEl.scrollHeight;
 }
 function hideTyping(){
   const t = document.getElementById("typing");
   if(t) t.remove();
 }
 
-function hideWelcomeChips(){
-  const el = document.getElementById("welcomeChips");
-  if(el) el.style.display = "none";
+/* CRYPTO HELPERS */
+function hexToBytes(hex){
+  const out=[];
+  for(let i=0;i<hex.length;i+=2){
+    out.push(parseInt(hex.substring(i,i+2),16));
+  }
+  return new Uint8Array(out);
+}
+function bytesToHex(bytes){
+  return Array.from(bytes, b=>b.toString(16).padStart(2,"0")).join("");
 }
 
-/* ==========================================================
-   CRYPTO HELPERS – HMAC SHA256 with clientKey
-========================================================== */
-async function hmacHex(clientKeyHex, message){
-  function hexToBuffer(hex){
-    const bytes = new Uint8Array(hex.length / 2);
-    for(let i=0;i<bytes.length;i++) bytes[i] = parseInt(hex.substr(i*2,2),16);
-    return bytes;
-  }
-  const keyBytes = hexToBuffer(clientKeyHex);
+/* SIGNING FUNCTION */
+async function signMessage(message, timestamp, clientKey, sessionToken){
+  const encoder = new TextEncoder();
+  const data = encoder.encode(`${message}:${timestamp}:${sessionToken}`);
+
+  const keyData = hexToBytes(clientKey);
   const cryptoKey = await crypto.subtle.importKey(
     "raw",
-    keyBytes,
+    keyData,
     { name: "HMAC", hash: "SHA-256" },
     false,
     ["sign"]
   );
-  const sig = await crypto.subtle.sign(
-    "HMAC",
-    cryptoKey,
-    new TextEncoder().encode(message)
-  );
-  return Array.from(new Uint8Array(sig))
-    .map(b => b.toString(16).padStart(2,"0"))
-    .join("");
+
+  const sigBuffer = await crypto.subtle.sign("HMAC", cryptoKey, data);
+  return bytesToHex(new Uint8Array(sigBuffer));
 }
 
-/* ==========================================================
-   START SESSION (MUST BE CALLED ONCE)
-========================================================== */
-async function startSecureSession(){
-  const resp = await fetch(`${WIDGET_API_BASE}/session/start`, {
-    method:"POST",
-    headers:{ "Content-Type":"application/json" },
-    body: JSON.stringify({})
-  });
-  const j = await resp.json();
-
-  sessionToken = j.session_token;
-  clientKey    = j.client_key;
-  tokenExpiresAt = j.expires_at;
+/* RECAPTCHA TOKEN */
+async function getRecaptchaToken(key){
+  return grecaptcha.execute(key, { action: "chat" });
 }
 
-/* ==========================================================
-   SEND CHAT
-========================================================== */
+/* START SESSION */
+async function startSession(){
+  try {
+    const res = await fetch(`${WIDGET_API_BASE}/session/start`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: "{}"
+    });
+
+    const j = await res.json();
+    if(j.ok){
+      sessionToken = j.session_token;
+      clientKey = j.client_key;
+    } else {
+      console.error("Session start failed", j);
+    }
+  } catch (err){
+    console.error("Session error", err);
+  }
+}
+
+/* SEND MESSAGE */
 async function sendMessage(){
   const text = inputEl.value.trim();
   if(!text) return;
 
-  appendMessage(text,"user");
+  appendMessage(text, "user");
   inputEl.value = "";
-  hideWelcomeChips();
+  hideElement("welcomeChips");
   showTyping();
 
+  const timestamp = Date.now().toString();
+  const signature = await signMessage(text, timestamp, clientKey, sessionToken);
+  const recaptchaToken = await getRecaptchaToken(RECAPTCHA_SITE_KEY);
+
   try {
-    // ensure valid token
-    if(!sessionToken || Date.now() > tokenExpiresAt){
-      await startSecureSession();
-    }
-
-    // recaptcha
-    const recToken = await grecaptcha.execute(RECAPTCHA_SITE_KEY, { action:"chat" });
-
-    const timestamp = Date.now().toString();
-    const body = { session_id: sessionId, message: text };
-    const bodyString = JSON.stringify(body);
-    const signature = await hmacHex(clientKey, `${timestamp}.${bodyString}`);
-
     const res = await fetch(`${WIDGET_API_BASE}/chat`, {
-      method:"POST",
-      headers:{
-        "Content-Type":"application/json",
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
         "X-Session-Token": sessionToken,
         "X-Timestamp": timestamp,
         "X-Signature": signature,
-        "X-Recaptcha-Token": recToken
+        "X-Recaptcha-Token": recaptchaToken
       },
-      body: bodyString
+      body: JSON.stringify({ message: text })
     });
 
     const j = await res.json();
     hideTyping();
-    appendMessage(j.reply || "Something went wrong.","bot");
-    if(j.suggested) appendChips(j.suggested);
+    appendMessage(j.reply || "Something went wrong.", "bot");
+    appendChips(j.suggested);
 
   } catch(err){
     hideTyping();
-    appendMessage("Network issue. Try again later.","bot");
-    console.error("Chat widget error:", err);
+    appendMessage("Network issue. Try again later.", "bot");
+    console.error("Chat error", err);
   }
 }
 
-function pick(s){ inputEl.value=s; sendMessage(); }
+function hideElement(id){
+  const el = document.getElementById(id);
+  if(el) el.style.display="none";
+}
 
 sendBtn.addEventListener("click", sendMessage);
-inputEl.addEventListener("keydown", e => { if(e.key === "Enter") sendMessage(); });
+inputEl.addEventListener("keydown", e=>{
+  if(e.key === "Enter") sendMessage();
+});
 
-/* ==========================================================
-   INITIALIZE SECURE SESSION ON LOAD
-========================================================== */
-startSecureSession();
+/* INIT */
+startSession();
 </script>
-
 </body>
 </html>
