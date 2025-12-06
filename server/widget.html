@@ -148,11 +148,13 @@ function signRequest(timestamp, bodyObject, clientKeyHex){
   console.log("🔐 Frontend Signing with CryptoJS:");
   console.log("   - Timestamp:", timestamp);
   console.log("   - Body:", bodyJSON);
-  console.log("   - ClientKey (hex, first 10):", clientKeyHex?.substring(0, 10));
+  console.log("   - ClientKey (hex, original):", clientKeyHex);
+  console.log("   - ClientKey (hex, lowercase):", clientKeyHex?.toLowerCase());
   console.log("   - Payload to sign:", payload);
   
   // Convert hex string to WordArray (CryptoJS format)
-  const key = CryptoJS.enc.Hex.parse(clientKeyHex);
+  // CRITICAL: Normalize to lowercase to match Node.js
+  const key = CryptoJS.enc.Hex.parse(clientKeyHex.toLowerCase());
   
   // Create HMAC-SHA256 signature
   const hmac = CryptoJS.HmacSHA256(payload, key);
