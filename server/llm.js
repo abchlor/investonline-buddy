@@ -26,8 +26,8 @@ function isAllowedURL(url) {
   }
 }
 
-// Fetch page content with timeout
-async function fetchPageContent(url, timeoutMs = 8000) {
+// Fetch page content with shorter timeout for speed
+async function fetchPageContent(url, timeoutMs = 5000) {
   if (!isAllowedURL(url)) {
     console.log(`❌ Blocked URL (not investonline.in): ${url}`);
     return null;
@@ -82,12 +82,12 @@ async function fetchPageContent(url, timeoutMs = 8000) {
     // Extract title
     const title = $('title').text() || $('h1').first().text() || '';
 
-    // Clean up
+    // Clean up and limit to 4000 chars for faster processing
     content = content
       .replace(/\s+/g, ' ')
       .replace(/\n+/g, ' ')
       .trim()
-      .slice(0, 6000);
+      .slice(0, 4000); // Reduced from 6000 to 4000
 
     const fullContent = `Page Title: ${title}\n\nPage Content: ${content}`;
 
@@ -145,13 +145,14 @@ function findRelevantURLs(query, flows) {
     }
   }
 
-  const uniqueURLs = [...urls].slice(0, 2);
+  // Only return 1 URL for faster processing
+  const uniqueURLs = [...urls].slice(0, 1);
   console.log(`📚 Found ${uniqueURLs.length} relevant URLs`);
   return uniqueURLs;
 }
 
-// Call GPT with timeout
-async function callGPT(userQuery, context, flows, relevantURLs = [], timeoutMs = 20000) {
+// Call GPT with reduced timeout and token limit
+async function callGPT(userQuery, context, flows, relevantURLs = [], timeoutMs = 12000) {
   if (!OPENAI_API_KEY) {
     throw new Error("OPENAI_API_KEY not set");
   }
@@ -160,36 +161,35 @@ async function callGPT(userQuery, context, flows, relevantURLs = [], timeoutMs =
 
 **Your Role:**
 - Help with mutual funds, SIPs, KYC, registration, calculators, and investment queries
-- Provide accurate information from InvestOnline.in content
-- Be concise, friendly, and professional
-- Use proper formatting with headings, bullet points, and numbered lists
-- Use 1-2 emojis per response for warmth
+- Provide accurate, concise information from InvestOnline.in content
+- Be friendly and professional
+- Use simple formatting with bullet points
+- Use 1 emoji per response
 
 **Response Formatting Rules:**
-1. Use **bold** for important terms (wrap in **text**)
-2. Use bullet points (•) or numbered lists for steps
-3. Break content into clear sections with line breaks
-4. Keep paragraphs short (2-3 sentences max)
-5. Add spacing between sections for readability
+1. DO NOT use markdown headings (no ###, ##, #)
+2. DO NOT use *** or ___ separators
+3. Keep responses SHORT and concise (under 150 words)
+4. Use bullet points (•) for lists
+5. Single line breaks only
 
 **Link Formatting Rules:**
-1. NEVER write bare URLs in your response
-2. NEVER use HTML tags in your response (no <a>, <href>, etc.)
-3. Instead, use this format: [Read more](URL)
-4. Example: For KYC info, write: [Complete KYC online](https://www.investonline.in/kyc)
-5. Place "Read more" links at the END of relevant sections
+1. ONLY include "Read more" links if you have a VALID URL from the Relevant URLs list below
+2. Use format: [Read more](URL) - where URL must be from the list
+3. If no relevant URL is available, DO NOT include any "Read more" link
+4. Place link at the END of response
 
 **Critical Rules:**
-1. ONLY use information from InvestOnline.in (provided in Context)
-2. Do NOT make up information
-3. Keep responses under 250 words
+1. ONLY use information from InvestOnline.in
+2. Keep responses under 150 words
+3. Be concise and direct
 4. End with: SUGGESTED: question1 | question2 | question3 | question4
 
 **Context from InvestOnline.in:**
-${context || "No page content available. Use general knowledge about InvestOnline services."}
+${context ? context.slice(0, 2000) : "No page content available. Use general knowledge about InvestOnline services."}
 
-**Relevant Page URLs (use these for "Read more" links):**
-${relevantURLs.length > 0 ? relevantURLs.join('\n') : 'No specific URLs available'}
+**Relevant URLs (ONLY use these for links):**
+${relevantURLs.length > 0 ? relevantURLs.map(url => `- ${url}`).join('\n') : 'NONE - Do not include any "Read more" links'}
 
 **Contact Info:**
 Email: wealth@investonline.in
@@ -215,7 +215,7 @@ Phone: 1800-2222-65`;
           { role: "user", content: userQuery }
         ],
         temperature: 0.7,
-        max_tokens: 500,
+        max_tokens: 300, // Reduced from 500 to 300 for speed
         top_p: 1,
         frequency_penalty: 0.3,
         presence_penalty: 0.3
@@ -256,7 +256,7 @@ Phone: 1800-2222-65`;
     }
 
     // ✅ FORMAT THE RESPONSE
-    reply = formatReply(reply);
+    reply = formatReply(reply, relevantURLs);
 
     return { reply, suggested };
 
@@ -270,12 +270,30 @@ Phone: 1800-2222-65`;
   }
 }
 
-// Format GPT's reply with proper HTML structure
-function formatReply(text) {
+// Format GPT's reply with proper HTML structure and validate links
+function formatReply(text, relevantURLs = []) {
   if (!text) return text;
 
-  // Convert markdown-style links [text](url) to HTML
-  text = text.replace(/\[([^\]]+)\]\((https?:\/\/[^)]+)\)/g, '<a href="$2" target="_blank" rel="noopener noreferrer" class="read-more">$1</a>');
+  // ✅ REMOVE MARKDOWN ARTIFACTS
+  text = text.replace(/^#{1,6}\s+(.+)$/gm, '<strong>$1</strong>');
+  text = text.replace(/^[\-*_]{3,}$/gm, '');
+  text = text.replace(/\*{2,3}([^*]+)\*{2,3}/g, '<strong>$1</strong>');
+  
+  // ✅ VALIDATE AND CONVERT MARKDOWN LINKS
+  // Only convert links that match our allowed URLs
+  text = text.replace(/\[([^\]]+)\]\((https?:\/\/[^)]+)\)/g, (match, linkText, url) => {
+    // Check if URL is in our relevantURLs list or is a valid InvestOnline URL
+    const isValid = relevantURLs.some(validUrl => url.includes(validUrl) || validUrl.includes(url)) || 
+                    ALLOWED_DOMAINS.some(domain => url.includes(domain));
+    
+    if (isValid) {
+      return `<a href="${url}" target="_blank" rel="noopener noreferrer" class="read-more">${linkText}</a>`;
+    } else {
+      // If URL is not valid, remove the link but keep the text
+      console.warn(`⚠️ Removed invalid link: ${url}`);
+      return linkText;
+    }
+  });
 
   // Convert **bold** to <strong>
   text = text.replace(/\*\*([^*]+)\*\*/g, '<strong>$1</strong>');
@@ -286,46 +304,50 @@ function formatReply(text) {
   // Convert numbered lists
   text = text.replace(/^\d+\.\s+(.+)$/gm, '<div class="numbered-item">$&</div>');
 
-  // Add line breaks between paragraphs (double newlines)
-  text = text.replace(/\n\n/g, '<br><br>');
-
-  // Single newlines become <br>
+  // ✅ SINGLE LINE BREAKS
+  text = text.replace(/\n{3,}/g, '\n\n');
+  text = text.replace(/\n\n/g, '<br>');
   text = text.replace(/\n/g, '<br>');
 
-  // Wrap contact info nicely
+  // Wrap contact info
   text = text.replace(/Email:\s*([^\s<]+)/g, '<div class="contact-info">📧 Email: <a href="mailto:$1">$1</a></div>');
   text = text.replace(/Phone:\s*([\d\-+]+)/g, '<div class="contact-info">📞 Phone: <a href="tel:$1">$1</a></div>');
+
+  // Clean up extra <br> tags
+  text = text.replace(/(<br>\s*){2,}/g, '<br>');
 
   return text;
 }
 
-// Main function with timeouts
+// Main function optimized for speed
 async function getSmartResponse(userQuery, flows) {
+  const startTime = Date.now();
+  
   try {
-    // Step 1: Find URLs
+    // Step 1: Find URLs (fast)
     const relevantURLs = findRelevantURLs(userQuery, flows);
 
-    // Step 2: Fetch content
+    // Step 2: Skip fetching if no URLs found (faster)
     let context = "";
     if (relevantURLs.length > 0) {
-      const fetchPromises = relevantURLs.map(url => 
-        fetchPageContent(url, 8000).catch(err => {
-          console.error(`Failed to fetch ${url}:`, err.message);
-          return null;
-        })
-      );
-      
-      const contents = await Promise.all(fetchPromises);
-      
-      relevantURLs.forEach((url, idx) => {
-        if (contents[idx]) {
-          context += `\n\n=== Source: ${url} ===\n${contents[idx]}\n`;
+      // Only fetch the first URL with short timeout
+      try {
+        const content = await fetchPageContent(relevantURLs[0], 5000);
+        if (content) {
+          context = `=== Source: ${relevantURLs[0]} ===\n${content}`;
         }
-      });
+      } catch (err) {
+        console.error(`Failed to fetch ${relevantURLs[0]}:`, err.message);
+        // Continue without context rather than failing
+      }
     }
 
-    // Step 3: Call GPT
-    const result = await callGPT(userQuery, context, flows, relevantURLs, 20000);
+    // Step 3: Call GPT with reduced timeout
+    const result = await callGPT(userQuery, context, flows, relevantURLs, 12000);
+    
+    const elapsed = Date.now() - startTime;
+    console.log(`⏱️ Total response time: ${elapsed}ms`);
+    
     return result;
 
   } catch (error) {
