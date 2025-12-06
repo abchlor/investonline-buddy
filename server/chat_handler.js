@@ -162,9 +162,17 @@ async function handleChat({ session_id, message, page, lang, req }) {
 
   // Use GPT-4o-mini for intelligent responses (main path)
   try {
-    console.log(`🤖 Using GPT-4o-mini for query: "${text.slice(0, 50)}..."`);
+    console.log(`🤖 Processing query: "${text.slice(0, 50)}..."`);
     
-    const result = await getSmartResponse(text, flows);
+    // Set a total timeout for the entire operation (25 seconds)
+    const timeoutPromise = new Promise((_, reject) => 
+      setTimeout(() => reject(new Error('Request timeout - please try a simpler question')), 25000)
+    );
+    
+    const responsePromise = getSmartResponse(text, flows);
+    
+    // Race between response and timeout
+    const result = await Promise.race([responsePromise, timeoutPromise]);
     
     // Store in session context for potential follow-ups
     s.context = s.context || [];
@@ -174,28 +182,36 @@ async function handleChat({ session_id, message, page, lang, req }) {
     });
     if (s.context.length > 5) s.context.shift(); // Keep last 5 interactions
     
-    console.log(`✅ GPT response generated with ${result.suggested.length} suggestions`);
+    console.log(`✅ Response generated with ${result.suggested.length} suggestions`);
     return result;
 
   } catch (gptError) {
-    console.error("❌ GPT call failed, using fallback:", gptError.message);
+    console.error("❌ Response generation failed:", gptError.message);
     
-    // Fallback to basic response
+    // User-friendly fallback response
     const fallback = (flows.global && flows.global.fallback_message) || 
-      "I can help with mutual funds, SIPs, calculators, redemptions, KYC, and platform questions.";
+      "I can help with mutual funds, SIPs, calculators, redemptions, KYC, and registration.";
     
     const support = flows.global?.support_block || {
       email: "wealth@investonline.in",
       phone_primary: "1800-2222-65"
     };
     
-    const reply = `${fallback}\n\n📧 Email: <a href="mailto:${support.email}">${support.email}</a>\n📞 Phone: ${support.phone_primary}`;
+    // Determine error type
+    let errorMessage = fallback;
+    if (gptError.message.includes('timeout')) {
+      errorMessage = "⏱️ That's taking a bit long. Let me give you our contact info instead!\n\n" + fallback;
+    } else if (gptError.message.includes('API')) {
+      errorMessage = "I'm having trouble connecting right now. Here's how to reach our support team:\n\n" + fallback;
+    }
+    
+    const reply = `${errorMessage}\n\n📧 Email: <a href="mailto:${support.email}">${support.email}</a>\n📞 Phone: ${support.phone_primary}`;
     
     return { 
       reply,
       suggested: [
         "What is KYC?",
-        "Start Registration",
+        "How to register?",
         "SIP Calculator",
         "Top Performing Funds",
         "Talk to Support"
