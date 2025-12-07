@@ -11,7 +11,9 @@ const END_CHAT_KEYWORDS = ["end chat", "stop", "close chat", "bye", "goodbye", "
 const SESSION_MSG_LIMIT = 120;
 const MIN_INTER_MESSAGE_MS = 200;
 
-function now() { return Date.now(); }
+function now() {
+  return Date.now();
+}
 
 function touchSession(sessionId) {
   let s = sessions.get(sessionId);
@@ -20,7 +22,8 @@ function touchSession(sessionId) {
       createdAt: now(), 
       lastMessageAt: now(),
       messageCount: 0, 
-      token: Math.random().toString(36).slice(2,8) 
+      context: [],
+      token: Math.random().toString(36).slice(2, 8) 
     };
     sessions.set(sessionId, s);
   }
@@ -30,11 +33,16 @@ function touchSession(sessionId) {
 function clearSession(sessionId, tokenId) {
   sessions.delete(sessionId);
   if (tokenId) {
-    try { invalidateToken(tokenId); } catch (e) { /* ignore */ }
+    try { 
+      invalidateToken(tokenId); 
+    } catch (e) { 
+      console.error("Error invalidating token:", e);
+    }
   }
 }
 
-function matchIntentText(text) {
+// Quick keyword matching for simple queries (fast path)
+function matchSimpleIntent(text) {
   if (!text || typeof text !== "string") return null;
   const lower = text.toLowerCase().trim();
   
@@ -42,27 +50,47 @@ function matchIntentText(text) {
     return { type: "end_chat" };
   }
 
-  const intents = flows.intents || {};
-  for (const [key, def] of Object.entries(intents)) {
-    const kws = def.keywords || [];
-    for (const kw of kws) {
-      if (!kw) continue;
-      if (lower.includes(kw.toLowerCase())) {
-        return { type: "intent", key, def };
-      }
+  const simpleMatches = {
+    "email": "email_support",
+    "email support": "email_support",
+    "mail": "email_support",
+    "call": "call_support",
+    "phone": "call_support",
+    "call support": "call_support",
+    "phone number": "call_support",
+    "contact": "contact",
+    "help": "contact"
+  };
+
+  for (const [keyword, intent] of Object.entries(simpleMatches)) {
+    if (lower === keyword) {
+      return { type: "simple", intent };
     }
   }
 
-  if (flows.site) {
-    for (const [k, def] of Object.entries(flows.site)) {
-      const kws = def.keywords || [];
-      for (const kw of kws) {
-        if (!kw) continue;
-        if (lower.includes(kw.toLowerCase())) {
-          return { type: "site", key: k, def };
-        }
-      }
-    }
+  return null;
+}
+
+function formatResponse(text) {
+  if (!text) return text;
+  return text.replace(/(https?:\/\/[^\s<]+)/g, '<a href="$1" target="_blank" rel="noopener noreferrer">$1</a>');
+}
+
+function getSimpleResponse(intent, flows) {
+  if (flows.intents && flows.intents[intent]) {
+    const def = flows.intents[intent];
+    return {
+      reply: formatResponse(def.response),
+      suggested: (def.suggested || []).slice(0, 5)
+    };
+  }
+  
+  if (flows.site && flows.site[intent]) {
+    const def = flows.site[intent];
+    return {
+      reply: formatResponse(def.response),
+      suggested: (def.suggested || []).slice(0, 5)
+    };
   }
   
   return null;
@@ -70,10 +98,11 @@ function matchIntentText(text) {
 
 async function handleChat({ session_id, message, page, lang, req }) {
   const text = typeof message === "string" ? message : (message && message.text) || "";
-  const sessionId = session_id || `anon_${Math.random().toString(36).slice(2,8)}`;
+  const sessionId = session_id || `anon_${Math.random().toString(36).slice(2, 8)}`;
   
   const s = touchSession(sessionId);
 
+  // Rate limiting
   if (s.messageCount > SESSION_MSG_LIMIT) {
     clearSession(sessionId);
     return { 
@@ -86,7 +115,7 @@ async function handleChat({ session_id, message, page, lang, req }) {
   const currentTime = now();
   const delta = currentTime - (s.lastMessageAt || 0);
   
-  if (s.messageCount > 1 && delta < MIN_INTER_MESSAGE_MS) {
+  if (s.messageCount > 0 && delta < MIN_INTER_MESSAGE_MS) {
     console.log(`⚠️ Rapid messages detected: ${delta}ms`);
     clearSession(sessionId);
     return { 
@@ -99,8 +128,9 @@ async function handleChat({ session_id, message, page, lang, req }) {
   s.messageCount = (s.messageCount || 0) + 1;
   s.lastMessageAt = currentTime;
 
-  const match = matchIntentText(text);
-  if (match && match.type === "end_chat") {
+  // Handle end chat
+  const simpleMatch = matchSimpleIntent(text);
+  if (simpleMatch && simpleMatch.type === "end_chat") {
     const tokenId = req && req.body && req.body.token_id;
     clearSession(sessionId, tokenId);
     return { 
@@ -109,49 +139,58 @@ async function handleChat({ session_id, message, page, lang, req }) {
     };
   }
 
-  if (match) {
-    if (match.type === "intent" || match.type === "site") {
-      const def = match.def;
-      const resp = def.response || "";
-      const suggested = (def.suggested || []).slice(0, 5);
-      return { reply: resp, suggested };
+  // Fast path for simple intents
+  if (simpleMatch && simpleMatch.type === "simple") {
+    console.log(`⚡ Fast path for: ${simpleMatch.intent}`);
+    const response = getSimpleResponse(simpleMatch.intent, flows);
+    if (response) {
+      return response;
     }
   }
 
-  // Use OpenAI for general queries
+  // Use OpenAI for everything else
   try {
-    console.log(`🤖 Using OpenAI for: "${text.slice(0, 50)}..."`);
+    console.log(`🤖 OpenAI processing: "${text.slice(0, 50)}..."`);
     
-    let context = "You are InvestOnline Buddy, a helpful financial assistant for InvestOnline.in.\n\n";
-    context += "Available services:\n";
+    const timeoutPromise = new Promise((_, reject) => 
+      setTimeout(() => reject(new Error('OpenAI request timeout')), 15000)
+    );
     
-    const intents = flows.intents || {};
-    Object.entries(intents).forEach(([key, def]) => {
-      if (def.response) {
-        context += `- ${key}: ${def.response.slice(0, 100)}...\n`;
-      }
-    });
+    // Build context-aware prompt
+    let prompt = text;
+    if (s.context && s.context.length > 0) {
+      const contextStr = s.context.slice(-3).map(c => 
+        `User: ${c.query}\nBot: ${c.response}`
+      ).join('\n');
+      prompt = `Previous conversation:\n${contextStr}\n\nCurrent question: ${text}`;
+    }
     
-    context += "\nAnswer briefly (under 150 words). Be helpful and professional.";
+    const responsePromise = callOpenAI(prompt);
+    const reply = await Promise.race([responsePromise, timeoutPromise]);
     
-    const prompt = `${context}\n\nUser question: ${text}\n\nYour answer:`;
+    // Update context
+    s.context = s.context || [];
+    s.context.push({ query: text, response: reply.slice(0, 100) });
+    if (s.context.length > 5) s.context.shift();
     
-    const answer = await callOpenAI(prompt);
+    console.log(`✅ OpenAI response ready`);
     
+    // Generate suggestions based on context
     const suggested = [
       "What is KYC?",
       "How to register?",
       "SIP Calculator",
+      "Top Funds",
       "Talk to Support"
     ];
     
     return { 
-      reply: answer,
+      reply: formatResponse(reply),
       suggested
     };
 
   } catch (error) {
-    console.error("❌ OpenAI error:", error.message);
+    console.error("❌ OpenAI failed:", error.message);
     
     const fallback = (flows.global && flows.global.fallback_message) || 
       "I can help with mutual funds, SIPs, calculators, KYC, and registration. 💰";
@@ -161,7 +200,7 @@ async function handleChat({ session_id, message, page, lang, req }) {
       phone_primary: "1800-2222-65"
     };
     
-    const reply = `${fallback}<br><br>📧 Email: ${support.email}<br>📞 Phone: ${support.phone_primary}`;
+    const reply = `${fallback}<br><br><div class="contact-info">📧 Email: <a href="mailto:${support.email}">${support.email}</a></div><div class="contact-info">📞 Phone: ${support.phone_primary}</div>`;
     
     return { 
       reply,
@@ -169,6 +208,7 @@ async function handleChat({ session_id, message, page, lang, req }) {
         "What is KYC?",
         "How to register?",
         "SIP Calculator",
+        "Top Funds",
         "Talk to Support"
       ]
     };
