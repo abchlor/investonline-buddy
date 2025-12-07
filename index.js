@@ -86,8 +86,8 @@ initSessionStore();
 console.log("Using in-memory session store");
 
 // ---- Global security middlewares ----
-app.use(rateLimitMiddleware()); // IP-based
-app.use(detectAutomationMiddleware()); // payload heuristics
+app.use(rateLimitMiddleware());
+app.use(detectAutomationMiddleware());
 
 // ---- Landing page at / ----
 app.get("/", (req, res) => {
@@ -124,34 +124,55 @@ app.post("/session/start", async (req, res) => {
 // ---- Chat endpoint ----
 app.post("/chat", async (req, res) => {
   try {
-    // Origin validation
     const origin = req.headers.origin || req.headers.referer || "";
+    console.log("📍 Origin check:", origin);
+    
     if (!origin || !allowedOrigins.some(o => origin.startsWith(o))) {
+      console.log("❌ REJECTED: Origin not allowed");
       return res.status(403).json({ error: "Origin not allowed" });
     }
+    console.log("✅ PASSED: Origin OK");
 
-    // Extract headers
     const sessionToken = req.headers["x-session-token"] || req.body.session_token;
     const recaptchaToken = req.headers["x-recaptcha-token"] || req.body.recaptchaToken;
 
-    if (!sessionToken || !recaptchaToken) {
-      return res.status(401).json({ error: "missing_headers" });
-    }
+    console.log("📦 Headers:", {
+      hasToken: !!sessionToken,
+      hasRecaptcha: !!recaptchaToken
+    });
 
-    // Verify reCAPTCHA
+    if (!sessionToken || !recaptchaToken) {
+      console.log("❌ REJECTED: Missing headers");
+      return res.status(401).json({ 
+        error: "missing_headers",
+        missing: {
+          sessionToken: !sessionToken,
+          recaptcha: !recaptchaToken
+        }
+      });
+    }
+    console.log("✅ PASSED: All headers present");
+
+    console.log("🔐 Checking reCAPTCHA...");
     try {
       await verifyRecaptcha(process.env.RECAPTCHA_SECRET || "", recaptchaToken);
+      console.log("✅ PASSED: reCAPTCHA OK");
     } catch (recaptchaErr) {
+      console.log("❌ REJECTED: reCAPTCHA failed -", recaptchaErr.message);
       return res.status(429).json({ error: 'recaptcha_failed' });
     }
 
-    // Verify session token
+    console.log("🎫 Checking session token...");
     const tokenInfo = await verifyTokenAndPayload(sessionToken);
     if (!tokenInfo || !tokenInfo.clientKey) {
+      console.log("❌ REJECTED: Session token invalid or expired");
       return res.status(401).json({ error: "invalid_session_token" });
     }
+    console.log("✅ PASSED: Session token OK");
 
-    // All checks passed
+    console.log("⚠️ SKIPPED: Signature verification (temporarily disabled)");
+
+    console.log("🎉 All security checks passed!");
     const { session_id, message, page = "/", lang = "en" } = req.body;
 
     if (!session_id || !message) {
