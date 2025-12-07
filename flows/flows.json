@@ -9,155 +9,155 @@
 
   "intents": {
     "kyc": {
-      "keywords": ["kyc", "ekyc", "complete kyc", "update kyc", "kyc process", "verify identity"],
-      "synonyms": ["identity check", "identity verification", "verify me", "verification"],
-      "response": "✅ **KYC (Know Your Customer)** verifies your identity and is mandatory for investing in India.\n\nYou can complete **e-KYC instantly** using:\n• Aadhaar OTP (takes 2-3 minutes)\n• Or upload documents manually\n\n🔗 Start KYC: https://www.investonline.in/onboarding",
-      "suggested": ["How to do e-KYC?", "What documents are required?", "How long does KYC take?", "Start Registration"]
+      "keywords": ["kyc", "ekyc", "complete kyc", "update kyc", "kyc process"],
+      "synonyms": ["verify identity", "identity check"],
+      "response": "✅ KYC verifies your identity and is mandatory for investing. You can complete e-KYC instantly using Aadhaar OTP or upload documents manually.\n\n[Complete KYC](https://www.investonline.in)",
+      "suggested": ["How to do e-KYC?", "What documents are required?", "How long does KYC take?"]
     },
 
     "ekyc_howto": {
       "keywords": ["how to do ekyc", "ekyc process", "complete ekyc", "do kyc online"],
       "synonyms": ["ekyc steps", "online kyc"],
-      "response": "📱 **How to complete e-KYC:**\n\n1. Go to https://www.investonline.in/onboarding\n2. Enter your PAN number\n3. Enter Aadhaar number\n4. Verify with Aadhaar OTP\n5. Upload selfie for photo verification\n6. Submit!\n\n✅ Your KYC will be verified instantly.",
+      "response": "📱 How to complete e-KYC:\n\n1. Visit InvestOnline homepage\n2. Click 'Login/Signup' button\n3. Enter your PAN number\n4. Enter Aadhaar number\n5. Verify with Aadhaar OTP\n6. Upload selfie for photo verification\n7. Submit!\n\n✅ Your KYC will be verified instantly.\n\n[Start e-KYC](https://www.investonline.in)",
       "suggested": ["What documents needed?", "Start Registration", "KYC taking time?", "Talk to Support"]
     },
 
     "kyc_documents": {
       "keywords": ["documents required", "documents needed", "what documents", "kyc documents", "documents for kyc"],
       "synonyms": ["required documents", "needed papers", "documentation"],
-      "response": "📄 **Documents Required for KYC:**\n\n**For e-KYC (Instant):**\n• PAN Card number\n• Aadhaar number\n• Mobile number (linked to Aadhaar)\n• Recent selfie/photo\n\n**For Manual KYC:**\n• PAN Card copy\n• Address proof (Aadhaar/Passport/Driving License)\n• Bank statement/cancelled cheque\n• Passport-size photo\n\n🔗 Start KYC: https://www.investonline.in/onboarding",
+      "response": "📄 Documents Required for KYC:\n\nFor e-KYC (Instant):\n• PAN Card number\n• Aadhaar number\n• Mobile number (linked to Aadhaar)\n• Recent selfie/photo\n\nFor Manual KYC:\n• PAN Card copy\n• Address proof (Aadhaar/Passport/Driving License)\n• Bank statement/cancelled cheque\n• Passport-size photo\n\n[Start KYC](https://www.investonline.in)",
       "suggested": ["How to do e-KYC?", "How long does KYC take?", "Start Registration", "PAN details"]
     },
 
     "kyc_time": {
       "keywords": ["how long kyc", "kyc time", "kyc duration", "how much time kyc"],
       "synonyms": ["kyc takes how long", "time for kyc"],
-      "response": "⏱️ **KYC Processing Time:**\n\n• **e-KYC (Aadhaar):** Instant (2-3 minutes)\n• **Manual KYC:** 24-48 hours\n\nMost users complete registration in **6-8 minutes** using Aadhaar e-KYC!\n\n🔗 Start now: https://www.investonline.in/onboarding",
+      "response": "⏱️ KYC Processing Time:\n\n• e-KYC (Aadhaar): Instant (2-3 minutes)\n• Manual KYC: 24-48 hours\n\nMost users complete registration in 6-8 minutes using Aadhaar e-KYC!\n\n[Start now](https://www.investonline.in)",
       "suggested": ["Start Registration", "What documents needed?", "How to do e-KYC?", "Talk to Support"]
     },
 
     "registration": {
-      "keywords": ["register", "registration", "sign up", "create account", "start registration", "new account", "regiater", "regiter"],
+      "keywords": ["register", "registration", "sign up", "create account", "start registration", "new account", "regiater", "regiter", "signup", "sign-up"],
       "synonyms": ["onboarding", "join", "enroll", "open account"],
-      "response": "🎉 **Start Your Investment Journey!**\n\nTo register on InvestOnline:\n1. Complete e-KYC (2-3 mins)\n2. Add bank details\n3. Set up your profile\n4. Start investing!\n\n📝 What you'll need:\n• PAN number\n• Aadhaar (for instant e-KYC)\n• Bank account details\n• Cancelled cheque/bank statement\n\n🔗 Start Registration: https://www.investonline.in/onboarding",
+      "response": "🎉 Start Your Investment Journey!\n\nTo register on InvestOnline:\n1. Visit the homepage\n2. Click 'Login/Signup' button (opens iframe)\n3. Fill in your details\n4. Complete e-KYC\n5. Start investing!\n\n📝 What you'll need:\n• PAN number\n• Aadhaar (for instant e-KYC)\n• Bank account details\n• Cancelled cheque/bank statement\n\n[Start Registration](https://www.investonline.in)",
       "suggested": ["What is KYC?", "Documents needed?", "How long does it take?", "E-KYC process", "Talk to Support"]
     },
 
     "sip": {
       "keywords": ["sip", "systematic investment", "monthly sip", "start sip", "what is sip"],
       "synonyms": ["sip plan", "systematic investment plan"],
-      "response": "💰 **SIP (Systematic Investment Plan)**\n\nInvest a fixed amount every month automatically!\n\n✅ Benefits:\n• Disciplined investing\n• Rupee cost averaging\n• Compound growth\n• Start with as low as ₹500/month\n\n🔗 Start SIP: https://www.investonline.in/mutual-funds\n🔗 SIP Calculator: https://www.investonline.in/financial-calculators/sip-calculator",
+      "response": "💰 SIP (Systematic Investment Plan)\n\nInvest a fixed amount every month automatically!\n\n✅ Benefits:\n• Disciplined investing\n• Rupee cost averaging\n• Compound growth\n• Start with as low as ₹500/month\n\n[Start SIP](https://www.investonline.in/mutual-funds)\n[SIP Calculator](https://www.investonline.in/financial-calculators/sip-calculator)",
       "suggested": ["How to start SIP?", "SIP Calculator", "Benefits of SIP?", "Top funds for SIP", "Goal-based SIP"]
     },
 
     "start_sip": {
       "keywords": ["how to start sip", "start sip", "begin sip", "create sip", "setup sip"],
       "synonyms": ["initiate sip", "sip setup"],
-      "response": "🚀 **How to Start a SIP:**\n\n1. Login to your dashboard\n2. Select a mutual fund\n3. Click 'Start SIP'\n4. Choose:\n   • SIP amount (min ₹500)\n   • SIP date (1-28 of month)\n   • Duration (min 6 months)\n5. Set up auto-debit mandate\n6. Done!\n\n🔗 Browse funds: https://www.investonline.in/mutual-funds\n🔗 Top performing funds: https://www.investonline.in/mutual-funds/top-performing-funds",
+      "response": "🚀 How to Start a SIP:\n\n1. Login to your dashboard\n2. Select a mutual fund\n3. Click 'Start SIP'\n4. Choose:\n   • SIP amount (min ₹500)\n   • SIP date (1-28 of month)\n   • Duration (min 6 months)\n5. Set up auto-debit mandate\n6. Done!\n\n[Browse funds](https://www.investonline.in/mutual-funds)\n[Top performing funds](https://www.investonline.in/mutual-funds/top-performing-funds)",
       "suggested": ["SIP Calculator", "Top funds", "Compare funds", "What is SIP?", "Goal SIP calculator"]
     },
 
     "sip_benefits": {
       "keywords": ["benefits of sip", "sip advantages", "why sip", "sip benefits"],
       "synonyms": ["sip pros", "advantages sip"],
-      "response": "✨ **Benefits of SIP:**\n\n1. **Disciplined Investing** - Auto-debit monthly\n2. **Rupee Cost Averaging** - Buy more units when prices low\n3. **Power of Compounding** - Grow wealth long-term\n4. **Flexible** - Start/stop/modify anytime\n5. **Low Minimum** - Start with ₹500/month\n6. **No Market Timing** - Invest systematically\n\n🔗 Calculate returns: https://www.investonline.in/financial-calculators/sip-calculator",
+      "response": "✨ Benefits of SIP:\n\n1. Disciplined Investing - Auto-debit monthly\n2. Rupee Cost Averaging - Buy more units when prices low\n3. Power of Compounding - Grow wealth long-term\n4. Flexible - Start/stop/modify anytime\n5. Low Minimum - Start with ₹500/month\n6. No Market Timing - Invest systematically\n\n[Calculate returns](https://www.investonline.in/financial-calculators/sip-calculator)",
       "suggested": ["SIP Calculator", "Start SIP", "Top SIP funds", "Goal-based SIP", "Compare funds"]
     },
 
     "login": {
       "keywords": ["login", "sign in", "password", "cant login", "login problem"],
       "synonyms": ["forgot password", "login issue", "cant access", "locked out"],
-      "response": "🔐 **Login Issues?**\n\nIf you're unable to log in:\n\n1. **Reset Password:** Use 'Forgot Password' on login page\n2. **Enter registered email/mobile**\n3. **Check spam folder** for reset link\n4. **Still stuck?** Contact support\n\n🔗 Login here: https://www.investonline.in/login\n🔗 Reset password: https://www.investonline.in/forgot-password",
+      "response": "🔐 Login Issues?\n\nIf you're unable to log in:\n\n1. Click 'Login/Signup' on homepage\n2. Use 'Forgot Password' option\n3. Enter registered email/mobile\n4. Check spam folder for reset link\n5. Still stuck? Contact support\n\n[Go to Login](https://www.investonline.in)",
       "suggested": ["Reset password", "Contact support", "Registration help", "Email support", "Call support"]
     },
 
     "email_support": {
       "keywords": ["email support", "support email", "email us", "mail support"],
-      "response": "📧 **Email Support:**\n\nYou can email us at: <a href=\"mailto:wealth@investonline.in\">wealth@investonline.in</a>\n\nWe typically respond within 24 hours during business days.",
+      "response": "📧 Email Support:\n\nYou can email us at: wealth@investonline.in\n\nWe typically respond within 24 hours during business days.",
       "suggested": ["Call support", "Talk to advisor", "Back to Help Center", "Live chat"]
     },
 
     "call_support": {
       "keywords": ["call support", "phone support", "call us", "contact number", "phone number"],
       "synonyms": ["call center", "helpline"],
-      "response": "📞 **Call Us:**\n\n• **Toll-Free:** 1800-2222-65\n• **Direct:** +91-22-4071-3333\n\n⏰ **Timings:** Mon-Fri, 9:30 AM - 6:00 PM IST",
+      "response": "📞 Call Us:\n\n• Toll-Free: 1800-2222-65\n• Direct: +91-22-4071-3333\n\n⏰ Timings: Mon-Fri, 9:30 AM - 6:00 PM IST",
       "suggested": ["Email support", "Talk to advisor", "Schedule callback", "Back to Help Center"]
     },
 
     "advisor_support": {
       "keywords": ["talk to advisor", "advisor", "schedule advisor", "financial advisor", "investment advisor"],
       "synonyms": ["wealth advisor", "consultant", "expert advice"],
-      "response": "👨‍💼 **Talk to Investment Advisor:**\n\nSchedule a personalized consultation with our wealth advisors!\n\n🔗 Book appointment: https://www.investonline.in/contact-us\n\nOr call: 1800-2222-65",
+      "response": "👨‍💼 Talk to Investment Advisor:\n\nSchedule a personalized consultation with our wealth advisors!\n\n[Book appointment](https://www.investonline.in/contact-us)\n\nOr call: 1800-2222-65",
       "suggested": ["Call support", "Email support", "Schedule callback", "Back to Help Center"]
     },
 
     "top_performing_funds": {
       "keywords": ["top funds", "highest return funds", "best mutual funds", "top performing", "best funds"],
       "synonyms": ["top returns", "best performance"],
-      "response": "🏆 **Top Performing Mutual Funds:**\n\nCheck the highest-performing funds across all categories:\n\n🔗 View top funds: https://www.investonline.in/mutual-funds/top-performing-funds\n\nFiltered by:\n• 1-year returns\n• 3-year returns\n• 5-year returns\n• Risk rating",
+      "response": "🏆 Top Performing Mutual Funds:\n\nCheck the highest-performing funds across all categories:\n\n[View top funds](https://www.investonline.in/mutual-funds/top-performing-funds)\n\nFiltered by:\n• 1-year returns\n• 3-year returns\n• 5-year returns\n• Risk rating",
       "suggested": ["Compare funds", "NFO list", "SIP calculator", "Start SIP", "Fund categories"]
     },
 
     "compare_schemes": {
       "keywords": ["compare funds", "compare schemes", "fund comparison", "compare mutual funds"],
       "synonyms": ["scheme comparison", "fund vs fund"],
-      "response": "🔍 **Compare Mutual Funds:**\n\nCompare funds side-by-side:\n• Returns (1Y, 3Y, 5Y)\n• Risk rating\n• Portfolio holdings\n• Expense ratio\n• Fund manager details\n\n🔗 Compare now: https://www.investonline.in/mutual-funds/compare-schemes",
+      "response": "🔍 Compare Mutual Funds:\n\nCompare funds side-by-side:\n• Returns (1Y, 3Y, 5Y)\n• Risk rating\n• Portfolio holdings\n• Expense ratio\n• Fund manager details\n\n[Compare now](https://www.investonline.in/mutual-funds/compare-schemes)",
       "suggested": ["Top funds", "NFO list", "What is NAV?", "Start SIP", "Fund categories"]
     },
 
     "nfo": {
       "keywords": ["nfo", "new fund offer", "latest nfo", "upcoming nfo", "new funds"],
       "synonyms": ["new launches", "upcoming funds"],
-      "response": "🆕 **New Fund Offers (NFO):**\n\nLatest NFOs with details:\n• Fund objectives\n• Lock-in period\n• Minimum investment\n• Subscription dates\n\n🔗 View NFOs: https://www.investonline.in/mutual-funds/new-fund-offer",
+      "response": "🆕 New Fund Offers (NFO):\n\nLatest NFOs with details:\n• Fund objectives\n• Lock-in period\n• Minimum investment\n• Subscription dates\n\n[View NFOs](https://www.investonline.in/mutual-funds/new-fund-offer)",
       "suggested": ["Compare schemes", "Top funds", "What is NAV?", "Start SIP"]
     },
 
     "sip_calculator": {
       "keywords": ["sip calculator", "calculate sip", "sip maturity amount", "sip returns"],
       "synonyms": ["sip calculation", "estimate sip"],
-      "response": "🧮 **SIP Calculator:**\n\nCalculate your SIP returns:\n• Enter monthly investment\n• Choose time period\n• Expected return rate\n• See maturity amount!\n\n🔗 Calculate now: https://www.investonline.in/financial-calculators/sip-calculator",
+      "response": "🧮 SIP Calculator:\n\nCalculate your SIP returns:\n• Enter monthly investment\n• Choose time period\n• Expected return rate\n• See maturity amount!\n\n[Calculate now](https://www.investonline.in/financial-calculators/sip-calculator)",
       "suggested": ["Goal-based SIP", "Compounding calculator", "Future value calculator", "Start SIP", "Top funds"]
     },
 
     "goal_sip_calculator": {
       "keywords": ["goal sip calculator", "sip for goal", "calculate sip for target", "goal based sip"],
       "synonyms": ["target sip", "goal calculator"],
-      "response": "🎯 **Goal-Based SIP Calculator:**\n\nPlan SIP for your financial goals:\n• Set target amount\n• Choose time horizon\n• Get monthly SIP needed!\n\nPerfect for:\n• Child's education\n• House down payment\n• Retirement planning\n• Dream vacation\n\n🔗 Calculate: https://www.investonline.in/financial-calculators/goal-based-sip-calculator",
+      "response": "🎯 Goal-Based SIP Calculator:\n\nPlan SIP for your financial goals:\n• Set target amount\n• Choose time horizon\n• Get monthly SIP needed!\n\nPerfect for:\n• Child's education\n• House down payment\n• Retirement planning\n• Dream vacation\n\n[Calculate](https://www.investonline.in/financial-calculators/goal-based-sip-calculator)",
       "suggested": ["SIP calculator", "Future value calculator", "Start SIP", "Top funds", "Asset allocation"]
     },
 
     "compounding_calculator": {
       "keywords": ["compounding calculator", "compound returns", "compound interest", "compounding"],
       "synonyms": ["compound calculator", "compounding effect"],
-      "response": "📈 **Compounding Returns Calculator:**\n\nSee the magic of compounding!\n• Enter investment amount\n• Expected annual return\n• Time period\n• Watch your wealth grow!\n\n💡 Albert Einstein: \"Compound interest is the 8th wonder of the world.\"\n\n🔗 Calculate: https://www.investonline.in/financial-calculators/compounding-returns-calculator",
+      "response": "📈 Compounding Returns Calculator:\n\nSee the magic of compounding!\n• Enter investment amount\n• Expected annual return\n• Time period\n• Watch your wealth grow!\n\n💡 Albert Einstein: \"Compound interest is the 8th wonder of the world.\"\n\n[Calculate](https://www.investonline.in/financial-calculators/compounding-returns-calculator)",
       "suggested": ["Future value calculator", "SIP calculator", "Goal SIP", "Start SIP"]
     },
 
     "future_value_calculator": {
       "keywords": ["future value", "fv calculator", "value after years", "future worth"],
       "synonyms": ["maturity value", "future amount"],
-      "response": "🔮 **Future Value Calculator:**\n\nEstimate what your investment will grow to:\n• Today's investment\n• Expected annual return\n• Time period\n• See future value!\n\n🔗 Calculate: https://www.investonline.in/financial-calculators/future-value-calculator",
+      "response": "🔮 Future Value Calculator:\n\nEstimate what your investment will grow to:\n• Today's investment\n• Expected annual return\n• Time period\n• See future value!\n\n[Calculate](https://www.investonline.in/financial-calculators/future-value-calculator)",
       "suggested": ["Compounding calculator", "SIP calculator", "Goal SIP calculator", "Start SIP"]
     },
 
     "asset_allocation": {
       "keywords": ["asset allocation", "portfolio mix", "ideal allocation", "equity debt ratio"],
       "synonyms": ["portfolio allocation", "investment mix"],
-      "response": "📊 **Asset Allocation Calculator:**\n\nGet ideal equity-debt mix based on:\n• Your age\n• Risk appetite\n• Investment horizon\n• Financial goals\n\n🔗 Calculate: https://www.investonline.in/financial-calculators/asset-allocation-calculator",
+      "response": "📊 Asset Allocation Calculator:\n\nGet ideal equity-debt mix based on:\n• Your age\n• Risk appetite\n• Investment horizon\n• Financial goals\n\n[Calculate](https://www.investonline.in/financial-calculators/asset-allocation-calculator)",
       "suggested": ["SIP calculator", "Top funds", "Compare funds", "Goal SIP", "Start SIP"]
     },
 
     "redeem": {
       "keywords": ["redeem", "withdraw", "sell units", "redeem mutual fund", "redemption"],
       "synonyms": ["withdrawal", "sell fund", "encash"],
-      "response": "💸 **Redeem Mutual Fund:**\n\nTo redeem your investment:\n1. Login to dashboard\n2. Go to 'My Portfolio'\n3. Select the fund\n4. Click 'Redeem'\n5. Enter amount/units\n6. Confirm redemption\n\n⏱️ Money credited in 2-4 business days.\n\n🔗 Login: https://www.investonline.in/login",
+      "response": "💸 Redeem Mutual Fund:\n\nTo redeem your investment:\n1. Login to dashboard\n2. Go to 'My Portfolio'\n3. Select the fund\n4. Click 'Redeem'\n5. Enter amount/units\n6. Confirm redemption\n\n⏱️ Money credited in 2-4 business days.\n\n[Login](https://www.investonline.in)",
       "suggested": ["Switch funds", "Track portfolio", "Exit load info", "Talk to support"]
     },
 
     "switch": {
       "keywords": ["switch fund", "move to another fund", "switch investment", "fund switch"],
       "synonyms": ["transfer fund", "change fund"],
-      "response": "🔄 **Switch Between Funds:**\n\nMove money between funds of same AMC:\n1. Login to dashboard\n2. Select source fund\n3. Choose target fund (same AMC)\n4. Enter amount\n5. Confirm switch\n\n⚡ No exit load on switches within same AMC!\n\n🔗 Login: https://www.investonline.in/login",
+      "response": "🔄 Switch Between Funds:\n\nMove money between funds of same AMC:\n1. Login to dashboard\n2. Select source fund\n3. Choose target fund (same AMC)\n4. Enter amount\n5. Confirm switch\n\n⚡ No exit load on switches within same AMC!\n\n[Login](https://www.investonline.in)",
       "suggested": ["Compare funds", "Redeem", "Top funds", "Talk to support"]
     }
   },
@@ -166,20 +166,20 @@
     "blogs": {
       "keywords": ["blog", "blogs", "articles", "mf blogs", "reading material", "investment articles"],
       "synonyms": ["latest posts", "investing articles", "learn investing"],
-      "response": "📚 **Investment Blogs & Articles:**\n\nRead expert insights on:\n• Mutual fund strategies\n• SIP tips & tricks\n• Market analysis\n• Tax planning\n• Wealth creation\n\n🔗 Read blogs: https://www.investonline.in/blogs",
+      "response": "📚 Investment Blogs & Articles:\n\nRead expert insights on:\n• Mutual fund strategies\n• SIP tips & tricks\n• Market analysis\n• Tax planning\n• Wealth creation\n\n[Read blogs](https://www.investonline.in/blogs)",
       "suggested": ["Latest articles", "Beginner guides", "SIP basics", "Tax saving", "Market updates"]
     },
 
     "tools": {
       "keywords": ["calculator", "tools", "financial tools", "investment tools", "calculators"],
-      "response": "🛠️ **Investment Tools & Calculators:**\n\n🔗 **SIP Calculator:** https://www.investonline.in/financial-calculators/sip-calculator\n🔗 **Goal-Based SIP:** https://www.investonline.in/financial-calculators/goal-based-sip-calculator\n🔗 **Compounding Returns:** https://www.investonline.in/financial-calculators/compounding-returns-calculator\n🔗 **Future Value:** https://www.investonline.in/financial-calculators/future-value-calculator\n🔗 **Asset Allocation:** https://www.investonline.in/financial-calculators/asset-allocation-calculator",
+      "response": "🛠️ Investment Tools & Calculators:\n\n[SIP Calculator](https://www.investonline.in/financial-calculators/sip-calculator)\n[Goal-Based SIP](https://www.investonline.in/financial-calculators/goal-based-sip-calculator)\n[Compounding Returns](https://www.investonline.in/financial-calculators/compounding-returns-calculator)\n[Future Value](https://www.investonline.in/financial-calculators/future-value-calculator)\n[Asset Allocation](https://www.investonline.in/financial-calculators/asset-allocation-calculator)",
       "suggested": ["SIP calculator", "Compare funds", "Start SIP", "Top funds", "Goal calculator"]
     },
 
     "contact": {
       "keywords": ["support", "help", "contact", "customer care", "help center"],
       "synonyms": ["reach team", "customer service", "assistance"],
-      "response": "📞 **Contact Customer Support:**\n\n🔗 Contact page: https://www.investonline.in/contact-us\n\n📧 Email: <a href=\"mailto:wealth@investonline.in\">wealth@investonline.in</a>\n📞 Toll-Free: 1800-2222-65\n📞 Direct: +91-22-4071-3333\n\n⏰ Mon-Fri, 9:30 AM - 6:00 PM IST",
+      "response": "📞 Contact Customer Support:\n\n[Contact page](https://www.investonline.in/contact-us)\n\n📧 Email: wealth@investonline.in\n📞 Toll-Free: 1800-2222-65\n📞 Direct: +91-22-4071-3333\n\n⏰ Mon-Fri, 9:30 AM - 6:00 PM IST",
       "suggested": ["Email support", "Call support", "Talk to advisor", "Schedule callback", "Back to Help"]
     }
   },
