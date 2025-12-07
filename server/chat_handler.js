@@ -1,7 +1,7 @@
 const fs = require("fs");
 const path = require("path");
 const { invalidateToken } = require("./utils");
-const { callOpenAI } = require("./llm");
+const { searchKnowledge } = require("./search");
 
 const FLOWS_PATH = path.join(__dirname, "..", "flows", "flows.json");
 let flows = JSON.parse(fs.readFileSync(FLOWS_PATH, "utf8"));
@@ -50,21 +50,26 @@ function matchSimpleIntent(text) {
     return { type: "end_chat" };
   }
 
-  const simpleMatches = {
-    "email": "email_support",
-    "email support": "email_support",
-    "mail": "email_support",
-    "call": "call_support",
-    "phone": "call_support",
-    "call support": "call_support",
-    "phone number": "call_support",
-    "contact": "contact",
-    "help": "contact"
-  };
+  // Check flows.json for predefined responses
+  if (flows.intents) {
+    for (const [key, def] of Object.entries(flows.intents)) {
+      const keywords = def.keywords || [];
+      for (const kw of keywords) {
+        if (lower.includes(kw.toLowerCase())) {
+          return { type: "intent", key, def };
+        }
+      }
+    }
+  }
 
-  for (const [keyword, intent] of Object.entries(simpleMatches)) {
-    if (lower === keyword) {
-      return { type: "simple", intent };
+  if (flows.site) {
+    for (const [key, def] of Object.entries(flows.site)) {
+      const keywords = def.keywords || [];
+      for (const kw of keywords) {
+        if (lower.includes(kw.toLowerCase())) {
+          return { type: "site", key, def };
+        }
+      }
     }
   }
 
@@ -76,24 +81,69 @@ function formatResponse(text) {
   return text.replace(/(https?:\/\/[^\s<]+)/g, '<a href="$1" target="_blank" rel="noopener noreferrer">$1</a>');
 }
 
-function getSimpleResponse(intent, flows) {
-  if (flows.intents && flows.intents[intent]) {
-    const def = flows.intents[intent];
+function getSupportInfo(flows) {
+  const support = flows.global?.support_block || {
+    email: "wealth@investonline.in",
+    phone_primary: "1800-2222-65 (Toll Free)",
+    phone_secondary: "+91-22-4071-3333"
+  };
+  
+  return `
+<div class="support-info" style="margin-top: 15px; padding: 15px; background: #f8f9fa; border-radius: 8px;">
+  <strong>📞 Contact Support:</strong><br><br>
+  📧 <strong>Email:</strong> <a href="mailto:${support.email}">${support.email}</a><br>
+  📞 <strong>Phone:</strong> ${support.phone_primary}<br>
+  ${support.phone_secondary ? `📱 <strong>Mobile:</strong> ${support.phone_secondary}<br>` : ''}
+</div>`;
+}
+
+function formatSearchResults(results, query, flows) {
+  if (!results || results.length === 0) {
     return {
-      reply: formatResponse(def.response),
-      suggested: (def.suggested || []).slice(0, 5)
+      reply: `I couldn't find specific information about "${query}" on InvestOnline.in.<br><br>
+Please contact our support team for assistance:${getSupportInfo(flows)}`,
+      suggested: [
+        "What is KYC?",
+        "How to register?",
+        "SIP Calculator",
+        "Mutual Funds",
+        "Contact Support"
+      ],
+      sources: []
     };
   }
+
+  // Build response from search results
+  let reply = `Here's what I found about "${query}" on InvestOnline.in:<br><br>`;
   
-  if (flows.site && flows.site[intent]) {
-    const def = flows.site[intent];
-    return {
-      reply: formatResponse(def.response),
-      suggested: (def.suggested || []).slice(0, 5)
-    };
-  }
+  const sources = [];
   
-  return null;
+  results.slice(0, 3).forEach((result, index) => {
+    reply += `<div class="search-result" style="margin-bottom: 15px;">
+  <strong>${index + 1}. <a href="${result.url}" target="_blank">${result.title}</a></strong><br>
+  <p style="margin: 5px 0; color: #555;">${result.snippet}</p>
+</div>`;
+    
+    sources.push({
+      title: result.title,
+      url: result.url
+    });
+  });
+
+  reply += `<br><div style="margin-top: 10px; font-size: 0.9em; color: #666;">
+💡 <em>Click the links above to learn more</em>
+</div>`;
+
+  // Generate relevant suggestions
+  const suggested = [
+    "Tell me more",
+    "SIP Calculator",
+    "Contact Support",
+    "Mutual Funds",
+    "KYC Information"
+  ];
+
+  return { reply, suggested, sources };
 }
 
 async function handleChat({ session_id, message, page, lang, req }) {
@@ -139,77 +189,43 @@ async function handleChat({ session_id, message, page, lang, req }) {
     };
   }
 
-  // Fast path for simple intents
-  if (simpleMatch && simpleMatch.type === "simple") {
-    console.log(`⚡ Fast path for: ${simpleMatch.intent}`);
-    const response = getSimpleResponse(simpleMatch.intent, flows);
-    if (response) {
-      return response;
-    }
+  // Fast path for predefined intents (from flows.json)
+  if (simpleMatch && (simpleMatch.type === "intent" || simpleMatch.type === "site")) {
+    console.log(`⚡ Fast path for: ${simpleMatch.key}`);
+    const def = simpleMatch.def;
+    return {
+      reply: formatResponse(def.response),
+      suggested: (def.suggested || []).slice(0, 5)
+    };
   }
 
-  // Use OpenAI for everything else
+  // Search InvestOnline.in website
   try {
-    console.log(`🤖 OpenAI processing: "${text.slice(0, 50)}..."`);
+    console.log(`🔍 Searching InvestOnline.in for: "${text}"`);
     
     const timeoutPromise = new Promise((_, reject) => 
-      setTimeout(() => reject(new Error('OpenAI request timeout')), 15000)
+      setTimeout(() => reject(new Error('Search timeout')), 20000) // 20 second timeout
     );
     
-    // Build context-aware prompt
-    let prompt = text;
-    if (s.context && s.context.length > 0) {
-      const contextStr = s.context.slice(-3).map(c => 
-        `User: ${c.query}\nBot: ${c.response}`
-      ).join('\n');
-      prompt = `Previous conversation:\n${contextStr}\n\nCurrent question: ${text}`;
-    }
+    const searchPromise = searchKnowledge(text, 5);
+    const results = await Promise.race([searchPromise, timeoutPromise]);
     
-    const responsePromise = callOpenAI(prompt);
-    const reply = await Promise.race([responsePromise, timeoutPromise]);
+    console.log(`✅ Search completed: ${results.length} results`);
     
-    // Update context
-    s.context = s.context || [];
-    s.context.push({ query: text, response: reply.slice(0, 100) });
-    if (s.context.length > 5) s.context.shift();
-    
-    console.log(`✅ OpenAI response ready`);
-    
-    // Generate suggestions based on context
-    const suggested = [
-      "What is KYC?",
-      "How to register?",
-      "SIP Calculator",
-      "Top Funds",
-      "Talk to Support"
-    ];
-    
-    return { 
-      reply: formatResponse(reply),
-      suggested
-    };
+    return formatSearchResults(results, text, flows);
 
   } catch (error) {
-    console.error("❌ OpenAI failed:", error.message);
+    console.error("❌ Search failed:", error.message);
     
-    const fallback = (flows.global && flows.global.fallback_message) || 
-      "I can help with mutual funds, SIPs, calculators, KYC, and registration. 💰";
-    
-    const support = flows.global?.support_block || {
-      email: "wealth@investonline.in",
-      phone_primary: "1800-2222-65"
-    };
-    
-    const reply = `${fallback}<br><br><div class="contact-info">📧 Email: <a href="mailto:${support.email}">${support.email}</a></div><div class="contact-info">📞 Phone: ${support.phone_primary}</div>`;
-    
-    return { 
-      reply,
+    return {
+      reply: `Sorry, I encountered an issue while searching InvestOnline.in.<br><br>
+Please contact our support team:${getSupportInfo(flows)}`,
       suggested: [
+        "Try again",
+        "Contact Support",
         "What is KYC?",
-        "How to register?",
-        "SIP Calculator",
-        "Top Funds",
-        "Talk to Support"
+        "Mutual Funds",
+        "SIP Calculator"
       ]
     };
   }
