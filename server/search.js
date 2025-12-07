@@ -194,7 +194,7 @@ function extractKeywords(text) {
 }
 
 // ====================================
-// SITEMAP CRAWLER
+// SITEMAP CRAWLER (FIXED FOR INVESTONLINE)
 // ====================================
 
 async function crawlSitemap(sitemapUrl) {
@@ -206,12 +206,18 @@ async function crawlSitemap(sitemapUrl) {
   try {
     console.log(`🗺️ Fetching sitemap: ${sitemapUrl}`);
     
+    const controller = new AbortController();
+    const timeout = setTimeout(() => controller.abort(), 15000); // 15 second timeout
+    
     const response = await fetch(sitemapUrl, {
+      signal: controller.signal,
       headers: {
-        'User-Agent': 'InvestOnlineBot/1.0'
-      },
-      timeout: 10000
+        'User-Agent': 'Mozilla/5.0 (compatible; InvestOnlineBot/1.0)',
+        'Accept': 'application/xml, text/xml, */*'
+      }
     });
+    
+    clearTimeout(timeout);
 
     if (!response.ok) {
       console.log(`❌ Sitemap fetch failed: ${response.status}`);
@@ -219,22 +225,71 @@ async function crawlSitemap(sitemapUrl) {
     }
 
     const xml = await response.text();
+    console.log(`📄 Received XML (${xml.length} bytes)`);
+    
     const $ = cheerio.load(xml, { xmlMode: true });
 
-    // Extract URLs from sitemap
-    const urls = [];
-    $('url > loc').each((i, elem) => {
+    // Try to detect sitemap index (multiple approaches)
+    let sitemapLinks = [];
+    
+    // Approach 1: Standard sitemap index
+    $('sitemapindex sitemap loc, sitemapindex > sitemap > loc').each((i, elem) => {
       const url = $(elem).text().trim();
-      if (isAllowedURL(url)) {
+      if (url && isAllowedURL(url)) {
+        sitemapLinks.push(url);
+      }
+    });
+
+    // Approach 2: Look for any <loc> tags that end with .xml (sitemap files)
+    if (sitemapLinks.length === 0) {
+      $('loc').each((i, elem) => {
+        const url = $(elem).text().trim();
+        if (url && url.endsWith('.xml') && isAllowedURL(url)) {
+          sitemapLinks.push(url);
+        }
+      });
+    }
+
+    // If sitemap index found, fetch sitemap_main.xml
+    if (sitemapLinks.length > 0) {
+      console.log(`📑 Found sitemap index with ${sitemapLinks.length} sitemaps`);
+      
+      // Find sitemap_main.xml
+      const mainSitemap = sitemapLinks.find(url => url.includes('sitemap_main.xml'));
+      
+      if (mainSitemap) {
+        console.log(`📚 Fetching main sitemap: ${mainSitemap}`);
+        return await crawlSitemap(mainSitemap); // Recursive call
+      } else {
+        console.log(`⚠️ sitemap_main.xml not found, trying first sitemap: ${sitemapLinks[0]}`);
+        return await crawlSitemap(sitemapLinks[0]);
+      }
+    }
+
+    // Extract page URLs from regular sitemap
+    const urls = [];
+    $('url loc, url > loc').each((i, elem) => {
+      const url = $(elem).text().trim();
+      // Only add if it's a page URL (not a .xml file) and is allowed
+      if (url && !url.endsWith('.xml') && isAllowedURL(url)) {
         urls.push(url);
       }
     });
 
-    console.log(`✅ Found ${urls.length} URLs in sitemap`);
+    console.log(`✅ Found ${urls.length} page URLs in sitemap`);
+    
+    if (urls.length === 0) {
+      console.log(`⚠️ Debug: First 500 chars of XML: ${xml.substring(0, 500)}`);
+    }
+    
     return urls;
 
   } catch (error) {
-    console.error(`❌ Error crawling sitemap:`, error.message);
+    if (error.name === 'AbortError') {
+      console.error(`⏱️ Timeout fetching sitemap`);
+    } else {
+      console.error(`❌ Error crawling sitemap:`, error.message);
+    }
     return [];
   }
 }
@@ -315,6 +370,7 @@ async function initializeKnowledgeBase(sitemapUrl) {
   
   if (urls.length === 0) {
     console.log(`⚠️ No URLs found in sitemap. Knowledge base will be empty.`);
+    console.log(`💡 Tip: Check if sitemap URL is correct or accessible`);
     return;
   }
 
