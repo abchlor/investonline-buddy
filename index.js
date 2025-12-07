@@ -20,6 +20,30 @@ const {
 } = require("./server/utils");
 
 const app = express();
+// ====================================
+// AI SEARCH INITIALIZATION
+// ====================================
+const { initializeKnowledgeBase } = require("./server/search");
+
+// Sitemap URL (customize if needed)
+const SITEMAP_URL = process.env.SITEMAP_URL || "https://www.investonline.in/sitemap.xml";
+
+console.log(`🚀 Starting InvestOnline Buddy with AI Search...`);
+
+// Initialize knowledge base on startup (async, non-blocking)
+(async () => {
+  try {
+    console.log(`📚 Building knowledge base from ${SITEMAP_URL}...`);
+    console.log(`⏳ This will take 1-2 minutes on first startup...`);
+    
+    await initializeKnowledgeBase(SITEMAP_URL);
+    
+    console.log(`✅ Knowledge base ready! Chatbot can now answer questions from your entire website.`);
+  } catch (err) {
+    console.error(`❌ Failed to initialize knowledge base:`, err.message);
+    console.log(`⚠️ Chatbot will work with flows.json only (limited responses)`);
+  }
+})();
 
 // ---- Basic security with IFRAME support ----
 app.use(
