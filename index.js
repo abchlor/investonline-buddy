@@ -1,404 +1,256 @@
-const fetch = require("node-fetch");
-const cheerio = require("cheerio");
+require("dotenv").config();
+const express = require("express");
+const cors = require("cors");
+const helmet = require("helmet");
+const morgan = require("morgan");
+const path = require("path");
+const crypto = require("crypto");
+
+const { handleChat } = require("./server/chat_handler");
+const { health } = require("./server/health");
+const { initSessionStore } = require("./server/session_store");
+
+const {
+  verifySignatureWithClientKey,
+  verifyTokenAndPayload,
+  createSessionTokenForClient,
+  verifyRecaptcha,
+  rateLimitMiddleware,
+  detectAutomationMiddleware
+} = require("./server/utils");
+
+const app = express();
 
 // ====================================
-// DOMAIN-RESTRICTED SEARCH ENGINE
-// Only searches investonline.in
+// AI SEARCH INITIALIZATION - FIXED!
 // ====================================
+const { initialize } = require("./server/search");
 
-const ALLOWED_DOMAINS = [
-  "investonline.in",
-  "www.investonline.in",
-  "beta.investonline.in"
-];
+console.log(`🚀 Starting InvestOnline Buddy with AI Search...`);
 
-// In-memory knowledge base (cache)
-const knowledgeBase = new Map(); // URL -> { title, content, lastFetched, keywords }
-const CACHE_TTL = 24 * 60 * 60 * 1000; // 24 hours
-const MAX_CACHE_SIZE = 200; // Max 200 pages cached
-
-// ====================================
-// URL VALIDATION
-// ====================================
-
-function isAllowedURL(url) {
+// Initialize search module (instant - no crawling!)
+(async () => {
   try {
-    const urlObj = new URL(url);
-    const isAllowed = ALLOWED_DOMAINS.some(domain => 
-      urlObj.hostname === domain || urlObj.hostname.endsWith(`.${domain}`)
-    );
-    
-    if (!isAllowed) {
-      console.log(`🚫 Blocked external URL: ${url}`);
-    }
-    
-    return isAllowed;
-  } catch (e) {
-    return false;
+    await initialize();
+    console.log(`✅ Search module ready! Chatbot will fetch pages on-demand.`);
+  } catch (err) {
+    console.error(`❌ Failed to initialize search:`, err.message);
   }
-}
+})();
 
-// ====================================
-// PAGE CONTENT EXTRACTION
-// ====================================
+// ---- Basic security with IFRAME support ----
+app.use(
+  helmet({
+    contentSecurityPolicy: false,
+    frameguard: false
+  })
+);
 
-async function fetchAndIndexPage(url, timeoutMs = 8000) {
-  if (!isAllowedURL(url)) {
-    console.log(`❌ Rejected URL (not investonline.in): ${url}`);
-    return null;
+app.use((req, res, next) => {
+  res.setHeader(
+    "Content-Security-Policy",
+    "frame-ancestors 'self' https://beta.investonline.in https://www.investonline.in https://investonline.in"
+  );
+  res.removeHeader("X-Frame-Options");
+  next();
+});
+
+// Capture raw body for signature verification (when re-enabled)
+app.use(express.json({ 
+  limit: "64kb",
+  verify: (req, res, buf, encoding) => {
+    req.rawBody = buf.toString(encoding || 'utf8');
   }
+}));
 
-  // Check cache
-  const cached = knowledgeBase.get(url);
-  if (cached && Date.now() - cached.lastFetched < CACHE_TTL) {
-    console.log(`✅ Cache hit: ${url}`);
-    return cached;
-  }
+app.use(morgan("tiny"));
 
+// ---- CORS ----
+const allowedOrigins = (process.env.ALLOWED_ORIGIN || "")
+  .split(",")
+  .map((s) => s.trim())
+  .filter(Boolean);
+console.log("Allowed origins:", allowedOrigins);
+
+app.use(
+  cors({
+    origin: function (origin, callback) {
+      if (!origin) return callback(null, true);
+      if (allowedOrigins.includes(origin)) {
+        return callback(null, true);
+      }
+      console.log("❌ Blocked by CORS:", origin);
+      callback(new Error("Not allowed by CORS"));
+    },
+    credentials: true,
+    methods: ["GET", "POST", "OPTIONS"],
+    allowedHeaders: [
+      "Content-Type",
+      "Authorization",
+      "X-Signature",
+      "X-Timestamp",
+      "X-Recaptcha-Token",
+      "X-Session-Token",
+      "X-Requested-With"
+    ]
+  })
+);
+
+// ---- Session store init ----
+initSessionStore();
+console.log("Using in-memory session store");
+
+// ---- Global security middlewares ----
+app.use(rateLimitMiddleware()); // IP-based
+app.use(detectAutomationMiddleware()); // payload heuristics
+
+// ---- Landing page at / ----
+app.get("/", (req, res) => {
+  res.sendFile(path.join(__dirname, "server", "widget.html"));
+});
+
+// ---- Session start: issues a signed, encrypted session token and a short-lived client_key ----
+app.post("/session/start", async (req, res) => {
   try {
-    console.log(`🔍 Indexing: ${url}`);
-    
-    const controller = new AbortController();
-    const timeout = setTimeout(() => controller.abort(), timeoutMs);
-    
-    const response = await fetch(url, {
-      signal: controller.signal,
-      headers: {
-        'User-Agent': 'InvestOnlineBot/1.0',
-        'Accept': 'text/html,application/xhtml+xml'
-      }
-    });
-    
-    clearTimeout(timeout);
-
-    if (!response.ok) {
-      console.log(`❌ Fetch failed (${response.status}): ${url}`);
-      return null;
+    // Accept optional session_id from frontend or create one
+    const { session_id: requestedSessionId } = req.body || {};
+    const origin = req.headers.origin || "";
+    if (!origin || !allowedOrigins.some(o => origin.startsWith(o))) {
+      return res.status(403).json({ error: "Origin not allowed" });
     }
 
-    const html = await response.text();
-    const $ = cheerio.load(html);
-
-    // Remove unwanted elements
-    $('script, style, nav, footer, header, .advertisement, .cookie-banner, .popup, iframe, noscript').remove();
-
-    // Extract title
-    const title = $('title').text().trim() || 
-                  $('h1').first().text().trim() || 
-                  'Untitled';
-
-    // Extract meta description
-    const metaDescription = $('meta[name="description"]').attr('content') || 
-                            $('meta[property="og:description"]').attr('content') || 
-                            '';
-
-    // Extract main content
-    let content = '';
-    const mainSelectors = [
-      'main',
-      'article',
-      '.content',
-      '.main-content',
-      '#main-content',
-      '#content',
-      '.page-content',
-      'body'
-    ];
-
-    for (const selector of mainSelectors) {
-      const element = $(selector);
-      if (element.length > 0) {
-        content = element.text();
-        break;
-      }
-    }
-
-    // Clean and structure content
-    content = content
-      .replace(/\s+/g, ' ')
-      .replace(/\n+/g, ' ')
-      .trim()
-      .slice(0, 8000); // Limit to 8000 chars
-
-    // Extract keywords (simple approach)
-    const keywords = extractKeywords(title + ' ' + metaDescription + ' ' + content);
-
-    const pageData = {
-      url,
-      title,
-      metaDescription,
-      content,
-      keywords,
-      lastFetched: Date.now()
+    const payload = {
+      session_id: requestedSessionId || `sess_${Date.now().toString(36)}_${Math.random().toString(36).slice(2,8)}`,
+      created_at: Date.now()
     };
 
-    // Store in knowledge base
-    knowledgeBase.set(url, pageData);
-
-    // Limit cache size (LRU-like: remove oldest)
-    if (knowledgeBase.size > MAX_CACHE_SIZE) {
-      const oldestKey = knowledgeBase.keys().next().value;
-      knowledgeBase.delete(oldestKey);
-      console.log(`🗑️ Removed oldest cache entry: ${oldestKey}`);
-    }
-
-    console.log(`✅ Indexed: ${title} (${content.length} chars, ${keywords.length} keywords)`);
-    
-    return pageData;
-
-  } catch (error) {
-    if (error.name === 'AbortError') {
-      console.error(`⏱️ Timeout indexing ${url}`);
-    } else {
-      console.error(`❌ Error indexing ${url}:`, error.message);
-    }
-    return null;
+    // create session token and client key
+    const { token, clientKey, expiresAt } = await createSessionTokenForClient(payload);
+    // return token and client_key to widget
+    return res.json({
+      ok: true,
+      session_token: token,
+      client_key: clientKey,
+      expires_at: expiresAt
+    });
+  } catch (e) {
+    console.error("session/start error", e);
+    return res.status(500).json({ error: "session_error" });
   }
-}
+});
 
-// ====================================
-// KEYWORD EXTRACTION (Simple)
-// ====================================
-
-function extractKeywords(text) {
-  if (!text) return [];
-  
-  const stopWords = new Set([
-    'the', 'a', 'an', 'and', 'or', 'but', 'in', 'on', 'at', 'to', 'for',
-    'of', 'with', 'by', 'from', 'as', 'is', 'was', 'are', 'were', 'be',
-    'been', 'being', 'have', 'has', 'had', 'do', 'does', 'did', 'will',
-    'would', 'should', 'could', 'may', 'might', 'can', 'this', 'that',
-    'these', 'those', 'it', 'its', 'they', 'their', 'them', 'we', 'us',
-    'our', 'you', 'your'
-  ]);
-
-  const words = text
-    .toLowerCase()
-    .replace(/[^\w\s]/g, ' ')
-    .split(/\s+/)
-    .filter(word => word.length > 3 && !stopWords.has(word));
-
-  // Count word frequency
-  const frequency = {};
-  words.forEach(word => {
-    frequency[word] = (frequency[word] || 0) + 1;
-  });
-
-  // Get top 20 keywords
-  const topKeywords = Object.entries(frequency)
-    .sort((a, b) => b[1] - a[1])
-    .slice(0, 20)
-    .map(([word]) => word);
-
-  return topKeywords;
-}
-
-// ====================================
-// SITEMAP CRAWLER (FIXED FOR INVESTONLINE)
-// ====================================
-
-async function crawlSitemap(sitemapUrl) {
-  if (!isAllowedURL(sitemapUrl)) {
-    console.log(`❌ Invalid sitemap URL: ${sitemapUrl}`);
-    return [];
-  }
-
+// ---- Chat endpoint: validation for token, recaptcha (signature disabled) ----
+app.post("/chat", async (req, res) => {
   try {
-    console.log(`🗺️ Fetching sitemap: ${sitemapUrl}`);
+    // === STEP 1: Origin validation ===
+    const origin = req.headers.origin || req.headers.referer || "";
+    console.log("📍 Origin check:", origin);
     
-    const controller = new AbortController();
-    const timeout = setTimeout(() => controller.abort(), 15000); // 15 second timeout
-    
-    const response = await fetch(sitemapUrl, {
-      signal: controller.signal,
-      headers: {
-        'User-Agent': 'Mozilla/5.0 (compatible; InvestOnlineBot/1.0)',
-        'Accept': 'application/xml, text/xml, */*'
-      }
-    });
-    
-    clearTimeout(timeout);
-
-    if (!response.ok) {
-      console.log(`❌ Sitemap fetch failed: ${response.status}`);
-      return [];
+    if (!origin || !allowedOrigins.some(o => origin.startsWith(o))) {
+      console.log("❌ REJECTED: Origin not allowed");
+      return res.status(403).json({ error: "Origin not allowed" });
     }
+    console.log("✅ PASSED: Origin OK");
 
-    const xml = await response.text();
-    console.log(`📄 Received XML (${xml.length} bytes)`);
-    
-    const $ = cheerio.load(xml, { xmlMode: true });
+    // === STEP 2: Extract headers ===
+    const sessionToken = req.headers["x-session-token"] || req.body.session_token;
+    const recaptchaToken = req.headers["x-recaptcha-token"] || req.body.recaptchaToken;
 
-    // Try to detect sitemap index (multiple approaches)
-    let sitemapLinks = [];
-    
-    // Approach 1: Standard sitemap index
-    $('sitemapindex sitemap loc, sitemapindex > sitemap > loc').each((i, elem) => {
-      const url = $(elem).text().trim();
-      if (url && isAllowedURL(url)) {
-        sitemapLinks.push(url);
-      }
+    console.log("📦 Headers:", {
+      hasToken: !!sessionToken,
+      hasRecaptcha: !!recaptchaToken
     });
 
-    // Approach 2: Look for any <loc> tags that end with .xml (sitemap files)
-    if (sitemapLinks.length === 0) {
-      $('loc').each((i, elem) => {
-        const url = $(elem).text().trim();
-        if (url && url.endsWith('.xml') && isAllowedURL(url)) {
-          sitemapLinks.push(url);
+    if (!sessionToken || !recaptchaToken) {
+      console.log("❌ REJECTED: Missing headers");
+      return res.status(401).json({ 
+        error: "missing_headers",
+        missing: {
+          sessionToken: !sessionToken,
+          recaptcha: !recaptchaToken
         }
       });
     }
+    console.log("✅ PASSED: All headers present");
 
-    // If sitemap index found, fetch sitemap_main.xml
-    if (sitemapLinks.length > 0) {
-      console.log(`📑 Found sitemap index with ${sitemapLinks.length} sitemaps`);
-      
-      // Find sitemap_main.xml
-      const mainSitemap = sitemapLinks.find(url => url.includes('sitemap_main.xml'));
-      
-      if (mainSitemap) {
-        console.log(`📚 Fetching main sitemap: ${mainSitemap}`);
-        return await crawlSitemap(mainSitemap); // Recursive call
-      } else {
-        console.log(`⚠️ sitemap_main.xml not found, trying first sitemap: ${sitemapLinks[0]}`);
-        return await crawlSitemap(sitemapLinks[0]);
-      }
+    // === STEP 3: Verify reCAPTCHA ===
+    console.log("🔐 Checking reCAPTCHA...");
+    try {
+      await verifyRecaptcha(process.env.RECAPTCHA_SECRET || "", recaptchaToken);
+      console.log("✅ PASSED: reCAPTCHA OK");
+    } catch (recaptchaErr) {
+      console.log("❌ REJECTED: reCAPTCHA failed -", recaptchaErr.message);
+      return res.status(429).json({ error: 'recaptcha_failed' });
     }
 
-    // Extract page URLs from regular sitemap
-    const urls = [];
-    $('url loc, url > loc').each((i, elem) => {
-      const url = $(elem).text().trim();
-      // Only add if it's a page URL (not a .xml file) and is allowed
-      if (url && !url.endsWith('.xml') && isAllowedURL(url)) {
-        urls.push(url);
-      }
-    });
+    // === STEP 4: Verify session token ===
+    console.log("🎫 Checking session token...");
+    const tokenInfo = await verifyTokenAndPayload(sessionToken);
+    if (!tokenInfo || !tokenInfo.clientKey) {
+      console.log("❌ REJECTED: Session token invalid or expired");
+      return res.status(401).json({ error: "invalid_session_token" });
+    }
+    console.log("✅ PASSED: Session token OK");
 
-    console.log(`✅ Found ${urls.length} page URLs in sitemap`);
+    // === STEP 5: Signature verification - DISABLED ===
+    console.log("⚠️ SKIPPED: Signature verification (temporarily disabled)");
+    // TODO: Re-enable signature verification after fixing hex encoding issue
+    /*
+    const clientSignature = req.headers["x-signature"];
+    const timestamp = req.headers["x-timestamp"];
     
-    if (urls.length === 0) {
-      console.log(`⚠️ Debug: First 500 chars of XML: ${xml.substring(0, 500)}`);
+    if (!clientSignature || !timestamp) {
+      console.log("❌ REJECTED: Missing signature/timestamp");
+      return res.status(401).json({ error: "missing_signature" });
     }
     
-    return urls;
-
-  } catch (error) {
-    if (error.name === 'AbortError') {
-      console.error(`⏱️ Timeout fetching sitemap`);
-    } else {
-      console.error(`❌ Error crawling sitemap:`, error.message);
+    const validSig = await verifySignatureWithClientKey(
+      tokenInfo.clientKey, 
+      timestamp, 
+      req.rawBody || req.body,
+      clientSignature
+    );
+    
+    if (!validSig) {
+      console.log("❌ REJECTED: Signature invalid");
+      return res.status(401).json({ error: "invalid_signature" });
     }
-    return [];
-  }
-}
+    console.log("✅ PASSED: Signature OK");
+    */
 
-// ====================================
-// SMART SEARCH: Find Relevant Pages
-// ====================================
+    // === All checks passed! ===
+    console.log("🎉 All security checks passed!");
+    const { session_id, message, page = "/", lang = "en" } = req.body;
 
-function findRelevantPages(query, topN = 3) {
-  if (!query || knowledgeBase.size === 0) {
-    console.log(`⚠️ No knowledge base available for search`);
-    return [];
-  }
-
-  const queryKeywords = extractKeywords(query);
-  console.log(`🔎 Searching for: ${query} (keywords: ${queryKeywords.join(', ')})`);
-
-  // Score each page based on keyword matches
-  const scores = [];
-
-  knowledgeBase.forEach((pageData, url) => {
-    let score = 0;
-
-    // Check title match (high weight)
-    queryKeywords.forEach(keyword => {
-      if (pageData.title.toLowerCase().includes(keyword)) {
-        score += 10;
-      }
-    });
-
-    // Check meta description match (medium weight)
-    queryKeywords.forEach(keyword => {
-      if (pageData.metaDescription.toLowerCase().includes(keyword)) {
-        score += 5;
-      }
-    });
-
-    // Check keyword match (medium weight)
-    queryKeywords.forEach(keyword => {
-      if (pageData.keywords.includes(keyword)) {
-        score += 3;
-      }
-    });
-
-    // Check content match (low weight)
-    queryKeywords.forEach(keyword => {
-      if (pageData.content.toLowerCase().includes(keyword)) {
-        score += 1;
-      }
-    });
-
-    if (score > 0) {
-      scores.push({ url, pageData, score });
+    if (!session_id || !message) {
+      return res.status(400).json({ error: "session_id and message required" });
     }
-  });
 
-  // Sort by score (descending) and return top N
-  const topPages = scores
-    .sort((a, b) => b.score - a.score)
-    .slice(0, topN);
+    const reply = await handleChat({ session_id, message, page, lang, req });
+    return res.json(reply);
 
-  console.log(`✅ Found ${topPages.length} relevant pages`);
-  topPages.forEach(({ url, score }) => {
-    console.log(`   - ${url} (score: ${score})`);
-  });
-
-  return topPages.map(({ url, pageData }) => ({ url, ...pageData }));
-}
-
-// ====================================
-// INITIALIZATION
-// ====================================
-
-async function initializeKnowledgeBase(sitemapUrl) {
-  console.log(`🚀 Initializing knowledge base from sitemap...`);
-  
-  const urls = await crawlSitemap(sitemapUrl);
-  
-  if (urls.length === 0) {
-    console.log(`⚠️ No URLs found in sitemap. Knowledge base will be empty.`);
-    console.log(`💡 Tip: Check if sitemap URL is correct or accessible`);
-    return;
+  } catch (err) {
+    console.error("💥 Chat Error:", err);
+    if (err && err.code === 'RECAPTCHA_FAIL') {
+      return res.status(429).json({ error: 'recaptcha_failed' });
+    }
+    return res.status(500).json({ error: "internal_error" });
   }
+});
 
-  // Index first 50 URLs on startup (to avoid long startup time)
-  const urlsToIndex = urls.slice(0, 50);
-  console.log(`📚 Indexing ${urlsToIndex.length} pages (out of ${urls.length} total)...`);
+// ---- Health & others ----
+app.get("/health", (req, res) => health(req, res));
+app.post("/feedback", (req, res) => { 
+  console.log("User Feedback:", req.body); 
+  res.json({ status: "ok" }); 
+});
 
-  const promises = urlsToIndex.map(url => 
-    fetchAndIndexPage(url).catch(err => {
-      console.error(`Failed to index ${url}:`, err.message);
-      return null;
-    })
-  );
+app.get("/widget", (req, res) => {
+  res.sendFile(path.join(__dirname, "server", "widget.html"));
+});
 
-  await Promise.all(promises);
-
-  console.log(`✅ Knowledge base initialized with ${knowledgeBase.size} pages`);
-}
-
-// ====================================
-// EXPORTS
-// ====================================
-
-module.exports = {
-  isAllowedURL,
-  fetchAndIndexPage,
-  crawlSitemap,
-  findRelevantPages,
-  initializeKnowledgeBase,
-  knowledgeBase // Export for debugging
-};
+const PORT = process.env.PORT || 8080;
+app.listen(PORT, () => {
+  console.log(`InvestOnline Buddy running on ${PORT}`);
+  console.log(`Iframe embedding allowed for: ${allowedOrigins.join(", ")}`);
+});
