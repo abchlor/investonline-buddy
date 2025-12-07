@@ -23,12 +23,28 @@ const MAX_CACHE_SIZE = 50; // Small cache - only 50 pages
 
 const KEY_PAGES = [
   "https://investonline.in/",
-  "https://investonline.in/about",
-  "https://investonline.in/services",
+  "https://investonline.in/contact-us",
+  "https://investonline.in/about-abchlor-investment-advisors-pvt-ltd",
+  "https://investonline.in/partner",
+  "https://investonline.in/faq",
   "https://investonline.in/pms",
-  "https://investonline.in/mutual-funds",
-  "https://investonline.in/contact",
-  // Add more important pages here
+  "https://investonline.in/mutual-funds/funds-explorer",
+  "https://investonline.in/mutual-funds/ready-to-go-portfolio",
+  "https://investonline.in/mutual-funds/do-it-yourself-portfolio",
+  "https://investonline.in/mutual-funds/lightning-sip",
+  "https://investonline.in/mutual-funds/top-up-sip",
+  "https://investonline.in/mutual-funds/category-returns",
+  "https://investonline.in/insurance/life-insurance",
+  "https://investonline.in/insurance/general-insurance",
+  "https://investonline.in/markets/equity-market-insights",
+  "https://investonline.in/features/all-features",
+  "https://investonline.in/features/financial-calculators",
+  "https://investonline.in/financial-calculators/sip-calculator",
+  "https://investonline.in/financial-calculators/emi-calculator",
+  "https://investonline.in/financial-calculators/retirement-calculator",
+  "https://investonline.in/blog/",
+  "https://investonline.in/magazine/investguide",
+  "https://investonline.in/money-heart-beat/weekend-read",
 ];
 
 // ====================================
