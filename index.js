@@ -11,15 +11,26 @@ const { verifyRecaptcha } = require("./server/recaptcha");
 const { validateSignature } = require("./server/signature");
 const { createToken, verifyToken, invalidateToken } = require("./server/utils");
 const { handleChat } = require("./server/chat_handler");
+const { initialize } = require("./server/search");
 
 const app = express();
 const PORT = process.env.PORT || 8080;
 
 // ====================================
-// CHATBOT VERSION: Simple OpenAI (No Search/Crawling)
+// CHATBOT VERSION: Pure InvestOnline Search (NO AI)
 // ====================================
-console.log(`🚀 Starting InvestOnline Buddy - Simple OpenAI Version`);
-console.log(`✅ No sitemap crawling | No search module | Fast startup`);
+console.log(`🚀 Starting InvestOnline Buddy - Pure Search Version`);
+console.log(`✅ Only searches InvestOnline.in | No AI fallback | No internet knowledge`);
+
+// Initialize search module (instant - no crawling)
+(async () => {
+  try {
+    await initialize();
+    console.log(`✅ Search module ready! Chatbot will fetch pages on-demand.`);
+  } catch (err) {
+    console.error(`❌ Search module failed:`, err.message);
+  }
+})();
 
 // ====================================
 // Security Configuration
@@ -80,8 +91,8 @@ app.use(express.json({ limit: "10kb" }));
 app.get("/", (req, res) => {
   res.json({ 
     status: "ok", 
-    version: "simple-openai-v1",
-    message: "InvestOnline Buddy is running (OpenAI only)" 
+    version: "pure-search-v1",
+    message: "InvestOnline Buddy is running (Pure InvestOnline.in search - No AI)" 
   });
 });
 
@@ -169,7 +180,7 @@ app.post("/chat", async (req, res) => {
     console.error(`❌ Chat handler error:`, err);
     res.status(500).json({ 
       error: "internal_error", 
-      reply: "Sorry, something went wrong. Please try again." 
+      reply: "Sorry, something went wrong. Please contact support at wealth@investonline.in or call 1800-2222-65." 
     });
   }
 });
@@ -202,7 +213,8 @@ setInterval(() => {
 app.listen(PORT, () => {
   console.log(`✅ InvestOnline Buddy running on port ${PORT}`);
   console.log(`🔒 Iframe embedding allowed for: ${ALLOWED_ORIGIN}`);
-  console.log(`🤖 Using OpenAI GPT-4o-mini (no search/crawling)`);
-  console.log(`📝 Using flows.json for keyword matching`);
+  console.log(`🔍 Only searches InvestOnline.in (no AI/internet knowledge)`);
+  console.log(`📝 Uses flows.json for keyword matching`);
+  console.log(`📞 Falls back to support contact if info not found`);
   console.log(`⚡ Ready to chat!`);
 });
