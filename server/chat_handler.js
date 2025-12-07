@@ -145,14 +145,16 @@ async function handleChat({ session_id, message, page, lang, req }) {
     }
   }
 
-  // Use GPT with reduced timeout (15 seconds total)
+  // Use GPT with search integration
   try {
     console.log(`🤖 Processing: "${text.slice(0, 50)}..."`);
     
+    // Reduced timeout to 15 seconds
     const timeoutPromise = new Promise((_, reject) => 
-      setTimeout(() => reject(new Error('Request timeout')), 15000) // Reduced from 25s to 15s
+      setTimeout(() => reject(new Error('Request timeout')), 15000)
     );
     
+    // getSmartResponse now handles search integration internally
     const responsePromise = getSmartResponse(text, flows);
     
     const result = await Promise.race([responsePromise, timeoutPromise]);
