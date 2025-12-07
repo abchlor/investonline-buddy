@@ -18,7 +18,7 @@ function touchSession(sessionId) {
   if (!s) {
     s = { 
       createdAt: now(), 
-      lastMessageAt: now(), 
+      lastMessageAt: now(),
       messageCount: 0, 
       token: Math.random().toString(36).slice(2,8) 
     };
@@ -42,7 +42,6 @@ function matchIntentText(text) {
     return { type: "end_chat" };
   }
 
-  // Check intents
   const intents = flows.intents || {};
   for (const [key, def] of Object.entries(intents)) {
     const kws = def.keywords || [];
@@ -54,7 +53,6 @@ function matchIntentText(text) {
     }
   }
 
-  // Check site
   if (flows.site) {
     for (const [k, def] of Object.entries(flows.site)) {
       const kws = def.keywords || [];
@@ -76,7 +74,6 @@ async function handleChat({ session_id, message, page, lang, req }) {
   
   const s = touchSession(sessionId);
 
-  // Rate limiting
   if (s.messageCount > SESSION_MSG_LIMIT) {
     clearSession(sessionId);
     return { 
@@ -102,7 +99,6 @@ async function handleChat({ session_id, message, page, lang, req }) {
   s.messageCount = (s.messageCount || 0) + 1;
   s.lastMessageAt = currentTime;
 
-  // Check for end chat
   const match = matchIntentText(text);
   if (match && match.type === "end_chat") {
     const tokenId = req && req.body && req.body.token_id;
@@ -113,7 +109,6 @@ async function handleChat({ session_id, message, page, lang, req }) {
     };
   }
 
-  // Check for intent match
   if (match) {
     if (match.type === "intent" || match.type === "site") {
       const def = match.def;
@@ -127,7 +122,6 @@ async function handleChat({ session_id, message, page, lang, req }) {
   try {
     console.log(`🤖 Using OpenAI for: "${text.slice(0, 50)}..."`);
     
-    // Build context from flows
     let context = "You are InvestOnline Buddy, a helpful financial assistant for InvestOnline.in.\n\n";
     context += "Available services:\n";
     
@@ -144,11 +138,6 @@ async function handleChat({ session_id, message, page, lang, req }) {
     
     const answer = await callOpenAI(prompt);
     
-    const support = flows.global?.support_block || {
-      email: "wealth@investonline.in",
-      phone_primary: "1800-2222-65"
-    };
-    
     const suggested = [
       "What is KYC?",
       "How to register?",
@@ -164,7 +153,6 @@ async function handleChat({ session_id, message, page, lang, req }) {
   } catch (error) {
     console.error("❌ OpenAI error:", error.message);
     
-    // Fallback
     const fallback = (flows.global && flows.global.fallback_message) || 
       "I can help with mutual funds, SIPs, calculators, KYC, and registration. 💰";
     
