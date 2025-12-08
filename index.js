@@ -1,15 +1,23 @@
+// ====================================
+// Load environment variables FIRST
+// ====================================
+const dotenv = require("dotenv");
+dotenv.config();
+
+// Convert ALLOWED_ORIGIN env into array
+const ALLOWED_ORIGIN = (process.env.ALLOWED_ORIGIN || "")
+  .split(",")
+  .map(v => v.trim())
+  .filter(Boolean);
+
 const express = require("express");
 const helmet = require("helmet");
 const morgan = require("morgan");
 const cors = require("cors");
-const dotenv = require("dotenv");
-
-// Load environment variables
-dotenv.config();
 
 const { verifyRecaptcha } = require("./server/recaptcha");
 const { validateSignature } = require("./server/signature");
-const { createToken, verifyToken, invalidateToken } = require("./server/utils");
+const { createToken } = require("./server/utils");
 const { handleChat } = require("./server/chat_handler");
 const { initialize } = require("./server/search");
 
@@ -36,51 +44,50 @@ console.log(`✅ Only searches InvestOnline.in | No AI fallback | No internet kn
 // Security Configuration
 // ====================================
 
-const ALLOWED_ORIGIN = process.env.ALLOWED_ORIGIN || "https://www.investonline.in";
 const SESSION_STORE = new Map();
 const SESSION_TTL = 12 * 60 * 60 * 1000; // 12 hours
 const CREATED_TOKENS = new Set();
 
+// Use ALLOWED_ORIGIN array for iframe + CORS validation
 const isIframeSafe = (origin) => {
   if (!origin) return false;
-  const allowed = [
-    "https://www.investonline.in",
-    "https://investonline.in",
-    "https://beta.investonline.in"
-  ];
-  return allowed.some(a => origin.startsWith(a));
+  return ALLOWED_ORIGIN.some(a => origin.startsWith(a));
 };
 
 // ====================================
 // Middleware
 // ====================================
 
-app.use(helmet({
-  contentSecurityPolicy: {
-    directives: {
-      defaultSrc: ["'self'"],
-      scriptSrc: ["'self'", "'unsafe-inline'"],
-      styleSrc: ["'self'", "'unsafe-inline'"],
-      imgSrc: ["'self'", "data:", "https:"],
-      connectSrc: ["'self'", ALLOWED_ORIGIN],
-      frameSrc: ["'self'", ALLOWED_ORIGIN],
-      frameAncestors: [ALLOWED_ORIGIN]
+app.use(
+  helmet({
+    contentSecurityPolicy: {
+      directives: {
+        defaultSrc: ["'self'"],
+        scriptSrc: ["'self'", "'unsafe-inline'"],
+        styleSrc: ["'self'", "'unsafe-inline'"],
+        imgSrc: ["'self'", "data:", "https:"],
+        connectSrc: ["'self'", ...ALLOWED_ORIGIN],
+        frameSrc: ["'self'", ...ALLOWED_ORIGIN],
+        frameAncestors: [...ALLOWED_ORIGIN]
+      }
     }
-  }
-}));
+  })
+);
 
 app.use(morgan("combined"));
 
-app.use(cors({
-  origin: (origin, callback) => {
-    if (!origin || isIframeSafe(origin)) {
-      callback(null, true);
-    } else {
-      callback(new Error("CORS policy: origin not allowed"));
-    }
-  },
-  credentials: true
-}));
+app.use(
+  cors({
+    origin: (origin, callback) => {
+      if (!origin || isIframeSafe(origin)) {
+        callback(null, true);
+      } else {
+        callback(new Error("CORS policy: origin not allowed"));
+      }
+    },
+    credentials: true
+  })
+);
 
 app.use(express.json({ limit: "10kb" }));
 
@@ -89,10 +96,10 @@ app.use(express.json({ limit: "10kb" }));
 // ====================================
 
 app.get("/", (req, res) => {
-  res.json({ 
-    status: "ok", 
+  res.json({
+    status: "ok",
     version: "pure-search-v1",
-    message: "InvestOnline Buddy is running (Pure InvestOnline.in search - No AI)" 
+    message: "InvestOnline Buddy is running (Pure InvestOnline.in search - No AI)"
   });
 });
 
@@ -101,19 +108,21 @@ app.get("/", (req, res) => {
 // ====================================
 
 app.post("/session/start", (req, res) => {
-  const sessionId = `session_${Date.now()}_${Math.random().toString(36).slice(2, 8)}`;
+  const sessionId = `session_${Date.now()}_${Math.random()
+    .toString(36)
+    .slice(2, 8)}`;
   const token = createToken();
-  
+
   SESSION_STORE.set(sessionId, {
     token,
     createdAt: Date.now(),
     lastAccess: Date.now()
   });
-  
+
   CREATED_TOKENS.add(token);
-  
+
   console.log(`✅ Session created: ${sessionId}`);
-  
+
   res.json({ session_id: sessionId, token });
 });
 
@@ -122,11 +131,19 @@ app.post("/session/start", (req, res) => {
 // ====================================
 
 app.post("/chat", async (req, res) => {
-  const { session_id, message, page, lang, token, token_id, signature, recaptcha_token } = req.body;
+  const {
+    session_id,
+    message,
+    page,
+    lang,
+    token,
+    signature,
+    recaptcha_token
+  } = req.body;
 
   console.log(`📩 Chat request from session: ${session_id || "anonymous"}`);
 
-  // 1. Origin check
+  // 1. Origin Check
   const origin = req.get("origin");
   if (!isIframeSafe(origin)) {
     console.log(`❌ Origin not allowed: ${origin}`);
@@ -142,15 +159,11 @@ app.post("/chat", async (req, res) => {
     console.log(`❌ Token mismatch for session: ${session_id}`);
     return res.status(401).json({ error: "invalid_session_token" });
   } else {
-    console.log(`✅ Session token valid`);
     sess.lastAccess = Date.now();
+    console.log(`✅ Session token valid`);
   }
 
-  // 3. Signature verification (TEMPORARILY DISABLED - Re-enable after fixing hex encoding issue)
-  // if (!validateSignature(signature, message, session_id, token)) {
-  //   console.log(`❌ Invalid signature`);
-  //   return res.status(401).json({ error: "invalid_signature" });
-  // }
+  // 3. Signature verification (temporarily disabled)
   console.log(`⚠️ Signature verification disabled (temporary)`);
 
   // 4. reCAPTCHA verification
@@ -163,24 +176,24 @@ app.post("/chat", async (req, res) => {
     console.log(`✅ reCAPTCHA passed`);
   }
 
-  // Handle chat
+  // 5. Chat handler
   try {
-    const result = await handleChat({ 
-      session_id, 
-      message, 
-      page, 
-      lang, 
-      req 
+    const result = await handleChat({
+      session_id,
+      message,
+      page,
+      lang,
+      req
     });
-    
+
     console.log(`✅ Chat response sent`);
     res.json(result);
-
   } catch (err) {
     console.error(`❌ Chat handler error:`, err);
-    res.status(500).json({ 
-      error: "internal_error", 
-      reply: "Sorry, something went wrong. Please contact support at wealth@investonline.in or call 1800-2222-65." 
+    res.status(500).json({
+      error: "internal_error",
+      reply:
+        "Sorry, something went wrong. Please contact support at wealth@investonline.in or call 1800-2222-65."
     });
   }
 });
@@ -192,7 +205,7 @@ app.post("/chat", async (req, res) => {
 setInterval(() => {
   const now = Date.now();
   let cleaned = 0;
-  
+
   for (const [sessionId, sess] of SESSION_STORE.entries()) {
     if (now - sess.lastAccess > SESSION_TTL) {
       SESSION_STORE.delete(sessionId);
@@ -200,7 +213,7 @@ setInterval(() => {
       cleaned++;
     }
   }
-  
+
   if (cleaned > 0) {
     console.log(`🧹 Cleaned ${cleaned} expired sessions`);
   }
@@ -212,7 +225,7 @@ setInterval(() => {
 
 app.listen(PORT, () => {
   console.log(`✅ InvestOnline Buddy running on port ${PORT}`);
-  console.log(`🔒 Iframe embedding allowed for: ${ALLOWED_ORIGIN}`);
+  console.log("🔒 Iframe embedding allowed for:", ALLOWED_ORIGIN);
   console.log(`🔍 Only searches InvestOnline.in (no AI/internet knowledge)`);
   console.log(`📝 Uses flows.json for keyword matching`);
   console.log(`📞 Falls back to support contact if info not found`);
