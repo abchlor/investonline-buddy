@@ -1,7 +1,7 @@
 const fs = require("fs");
 const path = require("path");
 const { invalidateToken } = require("./utils");
-const { searchKnowledge } = require("./search");
+const { callOpenAI, generateQuickAnswer } = require("./llm");
 
 const FLOWS_PATH = path.join(__dirname, "..", "flows", "flows.json");
 let flows = JSON.parse(fs.readFileSync(FLOWS_PATH, "utf8"));
@@ -23,6 +23,7 @@ function touchSession(sessionId) {
       lastMessageAt: now(),
       messageCount: 0, 
       context: [],
+      conversationHistory: [], // NEW: Track AI conversation history
       token: Math.random().toString(36).slice(2, 8) 
     };
     sessions.set(sessionId, s);
@@ -54,7 +55,10 @@ function matchSimpleIntent(text) {
   if (flows.intents) {
     for (const [key, def] of Object.entries(flows.intents)) {
       const keywords = def.keywords || [];
-      for (const kw of keywords) {
+      const synonyms = def.synonyms || [];
+      const allKeywords = [...keywords, ...synonyms];
+      
+      for (const kw of allKeywords) {
         if (lower.includes(kw.toLowerCase())) {
           return { type: "intent", key, def };
         }
@@ -97,53 +101,89 @@ function getSupportInfo(flows) {
 </div>`;
 }
 
-function formatSearchResults(results, query, flows) {
-  if (!results || results.length === 0) {
+/**
+ * Check for site-specific keywords not in flows.json
+ */
+function checkSiteKeywords(message) {
+  const lowerMsg = message.toLowerCase();
+  
+  // Registration keywords
+  if (/(sign ?up|register|create account|new user|get started|onboard)/i.test(lowerMsg)) {
     return {
-      reply: `I couldn't find specific information about "${query}" on InvestOnline.in.<br><br>
-Please contact our support team for assistance:${getSupportInfo(flows)}`,
-      suggested: [
-        "What is KYC?",
-        "How to register?",
-        "SIP Calculator",
-        "Mutual Funds",
-        "Contact Support"
-      ],
-      sources: []
+      topic: "registration",
+      response: "To register with InvestOnline.in, you'll need your PAN card and complete KYC verification. The process is simple and takes just 10 minutes! Would you like me to guide you through it? 😊",
+      followUp: ["Start Registration", "What is KYC?", "Documents Needed"]
     };
   }
-
-  // Build response from search results
-  let reply = `Here's what I found about "${query}" on InvestOnline.in:<br><br>`;
   
-  const sources = [];
+  // Payment/transaction issues
+  if (/(payment fail|transaction fail|money not debited|payment not working|payment issue)/i.test(lowerMsg)) {
+    return {
+      topic: "payment issues",
+      response: "For payment issues, please check: 1) Sufficient balance, 2) Daily transaction limit, 3) Correct OTP/CVV. Try using an alternate payment method (UPI/Net Banking). If the problem persists, contact us at 1800-2222-65. 📞",
+      followUp: ["Talk to Support", "How to Invest", "SIP Information"]
+    };
+  }
   
-  results.slice(0, 3).forEach((result, index) => {
-    reply += `<div class="search-result" style="margin-bottom: 15px;">
-  <strong>${index + 1}. <a href="${result.url}" target="_blank">${result.title}</a></strong><br>
-  <p style="margin: 5px 0; color: #555;">${result.snippet}</p>
-</div>`;
-    
-    sources.push({
-      title: result.title,
-      url: result.url
-    });
-  });
+  // Fund recommendations (boundary setting)
+  if (/(best fund|top fund|which fund|recommend fund|good fund|suggest fund)/i.test(lowerMsg)) {
+    return {
+      topic: "fund recommendations",
+      response: "I can't recommend specific funds, but I can help you understand fund categories! For personalized recommendations based on your goals and risk profile, please speak with our expert advisors at 1800-2222-65 or wealth@investonline.in. 😊",
+      followUp: ["Fund Categories", "Talk to Advisor", "Use SIP Calculator"]
+    };
+  }
+  
+  // Login issues
+  if (/(can'?t login|login fail|forgot password|account locked|reset password)/i.test(lowerMsg)) {
+    return {
+      topic: "login issues",
+      response: "For login issues: Click 'Forgot Password' to reset, or contact support if your account is locked. Email: wealth@investonline.in | Phone: 1800-2222-65",
+      followUp: ["Reset Password", "Talk to Support", "Registration Help"]
+    };
+  }
+  
+  // Minimum investment
+  if (/(minimum|min) ?(amount|investment|sip)/i.test(lowerMsg)) {
+    return {
+      topic: "minimum investment",
+      response: "You can start a SIP with as low as ₹500 per month! Lumpsum investments typically start from ₹1,000-₹5,000 depending on the scheme. 😊",
+      followUp: ["Start SIP", "SIP Calculator", "Fund Categories"]
+    };
+  }
+  
+  return null;
+}
 
-  reply += `<br><div style="margin-top: 10px; font-size: 0.9em; color: #666;">
-💡 <em>Click the links above to learn more</em>
-</div>`;
-
-  // Generate relevant suggestions
-  const suggested = [
-    "Tell me more",
-    "SIP Calculator",
-    "Contact Support",
-    "Mutual Funds",
-    "KYC Information"
-  ];
-
-  return { reply, suggested, sources };
+/**
+ * Generate contextual follow-up suggestions
+ */
+function generateFollowUpSuggestions(userMessage, aiResponse) {
+  const lowerMsg = userMessage.toLowerCase();
+  const lowerResp = aiResponse.toLowerCase();
+  
+  // KYC-related
+  if (/kyc/i.test(lowerMsg) || /kyc/i.test(lowerResp)) {
+    return ["Documents Needed", "e-KYC Process", "Start Registration"];
+  }
+  
+  // SIP-related
+  if (/sip/i.test(lowerMsg) || /sip/i.test(lowerResp)) {
+    return ["Start SIP", "SIP Calculator", "SIP Benefits"];
+  }
+  
+  // Registration-related
+  if (/regist/i.test(lowerMsg) || /regist/i.test(lowerResp)) {
+    return ["Start Registration", "What is KYC?", "Documents Needed"];
+  }
+  
+  // Investment-related
+  if (/(invest|fund|mutual)/i.test(lowerMsg)) {
+    return ["Fund Categories", "Start SIP", "Use Calculator"];
+  }
+  
+  // Default suggestions
+  return flows.quickReplies?.slice(0, 3) || ["Start Registration", "What is SIP?", "Talk to Support"];
 }
 
 async function handleChat({ session_id, message, page, lang, req }) {
@@ -167,10 +207,9 @@ async function handleChat({ session_id, message, page, lang, req }) {
   
   if (s.messageCount > 0 && delta < MIN_INTER_MESSAGE_MS) {
     console.log(`⚠️ Rapid messages detected: ${delta}ms`);
-    clearSession(sessionId);
     return { 
-      error: "automated_activity", 
-      reply: "Looks like automated activity. Session closed.",
+      error: "rate_limit", 
+      reply: "Please slow down a bit! 😊",
       suggested: []
     };
   }
@@ -189,44 +228,84 @@ async function handleChat({ session_id, message, page, lang, req }) {
     };
   }
 
-  // Fast path for predefined intents (from flows.json)
+  // LAYER 1: Fast path for predefined intents (from flows.json)
   if (simpleMatch && (simpleMatch.type === "intent" || simpleMatch.type === "site")) {
-    console.log(`⚡ Fast path for: ${simpleMatch.key}`);
+    console.log(`⚡ Fast path (flows.json) for: ${simpleMatch.key}`);
     const def = simpleMatch.def;
+    
+    // Store in conversation history
+    s.conversationHistory.push(
+      { role: 'user', content: text },
+      { role: 'assistant', content: def.response }
+    );
+    
     return {
       reply: formatResponse(def.response),
-      suggested: (def.suggested || []).slice(0, 5)
+      suggested: (def.suggestions || def.suggested || []).slice(0, 5)
     };
   }
 
-  // Search InvestOnline.in website
-  try {
-    console.log(`🔍 Searching InvestOnline.in for: "${text}"`);
+  // LAYER 2: Check for site-specific keywords
+  const keywordResponse = checkSiteKeywords(text);
+  if (keywordResponse) {
+    console.log(`✓ Keyword matched: ${keywordResponse.topic}`);
     
-    const timeoutPromise = new Promise((_, reject) => 
-      setTimeout(() => reject(new Error('Search timeout')), 20000) // 20 second timeout
+    // Store in conversation history
+    s.conversationHistory.push(
+      { role: 'user', content: text },
+      { role: 'assistant', content: keywordResponse.response }
     );
     
-    const searchPromise = searchKnowledge(text, 5);
-    const results = await Promise.race([searchPromise, timeoutPromise]);
+    return {
+      reply: formatResponse(keywordResponse.response),
+      suggested: keywordResponse.followUp || []
+    };
+  }
+
+  // LAYER 3: Use OpenAI with full knowledge base
+  try {
+    console.log(`🤖 Using OpenAI with knowledge base for: "${text}"`);
     
-    console.log(`✅ Search completed: ${results.length} results`);
-    
-    return formatSearchResults(results, text, flows);
+    const context = {
+      page: page || 'unknown',
+      userStatus: 'guest',
+      additionalInfo: ''
+    };
+
+    const aiResponse = await callOpenAI(
+      text, 
+      s.conversationHistory,
+      context
+    );
+
+    console.log(`✅ OpenAI response generated`);
+
+    // Store conversation in history
+    s.conversationHistory.push(
+      { role: 'user', content: text },
+      { role: 'assistant', content: aiResponse }
+    );
+
+    // Keep only last 10 messages to avoid memory issues
+    if (s.conversationHistory.length > 10) {
+      s.conversationHistory = s.conversationHistory.slice(-10);
+    }
+
+    // Generate contextual follow-up suggestions
+    const followUps = generateFollowUpSuggestions(text, aiResponse);
+
+    return {
+      reply: formatResponse(aiResponse),
+      suggested: followUps
+    };
 
   } catch (error) {
-    console.error("❌ Search failed:", error.message);
+    console.error("❌ Error in handleChat:", error.message);
     
+    // Friendly error message with support info
     return {
-      reply: `Sorry, I encountered an issue while searching InvestOnline.in.<br><br>
-Please contact our support team:${getSupportInfo(flows)}`,
-      suggested: [
-        "Try again",
-        "Contact Support",
-        "What is KYC?",
-        "Mutual Funds",
-        "SIP Calculator"
-      ]
+      reply: `I'm having trouble processing that right now. 😅<br><br>Please try rephrasing your question, or contact our support team:${getSupportInfo(flows)}`,
+      suggested: ["Talk to Support", "Start Registration", "What is KYC?", "SIP Calculator"]
     };
   }
 }
