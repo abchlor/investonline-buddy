@@ -250,11 +250,11 @@ app.get("/widget", (req, res) => {
       box-sizing: border-box;
     }
     body {
-      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
       height: 100vh;
       display: flex;
       flex-direction: column;
-      background: #f5f5f5;
+      background: #f8f9fa;
     }
     #chat-container {
       flex: 1;
@@ -265,12 +265,37 @@ app.get("/widget", (req, res) => {
       overflow: hidden;
     }
     #chat-header {
-      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      background: linear-gradient(135deg, #e74c3c 0%, #c0392b 100%);
       color: white;
       padding: 16px;
-      text-align: center;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+    }
+    #chat-header-logo {
+      width: 36px;
+      height: 36px;
+      background: white;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: bold;
+      color: #e74c3c;
+      font-size: 16px;
+    }
+    #chat-header-text {
+      flex: 1;
+    }
+    #chat-header-title {
       font-weight: 600;
-      font-size: 18px;
+      font-size: 16px;
+      margin-bottom: 2px;
+    }
+    #chat-header-subtitle {
+      font-size: 11px;
+      opacity: 0.9;
     }
     #chat-messages {
       flex: 1;
@@ -279,6 +304,7 @@ app.get("/widget", (req, res) => {
       display: flex;
       flex-direction: column;
       gap: 12px;
+      background: #f8f9fa;
     }
     .message {
       max-width: 80%;
@@ -286,6 +312,7 @@ app.get("/widget", (req, res) => {
       border-radius: 12px;
       word-wrap: break-word;
       animation: slideIn 0.3s ease-out;
+      line-height: 1.6;
     }
     @keyframes slideIn {
       from {
@@ -298,15 +325,74 @@ app.get("/widget", (req, res) => {
       }
     }
     .message.user {
-      background: #667eea;
+      background: #e74c3c;
       color: white;
       align-self: flex-end;
       margin-left: auto;
+      border-bottom-right-radius: 4px;
     }
     .message.bot {
-      background: #f0f0f0;
-      color: #333;
+      background: white;
+      color: #2c3e50;
       align-self: flex-start;
+      border: 1px solid #e0e0e0;
+      border-bottom-left-radius: 4px;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+    }
+    .message.bot p {
+      margin: 0 0 12px 0;
+      line-height: 1.6;
+    }
+    .message.bot p:last-child {
+      margin-bottom: 0;
+    }
+    .message.bot a {
+      color: #e74c3c;
+      text-decoration: none;
+      font-weight: 500;
+      border-bottom: 1px solid #e74c3c;
+      transition: all 0.2s;
+    }
+    .message.bot a:hover {
+      color: #c0392b;
+      border-bottom-color: #c0392b;
+    }
+    .message.bot ul, .message.bot ol {
+      margin: 8px 0;
+      padding-left: 20px;
+    }
+    .message.bot li {
+      margin: 4px 0;
+    }
+    .message.bot strong {
+      color: #e74c3c;
+    }
+    .quick-replies {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      padding: 8px 0;
+      animation: slideIn 0.3s ease-out;
+      align-self: flex-start;
+      max-width: 100%;
+    }
+    .quick-reply-btn {
+      padding: 8px 14px;
+      background: white;
+      border: 2px solid #e74c3c;
+      color: #e74c3c;
+      border-radius: 20px;
+      font-size: 13px;
+      font-weight: 500;
+      cursor: pointer;
+      transition: all 0.2s;
+      white-space: nowrap;
+    }
+    .quick-reply-btn:hover {
+      background: #e74c3c;
+      color: white;
+      transform: translateY(-2px);
+      box-shadow: 0 2px 8px rgba(231, 76, 60, 0.3);
     }
     #chat-input-container {
       padding: 16px;
@@ -321,24 +407,27 @@ app.get("/widget", (req, res) => {
       border: 2px solid #e0e0e0;
       border-radius: 24px;
       font-size: 14px;
+      font-family: inherit;
       outline: none;
       transition: border-color 0.3s;
     }
     #chat-input:focus {
-      border-color: #667eea;
+      border-color: #e74c3c;
     }
     #send-button {
       padding: 12px 24px;
-      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      background: linear-gradient(135deg, #e74c3c 0%, #c0392b 100%);
       color: white;
       border: none;
       border-radius: 24px;
       font-weight: 600;
+      font-size: 14px;
       cursor: pointer;
-      transition: transform 0.2s, opacity 0.3s;
+      transition: transform 0.2s, opacity 0.3s, box-shadow 0.2s;
     }
     #send-button:hover:not(:disabled) {
       transform: scale(1.05);
+      box-shadow: 0 4px 12px rgba(231, 76, 60, 0.3);
     }
     #send-button:disabled {
       opacity: 0.5;
@@ -353,7 +442,7 @@ app.get("/widget", (req, res) => {
       width: 8px;
       height: 8px;
       border-radius: 50%;
-      background: #999;
+      background: #e74c3c;
       animation: typing 1.4s infinite;
     }
     .typing-indicator span:nth-child(2) {
@@ -365,9 +454,11 @@ app.get("/widget", (req, res) => {
     @keyframes typing {
       0%, 60%, 100% {
         transform: translateY(0);
+        opacity: 0.5;
       }
       30% {
         transform: translateY(-10px);
+        opacity: 1;
       }
     }
   </style>
@@ -375,11 +466,16 @@ app.get("/widget", (req, res) => {
 <body>
   <div id="chat-container">
     <div id="chat-header">
-      💬 InvestOnline Buddy
+      <div id="chat-header-logo">IO</div>
+      <div id="chat-header-text">
+        <div id="chat-header-title">InvestOnline Buddy</div>
+        <div id="chat-header-subtitle">Your Investment Assistant</div>
+      </div>
     </div>
     <div id="chat-messages">
       <div class="message bot">
-        Hi! I'm InvestOnline Buddy. I can help you with information about mutual funds, SIPs, account opening, and more. How can I assist you today?
+        <p>Hi! I'm InvestOnline Buddy. 👋</p>
+        <p>I can help you with information about mutual funds, SIPs, account opening, and more. How can I assist you today?</p>
       </div>
     </div>
     <div id="chat-input-container">
@@ -423,7 +519,20 @@ app.get("/widget", (req, res) => {
     function addMessage(text, isUser = false) {
       const messageDiv = document.createElement('div');
       messageDiv.className = \`message \${isUser ? 'user' : 'bot'}\`;
-      messageDiv.textContent = text;
+      
+      if (isUser) {
+        messageDiv.textContent = text;
+      } else {
+        // Format bot messages with proper paragraphs and links
+        const formatted = text
+          .replace(/\[([^\]]+)\]\(([^)]+)\)/g, '<a href="$2" target="_blank" rel="noopener noreferrer">$1</a>')
+          .split('\n')
+          .filter(line => line.trim())
+          .map(line => \`<p>\${line.trim()}</p>\`)
+          .join('');
+        messageDiv.innerHTML = formatted;
+      }
+      
       chatMessages.appendChild(messageDiv);
       chatMessages.scrollTop = chatMessages.scrollHeight;
     }
@@ -434,6 +543,33 @@ app.get("/widget", (req, res) => {
 
     function addUserMessage(text) {
       addMessage(text, true);
+    }
+
+    // Quick reply buttons
+    function addQuickReplies(suggestions) {
+      // Remove existing quick replies
+      const existing = document.getElementById('quick-replies');
+      if (existing) existing.remove();
+
+      if (!suggestions || suggestions.length === 0) return;
+
+      const quickRepliesDiv = document.createElement('div');
+      quickRepliesDiv.id = 'quick-replies';
+      quickRepliesDiv.className = 'quick-replies';
+
+      suggestions.forEach(suggestion => {
+        const button = document.createElement('button');
+        button.className = 'quick-reply-btn';
+        button.textContent = suggestion;
+        button.onclick = () => {
+          chatInput.value = suggestion;
+          sendMessage();
+        };
+        quickRepliesDiv.appendChild(button);
+      });
+
+      chatMessages.appendChild(quickRepliesDiv);
+      chatMessages.scrollTop = chatMessages.scrollHeight;
     }
 
     // Show typing indicator
@@ -455,6 +591,10 @@ app.get("/widget", (req, res) => {
     async function sendMessage() {
       const message = chatInput.value.trim();
       if (!message) return;
+
+      // Remove quick replies when user sends a message
+      const quickReplies = document.getElementById('quick-replies');
+      if (quickReplies) quickReplies.remove();
 
       // Disable input
       chatInput.disabled = true;
@@ -485,13 +625,29 @@ app.get("/widget", (req, res) => {
 
         if (data.reply) {
           addBotMessage(data.reply);
+          
+          // Add contextual quick replies based on response
+          const lowerReply = data.reply.toLowerCase();
+          if (lowerReply.includes('register') || lowerReply.includes('account')) {
+            addQuickReplies(['What is KYC?', 'Required documents', 'Contact support']);
+          } else if (lowerReply.includes('sip')) {
+            addQuickReplies(['SIP Calculator', 'Top Mutual Funds', 'Minimum SIP amount']);
+          } else if (lowerReply.includes('kyc')) {
+            addQuickReplies(['How to register?', 'Required documents', 'Talk to advisor']);
+          } else if (lowerReply.includes('fund')) {
+            addQuickReplies(['SIP Calculator', 'How to start SIP?', 'Top Mutual Funds']);
+          } else {
+            addQuickReplies(['How to register?', 'Start SIP', 'Contact support']);
+          }
         } else {
           addBotMessage('Sorry, I encountered an error. Please try again.');
+          addQuickReplies(['How to register?', 'Contact support']);
         }
       } catch (error) {
         console.error('❌ Chat error:', error);
         hideTyping();
         addBotMessage('Sorry, something went wrong. Please try again.');
+        addQuickReplies(['Contact support', 'Try again']);
       } finally {
         // Re-enable input
         chatInput.disabled = false;
@@ -508,6 +664,18 @@ app.get("/widget", (req, res) => {
 
     // Initialize on load
     initSession();
+    
+    // Show initial quick replies after a short delay
+    setTimeout(() => {
+      addQuickReplies([
+        '🎯 How to register?',
+        '📝 What is KYC?',
+        '💰 How to start SIP?',
+        '📊 SIP Calculator',
+        '🏆 Top Mutual Funds',
+        '📞 Contact Support'
+      ]);
+    }, 800);
   </script>
 </body>
 </html>
