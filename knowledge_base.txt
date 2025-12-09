@@ -1,0 +1,279 @@
+INVESTONLINE.IN KNOWLEDGE BASE FOR AI ASSISTANT
+==============================================
+
+## COMPANY OVERVIEW
+InvestOnline.in is a mutual fund investment platform offering:
+- 2,000+ mutual fund schemes
+- Zero commission investing
+- SIP starting from ₹500
+- AI-powered research tools
+- Expert advisory services
+
+Contact Information:
+- Email: wealth@investonline.in
+- Phone: 1800-2222-65 (Toll-free)
+- Phone: +91-22-4071-3333 (Direct)
+- Website: www.investonline.in
+
+## USER REGISTRATION & KYC
+
+### Registration Process
+1. Provide PAN card number
+2. Complete e-KYC verification (Aadhaar-based)
+3. Upload required documents
+4. Bank account verification
+5. Risk profile assessment
+
+### KYC (Know Your Customer)
+**What is KYC?**
+KYC is a one-time verification process for investing in mutual funds in India. It confirms your identity and address as per SEBI regulations.
+
+**e-KYC Process:**
+1. Enter PAN and Aadhaar details
+2. Receive OTP on registered mobile
+3. Verify OTP
+4. Digital signature captured
+5. KYC verified instantly (usually within minutes)
+
+**Required Documents:**
+- PAN Card (mandatory)
+- Aadhaar Card (for e-KYC)
+- Bank Proof: Cancelled cheque or bank statement
+- Photograph (for manual KYC)
+- Address Proof (if Aadhaar not used): Passport, Voter ID, Driver's License, or utility bill
+
+**KYC Processing Time:**
+- e-KYC: Instant to 24 hours
+- Manual KYC: 3-5 business days
+
+**Checking KYC Status:**
+Visit: https://www.karvykra.com or contact support at wealth@investonline.in
+
+## INVESTMENT TYPES
+
+### Systematic Investment Plan (SIP)
+**What is SIP?**
+SIP allows you to invest a fixed amount regularly (monthly/quarterly) in mutual funds. It's a disciplined approach with benefits like rupee cost averaging.
+
+**Starting SIP:**
+1. Complete registration and KYC
+2. Choose a mutual fund scheme
+3. Select SIP amount (minimum ₹500) and frequency
+4. Set up auto-debit mandate
+5. Choose start date
+
+**SIP Benefits:**
+- Disciplined investing habit
+- Rupee cost averaging
+- Power of compounding
+- Flexibility to pause/stop
+- No market timing needed
+
+### Lumpsum Investment
+Invest a one-time amount in mutual funds. Suitable for:
+- Windfall gains (bonus, inheritance)
+- Long-term goals
+- When you have idle funds
+
+## MUTUAL FUND CATEGORIES
+
+### Equity Funds
+**Best for:** Long-term wealth creation (7+ years)
+**Risk:** High
+**Examples:** Large Cap, Mid Cap, Small Cap, Flexi Cap, Sectoral
+**Top Performers:** Check "Top Equity Funds" section on website
+
+### Debt Funds
+**Best for:** Stable returns, short-to-medium term goals
+**Risk:** Low to Moderate
+**Examples:** Liquid, Short Duration, Corporate Bond, Gilt
+**Returns:** 6-8% annually
+
+### Hybrid Funds
+**Best for:** Balanced risk-reward
+**Risk:** Moderate
+**Mix:** Combination of equity and debt
+**Examples:** Aggressive Hybrid (65-80% equity), Conservative Hybrid (25-40% equity)
+
+### Tax Saver Funds (ELSS)
+**Best for:** Tax savings under Section 80C
+**Lock-in:** 3 years (shortest among tax-saving options)
+**Tax Benefit:** Up to ₹1.5 lakh deduction
+**Risk:** Moderate to High (equity-oriented)
+
+### International Funds
+**Best for:** Geographical diversification
+**Risk:** Moderate to High
+**Invests in:** Global markets (US, Europe, Asia)
+
+## CALCULATORS & TOOLS
+
+### 1. SIP Calculator
+Calculate future value of regular SIP investments.
+**Inputs:** Monthly investment, expected return rate, investment period
+**Output:** Maturity value, total invested amount
+
+### 2. Goal-Based SIP Calculator
+Plan SIPs based on specific financial goals (child's education, retirement, house).
+**Features:** Goal amount, time horizon, inflation adjustment
+
+### 3. Compounding Calculator
+Shows the power of compounding over time.
+**Demonstrates:** How reinvested returns grow wealth exponentially
+
+### 4. Future Value Calculator
+Estimate future value of current investments.
+**Inputs:** Current investment, expected annual return, time period
+
+### 5. Asset Allocation Calculator
+Recommends ideal portfolio mix based on age, risk profile, and goals.
+**Output:** Equity-Debt-Gold allocation percentages
+
+## PORTFOLIO MANAGEMENT
+
+### Redeeming Investments
+**Process:**
+1. Login to your account
+2. Go to "My Portfolio"
+3. Select scheme to redeem
+4. Choose full/partial redemption
+5. Confirm and submit
+**Timeline:** Funds credited in 3-5 business days
+
+### Switching Between Funds
+**What is Switch?**
+Moving money from one scheme to another within the same fund house without redeeming.
+**Benefits:** 
+- No exit from investment
+- Realign portfolio with goals
+- Rebalance asset allocation
+**How:** Login → My Portfolio → Select Switch option
+
+### New Fund Offers (NFOs)
+**What are NFOs?**
+New mutual fund schemes launched by AMCs (Asset Management Companies).
+**NFO Price:** Usually ₹10 per unit
+**Should you invest?** Evaluate fund house reputation, fund manager track record, investment strategy, and compare with existing similar schemes.
+
+## LOGIN & ACCOUNT SUPPORT
+
+### Login Issues
+**Common Problems:**
+1. **Forgot Password:** Click "Forgot Password" → Enter registered email → Reset link sent
+2. **Account Locked:** Contact support after 3 failed attempts
+3. **Email/Mobile not recognized:** Verify registration status or contact support
+
+### Updating Account Details
+**Process:**
+1. Login → Profile Settings
+2. Update email/mobile/bank account
+3. Verify OTP
+4. Submit supporting documents if required
+
+## PAYMENT & TRANSACTIONS
+
+### Payment Methods
+- UPI (instant)
+- Net Banking
+- Debit Card
+- Auto-debit for SIP (e-NACH mandate)
+
+### Payment Failures
+**Common Reasons:**
+- Insufficient balance
+- Bank server issues
+- Wrong CVV/OTP
+- Daily transaction limit exceeded
+
+**Solution:** Retry after checking balance and limits, or use alternate payment method
+
+## FEES & CHARGES
+
+### Platform Fees
+**Zero commission:** InvestOnline.in is a direct platform - no distribution commission charged
+**Transaction charges:** Nil
+**AMC charges:** Standard expense ratio as per scheme (deducted from NAV)
+
+### Exit Loads
+Charged by fund houses if you redeem before specified period:
+- Equity: Usually 1% if redeemed within 1 year
+- Debt: 0.25-1% if redeemed within 1 year
+- ELSS: No exit load (3-year lock-in)
+
+## AI RESEARCH TOOLS (FUTURE FEATURE)
+
+### Deep Fund Analysis
+- Multi-factor scoring (returns, risk, expense ratio, AUM)
+- Peer comparison
+- Portfolio overlap analysis
+- Historical performance with charts
+
+### Smart Recommendations
+- Risk profiling
+- Goal-based suggestions
+- Portfolio construction
+- Rebalancing alerts
+
+*Note: These features require full registration*
+
+## SECURITY & PRIVACY
+
+**Data Security:**
+- 256-bit SSL encryption
+- Two-factor authentication
+- SEBI-registered intermediary
+- Data privacy compliant (IT Act)
+
+**Privacy Policy:** Available at www.investonline.in/privacy-policy
+
+## COMMON USER QUESTIONS
+
+**Q: Is my money safe?**
+A: Mutual fund investments are regulated by SEBI. Your units are held in your name with the fund house. InvestOnline.in is a SEBI-registered platform.
+
+**Q: Can I invest without KYC?**
+A: No, KYC is mandatory as per SEBI regulations before investing in mutual funds.
+
+**Q: What is the minimum investment?**
+A: SIP minimum: ₹500/month. Lumpsum minimum: Varies by scheme (₹1,000-₹5,000)
+
+**Q: How do I track my investments?**
+A: Login to your account → Dashboard shows portfolio value, returns, holdings
+
+**Q: Can I stop my SIP anytime?**
+A: Yes, SIPs are flexible. You can pause, stop, or modify them anytime (except during ELSS 3-year lock-in).
+
+**Q: How are returns calculated?**
+A: Returns shown as CAGR (Compound Annual Growth Rate) or absolute returns for periods less than 1 year.
+
+**Q: What is NAV?**
+A: Net Asset Value - the price per unit of a mutual fund, calculated daily after market close.
+
+**Q: Are returns guaranteed?**
+A: No, mutual funds are market-linked investments. Past performance doesn't guarantee future returns.
+
+## SUPPORT ESCALATION
+
+**When to contact human support:**
+- Investment advice needed
+- Complex account issues
+- Legal/compliance queries
+- Technical errors persisting
+- Document verification problems
+
+**Response Time:**
+- Email: 24-48 hours
+- Phone: Immediate during business hours (9 AM - 6 PM, Mon-Fri)
+
+## BLOGS & EDUCATIONAL CONTENT
+
+Visit www.investonline.in/blogs for articles on:
+- Investment strategies
+- Market insights
+- Tax planning
+- Financial planning
+- Scheme reviews
+
+## DISCLAIMER
+
+*Mutual fund investments are subject to market risks. Read all scheme-related documents carefully before investing. Past performance is not indicative of future returns.*
