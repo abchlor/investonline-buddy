@@ -265,7 +265,7 @@ app.get("/widget", (req, res) => {
       overflow: hidden;
     }
     #chat-header {
-      background: linear-gradient(135deg, #e74c3c 0%, #c0392b 100%);
+      background: linear-gradient(135deg, #FF6B35 0%, #F7931E 100%);
       color: white;
       padding: 16px;
       display: flex;
@@ -282,7 +282,7 @@ app.get("/widget", (req, res) => {
       align-items: center;
       justify-content: center;
       font-weight: bold;
-      color: #e74c3c;
+      color: #FF6B35;
       font-size: 16px;
     }
     #chat-header-text {
@@ -325,7 +325,7 @@ app.get("/widget", (req, res) => {
       }
     }
     .message.user {
-      background: #e74c3c;
+      background: #FF6B35;
       color: white;
       align-self: flex-end;
       margin-left: auto;
@@ -347,15 +347,15 @@ app.get("/widget", (req, res) => {
       margin-bottom: 0;
     }
     .message.bot a {
-      color: #e74c3c;
+      color: #FF6B35;
       text-decoration: none;
       font-weight: 500;
-      border-bottom: 1px solid #e74c3c;
+      border-bottom: 1px solid #FF6B35;
       transition: all 0.2s;
     }
     .message.bot a:hover {
-      color: #c0392b;
-      border-bottom-color: #c0392b;
+      color: #F7931E;
+      border-bottom-color: #F7931E;
     }
     .message.bot ul, .message.bot ol {
       margin: 8px 0;
@@ -365,7 +365,7 @@ app.get("/widget", (req, res) => {
       margin: 4px 0;
     }
     .message.bot strong {
-      color: #e74c3c;
+      color: #FF6B35;
     }
     .quick-replies {
       display: flex;
@@ -379,8 +379,8 @@ app.get("/widget", (req, res) => {
     .quick-reply-btn {
       padding: 8px 14px;
       background: white;
-      border: 2px solid #e74c3c;
-      color: #e74c3c;
+      border: 2px solid #FF6B35;
+      color: #FF6B35;
       border-radius: 20px;
       font-size: 13px;
       font-weight: 500;
@@ -389,10 +389,10 @@ app.get("/widget", (req, res) => {
       white-space: nowrap;
     }
     .quick-reply-btn:hover {
-      background: #e74c3c;
+      background: #FF6B35;
       color: white;
       transform: translateY(-2px);
-      box-shadow: 0 2px 8px rgba(231, 76, 60, 0.3);
+      box-shadow: 0 2px 8px rgba(255, 107, 53, 0.3);
     }
     #chat-input-container {
       padding: 16px;
@@ -412,11 +412,11 @@ app.get("/widget", (req, res) => {
       transition: border-color 0.3s;
     }
     #chat-input:focus {
-      border-color: #e74c3c;
+      border-color: #FF6B35;
     }
     #send-button {
       padding: 12px 24px;
-      background: linear-gradient(135deg, #e74c3c 0%, #c0392b 100%);
+      background: linear-gradient(135deg, #FF6B35 0%, #F7931E 100%);
       color: white;
       border: none;
       border-radius: 24px;
@@ -427,7 +427,7 @@ app.get("/widget", (req, res) => {
     }
     #send-button:hover:not(:disabled) {
       transform: scale(1.05);
-      box-shadow: 0 4px 12px rgba(231, 76, 60, 0.3);
+      box-shadow: 0 4px 12px rgba(255, 107, 53, 0.3);
     }
     #send-button:disabled {
       opacity: 0.5;
@@ -442,7 +442,7 @@ app.get("/widget", (req, res) => {
       width: 8px;
       height: 8px;
       border-radius: 50%;
-      background: #e74c3c;
+      background: #FF6B35;
       animation: typing 1.4s infinite;
     }
     .typing-indicator span:nth-child(2) {
@@ -501,14 +501,33 @@ app.get("/widget", (req, res) => {
     // Initialize session
     async function initSession() {
       try {
+        console.log('🔄 Initializing session...');
         const response = await fetch(\`\${API_URL}/session/start\`, {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' }
         });
+        
+        if (!response.ok) {
+          throw new Error(\`HTTP \${response.status}: \${response.statusText}\`);
+        }
+        
         const data = await response.json();
         sessionId = data.session_id;
         sessionToken = data.token;
         console.log('✅ Session initialized:', sessionId);
+        
+        // Show quick replies after session is ready
+        setTimeout(() => {
+          addQuickReplies([
+            '🎯 How to register?',
+            '📝 What is KYC?',
+            '💰 How to start SIP?',
+            '📊 SIP Calculator',
+            '🏆 Top Mutual Funds',
+            '📞 Contact Support'
+          ]);
+        }, 800);
+        
       } catch (error) {
         console.error('❌ Failed to initialize session:', error);
         addBotMessage('Sorry, I encountered an error connecting. Please refresh the page.');
@@ -592,6 +611,12 @@ app.get("/widget", (req, res) => {
       const message = chatInput.value.trim();
       if (!message) return;
 
+      if (!sessionId || !sessionToken) {
+        addBotMessage('Please wait, initializing session...');
+        await initSession();
+        return;
+      }
+
       // Remove quick replies when user sends a message
       const quickReplies = document.getElementById('quick-replies');
       if (quickReplies) quickReplies.remove();
@@ -608,6 +633,7 @@ app.get("/widget", (req, res) => {
       showTyping();
 
       try {
+        console.log('📤 Sending message:', message);
         const response = await fetch(\`\${API_URL}/chat\`, {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
@@ -620,7 +646,12 @@ app.get("/widget", (req, res) => {
           })
         });
 
+        if (!response.ok) {
+          throw new Error(\`HTTP \${response.status}: \${response.statusText}\`);
+        }
+
         const data = await response.json();
+        console.log('📥 Received response:', data);
         hideTyping();
 
         if (data.reply) {
@@ -663,19 +694,8 @@ app.get("/widget", (req, res) => {
     });
 
     // Initialize on load
+    console.log('🚀 Starting InvestOnline Buddy...');
     initSession();
-    
-    // Show initial quick replies after a short delay
-    setTimeout(() => {
-      addQuickReplies([
-        '🎯 How to register?',
-        '📝 What is KYC?',
-        '💰 How to start SIP?',
-        '📊 SIP Calculator',
-        '🏆 Top Mutual Funds',
-        '📞 Contact Support'
-      ]);
-    }, 800);
   </script>
 </body>
 </html>
