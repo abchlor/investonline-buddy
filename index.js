@@ -70,9 +70,21 @@ app.use(
         frameSrc: ["'self'", ...ALLOWED_ORIGIN],
         frameAncestors: [...ALLOWED_ORIGIN]
       }
-    }
+    },
+    crossOriginEmbedderPolicy: false,
+    crossOriginResourcePolicy: { policy: "cross-origin" }
   })
 );
+
+// Explicitly allow iframe embedding from allowed origins
+app.use((req, res, next) => {
+  const origin = req.get('origin') || req.get('referer');
+  if (origin && isIframeSafe(origin)) {
+    res.removeHeader('X-Frame-Options');
+    res.setHeader('Content-Security-Policy', `frame-ancestors ${ALLOWED_ORIGIN.join(' ')}`);
+  }
+  next();
+});
 
 app.use(morgan("combined"));
 
@@ -90,6 +102,7 @@ app.use(
 );
 
 app.use(express.json({ limit: "10kb" }));
+
 
 // ====================================
 // Health Check
