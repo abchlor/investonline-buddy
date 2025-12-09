@@ -17,7 +17,7 @@ const cors = require("cors");
 
 const { verifyRecaptcha } = require("./server/recaptcha");
 const { validateSignature } = require("./server/signature");
-const { createToken } = require("./server/utils");
+const { createSessionTokenForClient } = require("./server/utils");
 const { handleChat } = require("./server/chat_handler");
 const { initialize } = require("./server/search");
 
@@ -120,23 +120,43 @@ app.get("/", (req, res) => {
 // Session Management
 // ====================================
 
-app.post("/session/start", (req, res) => {
-  const sessionId = `session_${Date.now()}_${Math.random()
-    .toString(36)
-    .slice(2, 8)}`;
-  const token = createToken();
+app.post("/session/start", async (req, res) => {
+  try {
+    const sessionId = `session_${Date.now()}_${Math.random()
+      .toString(36)
+      .slice(2, 8)}`;
+    
+    // Use the proper function from utils
+    const { token, clientKey, expiresAt } = await createSessionTokenForClient({
+      sessionId,
+      createdAt: Date.now()
+    });
 
-  SESSION_STORE.set(sessionId, {
-    token,
-    createdAt: Date.now(),
-    lastAccess: Date.now()
-  });
+    SESSION_STORE.set(sessionId, {
+      token,
+      clientKey,
+      createdAt: Date.now(),
+      lastAccess: Date.now(),
+      expiresAt
+    });
 
-  CREATED_TOKENS.add(token);
+    CREATED_TOKENS.add(token);
 
-  console.log(`✅ Session created: ${sessionId}`);
+    console.log(`✅ Session created: ${sessionId}`);
 
-  res.json({ session_id: sessionId, token });
+    res.json({ 
+      session_id: sessionId, 
+      token,
+      client_key: clientKey,
+      expires_at: expiresAt
+    });
+  } catch (error) {
+    console.error('❌ Session creation error:', error);
+    res.status(500).json({ 
+      error: 'session_creation_failed',
+      message: error.message 
+    });
+  }
 });
 
 // ====================================
