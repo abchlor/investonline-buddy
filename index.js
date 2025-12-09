@@ -223,7 +223,7 @@ setInterval(() => {
 // Start Server
 // ====================================
 
-app.listen(PORT, () => {
+app.listen(PORT, '0.0.0.0', () => {
   console.log(`✅ InvestOnline Buddy running on port ${PORT}`);
   console.log("🔒 Iframe embedding allowed for:", ALLOWED_ORIGIN);
   console.log(`🔍 Only searches InvestOnline.in (no AI/internet knowledge)`);
