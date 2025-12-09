@@ -23,7 +23,7 @@ function touchSession(sessionId) {
       lastMessageAt: now(),
       messageCount: 0, 
       context: [],
-      conversationHistory: [], // NEW: Track AI conversation history
+      conversationHistory: [],
       token: Math.random().toString(36).slice(2, 8) 
     };
     sessions.set(sessionId, s);
@@ -80,10 +80,8 @@ function matchSimpleIntent(text) {
   return null;
 }
 
-function formatResponse(text) {
-  if (!text) return text;
-  return text.replace(/(https?:\/\/[^\s<]+)/g, '<a href="$1" target="_blank" rel="noopener noreferrer">$1</a>');
-}
+// REMOVED: Don't format responses - let widget handle markdown
+// The widget will convert [text](url) to proper HTML links
 
 function getSupportInfo(flows) {
   const support = flows.global?.support_block || {
@@ -93,12 +91,13 @@ function getSupportInfo(flows) {
   };
   
   return `
-<div class="support-info" style="margin-top: 15px; padding: 15px; background: #f8f9fa; border-radius: 8px;">
-  <strong>📞 Contact Support:</strong><br><br>
-  📧 <strong>Email:</strong> <a href="mailto:${support.email}">${support.email}</a><br>
-  📞 <strong>Phone:</strong> ${support.phone_primary}<br>
-  ${support.phone_secondary ? `📱 <strong>Mobile:</strong> ${support.phone_secondary}<br>` : ''}
-</div>`;
+
+📞 Contact Support:
+
+📧 Email: ${support.email}
+📞 Phone: ${support.phone_primary}
+${support.phone_secondary ? `📱 Mobile: ${support.phone_secondary}` : ''}
+`;
 }
 
 /**
@@ -239,8 +238,9 @@ async function handleChat({ session_id, message, page, lang, req }) {
       { role: 'assistant', content: def.response }
     );
     
+    // FIXED: Return raw response without formatting - let widget handle markdown
     return {
-      reply: formatResponse(def.response),
+      reply: def.response,
       suggested: (def.suggestions || def.suggested || []).slice(0, 5)
     };
   }
@@ -256,8 +256,9 @@ async function handleChat({ session_id, message, page, lang, req }) {
       { role: 'assistant', content: keywordResponse.response }
     );
     
+    // FIXED: Return raw response without formatting
     return {
-      reply: formatResponse(keywordResponse.response),
+      reply: keywordResponse.response,
       suggested: keywordResponse.followUp || []
     };
   }
@@ -294,8 +295,9 @@ async function handleChat({ session_id, message, page, lang, req }) {
     // Generate contextual follow-up suggestions
     const followUps = generateFollowUpSuggestions(text, aiResponse);
 
+    // FIXED: Return raw response without formatting
     return {
-      reply: formatResponse(aiResponse),
+      reply: aiResponse,
       suggested: followUps
     };
 
@@ -304,7 +306,9 @@ async function handleChat({ session_id, message, page, lang, req }) {
     
     // Friendly error message with support info
     return {
-      reply: `I'm having trouble processing that right now. 😅<br><br>Please try rephrasing your question, or contact our support team:${getSupportInfo(flows)}`,
+      reply: `I'm having trouble processing that right now. 😅
+
+Please try rephrasing your question, or contact our support team:${getSupportInfo(flows)}`,
       suggested: ["Talk to Support", "Start Registration", "What is KYC?", "SIP Calculator"]
     };
   }
