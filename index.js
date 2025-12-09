@@ -290,7 +290,7 @@ app.get("/widget", (req, res) => {
       max-width: 80%;
       padding: 12px 16px;
       border-radius: 12px;
-      line-height: 1.6;
+      line-height: 1.5;
       animation: slideIn 0.3s ease-out;
     }
     @keyframes slideIn {
@@ -311,10 +311,27 @@ app.get("/widget", (req, res) => {
       border-bottom-left-radius: 4px;
       box-shadow: 0 1px 3px rgba(0,0,0,0.05);
     }
-    .message.bot p { margin: 0 0 12px 0; line-height: 1.6; }
+    .message.bot p { 
+      margin: 0 0 8px 0; 
+      line-height: 1.5;
+    }
     .message.bot p:last-child { margin-bottom: 0; }
-    .message.bot ul { margin: 8px 0; padding-left: 20px; }
-    .message.bot li { margin: 4px 0; }
+    .message.bot h3 {
+      color: #FF6B35;
+      font-size: 15px;
+      font-weight: 600;
+      margin: 0 0 8px 0;
+      border-bottom: 2px solid #FF6B35;
+      padding-bottom: 4px;
+    }
+    .message.bot h4 {
+      color: #2c3e50;
+      font-size: 14px;
+      font-weight: 600;
+      margin: 8px 0 6px 0;
+    }
+    .message.bot ul { margin: 6px 0; padding-left: 20px; }
+    .message.bot li { margin: 3px 0; }
     .message.bot strong { color: #FF6B35; font-weight: 600; }
     .message.bot a {
       color: #FF6B35;
@@ -445,8 +462,21 @@ app.get("/widget", (req, res) => {
         for (var i = 0; i < lines.length; i++) {
           var line = lines[i].trim();
           if (line) {
-            var processedLine = line.replace(/\[([^\]]+)\]\(([^)]+)\)/g, '<a href="$2" target="_blank" rel="noopener noreferrer">$1</a>');
-            html += '<p>' + processedLine + '</p>';
+            // Convert **Bold Text:** to h4 headings
+            if (line.match(/^\*\*(.+):\*\*$/)) {
+              var heading = line.replace(/^\*\*(.+):\*\*$/, '$1');
+              html += '<h4>' + heading + '</h4>';
+            }
+            // Convert **Bold Text** (without colon) to h3 headings
+            else if (line.match(/^\*\*(.+)\*\*$/)) {
+              var heading = line.replace(/^\*\*(.+)\*\*$/, '$1');
+              html += '<h3>' + heading + '</h3>';
+            }
+            // Regular paragraphs with links
+            else {
+              var processedLine = line.replace(/\[([^\]]+)\]\(([^)]+)\)/g, '<a href="$2" target="_blank" rel="noopener noreferrer">$1</a>');
+              html += '<p>' + processedLine + '</p>';
+            }
           }
         }
         
@@ -608,7 +638,6 @@ app.get("/widget", (req, res) => {
 
   res.send(html);
 });
-
 
 // ====================================
 // Debug Widget Endpoint
