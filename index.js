@@ -231,10 +231,6 @@ app.post("/chat", async (req, res) => {
   }
 });
 
-// ====================================
-// Widget Endpoint (for iframe embedding)
-// ====================================
-
 app.get("/widget", (req, res) => {
   res.send(`
 <!DOCTYPE html>
@@ -244,11 +240,7 @@ app.get("/widget", (req, res) => {
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>InvestOnline Buddy</title>
   <style>
-    * {
-      margin: 0;
-      padding: 0;
-      box-sizing: border-box;
-    }
+    * { margin: 0; padding: 0; box-sizing: border-box; }
     body {
       font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
       height: 100vh;
@@ -260,9 +252,7 @@ app.get("/widget", (req, res) => {
       flex: 1;
       display: flex;
       flex-direction: column;
-      max-width: 100%;
       background: white;
-      overflow: hidden;
     }
     #chat-header {
       background: linear-gradient(135deg, #FF6B35 0%, #F7931E 100%);
@@ -271,7 +261,6 @@ app.get("/widget", (req, res) => {
       display: flex;
       align-items: center;
       gap: 12px;
-      box-shadow: 0 2px 8px rgba(0,0,0,0.1);
     }
     #chat-header-logo {
       width: 36px;
@@ -285,18 +274,9 @@ app.get("/widget", (req, res) => {
       color: #FF6B35;
       font-size: 16px;
     }
-    #chat-header-text {
-      flex: 1;
-    }
-    #chat-header-title {
-      font-weight: 600;
-      font-size: 16px;
-      margin-bottom: 2px;
-    }
-    #chat-header-subtitle {
-      font-size: 11px;
-      opacity: 0.9;
-    }
+    #chat-header-text { flex: 1; }
+    #chat-header-title { font-weight: 600; font-size: 16px; }
+    #chat-header-subtitle { font-size: 11px; opacity: 0.9; }
     #chat-messages {
       flex: 1;
       overflow-y: auto;
@@ -310,25 +290,17 @@ app.get("/widget", (req, res) => {
       max-width: 80%;
       padding: 12px 16px;
       border-radius: 12px;
-      word-wrap: break-word;
-      animation: slideIn 0.3s ease-out;
       line-height: 1.6;
+      animation: slideIn 0.3s ease-out;
     }
     @keyframes slideIn {
-      from {
-        opacity: 0;
-        transform: translateY(10px);
-      }
-      to {
-        opacity: 1;
-        transform: translateY(0);
-      }
+      from { opacity: 0; transform: translateY(10px); }
+      to { opacity: 1; transform: translateY(0); }
     }
     .message.user {
       background: #FF6B35;
       color: white;
       align-self: flex-end;
-      margin-left: auto;
       border-bottom-right-radius: 4px;
     }
     .message.bot {
@@ -339,41 +311,19 @@ app.get("/widget", (req, res) => {
       border-bottom-left-radius: 4px;
       box-shadow: 0 1px 3px rgba(0,0,0,0.05);
     }
-    .message.bot p {
-      margin: 0 0 12px 0;
-      line-height: 1.6;
-    }
-    .message.bot p:last-child {
-      margin-bottom: 0;
-    }
+    .message.bot p { margin: 0 0 12px 0; }
+    .message.bot p:last-child { margin-bottom: 0; }
     .message.bot a {
       color: #FF6B35;
       text-decoration: none;
       font-weight: 500;
       border-bottom: 1px solid #FF6B35;
-      transition: all 0.2s;
-    }
-    .message.bot a:hover {
-      color: #F7931E;
-      border-bottom-color: #F7931E;
-    }
-    .message.bot ul, .message.bot ol {
-      margin: 8px 0;
-      padding-left: 20px;
-    }
-    .message.bot li {
-      margin: 4px 0;
-    }
-    .message.bot strong {
-      color: #FF6B35;
     }
     .quick-replies {
       display: flex;
       flex-wrap: wrap;
       gap: 8px;
       padding: 8px 0;
-      animation: slideIn 0.3s ease-out;
-      align-self: flex-start;
       max-width: 100%;
     }
     .quick-reply-btn {
@@ -386,13 +336,11 @@ app.get("/widget", (req, res) => {
       font-weight: 500;
       cursor: pointer;
       transition: all 0.2s;
-      white-space: nowrap;
     }
     .quick-reply-btn:hover {
       background: #FF6B35;
       color: white;
       transform: translateY(-2px);
-      box-shadow: 0 2px 8px rgba(255, 107, 53, 0.3);
     }
     #chat-input-container {
       padding: 16px;
@@ -407,13 +355,9 @@ app.get("/widget", (req, res) => {
       border: 2px solid #e0e0e0;
       border-radius: 24px;
       font-size: 14px;
-      font-family: inherit;
       outline: none;
-      transition: border-color 0.3s;
     }
-    #chat-input:focus {
-      border-color: #FF6B35;
-    }
+    #chat-input:focus { border-color: #FF6B35; }
     #send-button {
       padding: 12px 24px;
       background: linear-gradient(135deg, #FF6B35 0%, #F7931E 100%);
@@ -421,20 +365,15 @@ app.get("/widget", (req, res) => {
       border: none;
       border-radius: 24px;
       font-weight: 600;
-      font-size: 14px;
       cursor: pointer;
-      transition: transform 0.2s, opacity 0.3s, box-shadow 0.2s;
     }
     #send-button:hover:not(:disabled) {
       transform: scale(1.05);
       box-shadow: 0 4px 12px rgba(255, 107, 53, 0.3);
     }
-    #send-button:disabled {
-      opacity: 0.5;
-      cursor: not-allowed;
-    }
+    #send-button:disabled { opacity: 0.5; }
     .typing-indicator {
-      display: inline-flex;
+      display: flex;
       gap: 4px;
       padding: 12px 16px;
     }
@@ -445,21 +384,11 @@ app.get("/widget", (req, res) => {
       background: #FF6B35;
       animation: typing 1.4s infinite;
     }
-    .typing-indicator span:nth-child(2) {
-      animation-delay: 0.2s;
-    }
-    .typing-indicator span:nth-child(3) {
-      animation-delay: 0.4s;
-    }
+    .typing-indicator span:nth-child(2) { animation-delay: 0.2s; }
+    .typing-indicator span:nth-child(3) { animation-delay: 0.4s; }
     @keyframes typing {
-      0%, 60%, 100% {
-        transform: translateY(0);
-        opacity: 0.5;
-      }
-      30% {
-        transform: translateY(-10px);
-        opacity: 1;
-      }
+      0%, 60%, 100% { transform: translateY(0); opacity: 0.5; }
+      30% { transform: translateY(-10px); opacity: 1; }
     }
   </style>
 </head>
@@ -479,228 +408,315 @@ app.get("/widget", (req, res) => {
       </div>
     </div>
     <div id="chat-input-container">
-      <input 
-        type="text" 
-        id="chat-input" 
-        placeholder="Type your message..." 
-        autocomplete="off"
-      />
+      <input type="text" id="chat-input" placeholder="Type your message..." />
       <button id="send-button">Send</button>
     </div>
   </div>
 
   <script>
-    let sessionId = null;
-    let sessionToken = null;
-    const API_URL = window.location.origin;
+  console.log('🚀 Widget starting...');
+  
+  let sessionId = null;
+  let sessionToken = null;
+  const API_URL = window.location.origin;
+  const chatMessages = document.getElementById('chat-messages');
+  const chatInput = document.getElementById('chat-input');
+  const sendButton = document.getElementById('send-button');
 
-    const chatMessages = document.getElementById('chat-messages');
-    const chatInput = document.getElementById('chat-input');
-    const sendButton = document.getElementById('send-button');
-
-    // Initialize session
-    async function initSession() {
-      try {
-        console.log('🔄 Initializing session...');
-        const response = await fetch(\`\${API_URL}/session/start\`, {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' }
-        });
-        
-        if (!response.ok) {
-          throw new Error(\`HTTP \${response.status}: \${response.statusText}\`);
-        }
-        
-        const data = await response.json();
-        sessionId = data.session_id;
-        sessionToken = data.token;
-        console.log('✅ Session initialized:', sessionId);
-        
-        // Show quick replies after session is ready
-        setTimeout(() => {
-          addQuickReplies([
-            '🎯 How to register?',
-            '📝 What is KYC?',
-            '💰 How to start SIP?',
-            '📊 SIP Calculator',
-            '🏆 Top Mutual Funds',
-            '📞 Contact Support'
-          ]);
-        }, 800);
-        
-      } catch (error) {
-        console.error('❌ Failed to initialize session:', error);
-        addBotMessage('Sorry, I encountered an error connecting. Please refresh the page.');
-      }
-    }
-
-    // Add message to chat
-    function addMessage(text, isUser = false) {
-      const messageDiv = document.createElement('div');
-      messageDiv.className = \`message \${isUser ? 'user' : 'bot'}\`;
+  function addMessage(text, isUser = false) {
+    const messageDiv = document.createElement('div');
+    messageDiv.className = 'message ' + (isUser ? 'user' : 'bot');
+    
+    if (isUser) {
+      messageDiv.textContent = text;
+    } else {
+      // Parse markdown links: [text](url)
+      const lines = text.split('\\n').filter(line => line.trim());
+      let html = '';
       
-      if (isUser) {
-        messageDiv.textContent = text;
-      } else {
-        // Format bot messages with proper paragraphs and links
-        const formatted = text
-          .replace(/\[([^\]]+)\]\(([^)]+)\)/g, '<a href="$2" target="_blank" rel="noopener noreferrer">$1</a>')
-          .split('\n')
-          .filter(line => line.trim())
-          .map(line => \`<p>\${line.trim()}</p>\`)
-          .join('');
-        messageDiv.innerHTML = formatted;
+      for (const line of lines) {
+        const processedLine = line.replace(/\\[([^\\]]+)\\]\\(([^)]+)\\)/g, 
+          '<a href="$2" target="_blank" rel="noopener noreferrer">$1</a>');
+        html += '<p>' + processedLine + '</p>';
       }
       
-      chatMessages.appendChild(messageDiv);
-      chatMessages.scrollTop = chatMessages.scrollHeight;
+      messageDiv.innerHTML = html;
     }
+    
+    chatMessages.appendChild(messageDiv);
+    chatMessages.scrollTop = chatMessages.scrollHeight;
+  }
 
-    function addBotMessage(text) {
-      addMessage(text, false);
-    }
+  function addQuickReplies(suggestions) {
+    const existing = document.getElementById('quick-replies');
+    if (existing) existing.remove();
+    if (!suggestions || !suggestions.length) return;
 
-    function addUserMessage(text) {
-      addMessage(text, true);
-    }
+    const div = document.createElement('div');
+    div.id = 'quick-replies';
+    div.className = 'quick-replies';
 
-    // Quick reply buttons
-    function addQuickReplies(suggestions) {
-      // Remove existing quick replies
-      const existing = document.getElementById('quick-replies');
-      if (existing) existing.remove();
-
-      if (!suggestions || suggestions.length === 0) return;
-
-      const quickRepliesDiv = document.createElement('div');
-      quickRepliesDiv.id = 'quick-replies';
-      quickRepliesDiv.className = 'quick-replies';
-
-      suggestions.forEach(suggestion => {
-        const button = document.createElement('button');
-        button.className = 'quick-reply-btn';
-        button.textContent = suggestion;
-        button.onclick = () => {
-          chatInput.value = suggestion;
-          sendMessage();
-        };
-        quickRepliesDiv.appendChild(button);
-      });
-
-      chatMessages.appendChild(quickRepliesDiv);
-      chatMessages.scrollTop = chatMessages.scrollHeight;
-    }
-
-    // Show typing indicator
-    function showTyping() {
-      const typingDiv = document.createElement('div');
-      typingDiv.className = 'message bot typing-indicator';
-      typingDiv.innerHTML = '<span></span><span></span><span></span>';
-      typingDiv.id = 'typing-indicator';
-      chatMessages.appendChild(typingDiv);
-      chatMessages.scrollTop = chatMessages.scrollHeight;
-    }
-
-    function hideTyping() {
-      const typing = document.getElementById('typing-indicator');
-      if (typing) typing.remove();
-    }
-
-    // Send message
-    async function sendMessage() {
-      const message = chatInput.value.trim();
-      if (!message) return;
-
-      if (!sessionId || !sessionToken) {
-        addBotMessage('Please wait, initializing session...');
-        await initSession();
-        return;
-      }
-
-      // Remove quick replies when user sends a message
-      const quickReplies = document.getElementById('quick-replies');
-      if (quickReplies) quickReplies.remove();
-
-      // Disable input
-      chatInput.disabled = true;
-      sendButton.disabled = true;
-
-      // Add user message
-      addUserMessage(message);
-      chatInput.value = '';
-
-      // Show typing
-      showTyping();
-
-      try {
-        console.log('📤 Sending message:', message);
-        const response = await fetch(\`\${API_URL}/chat\`, {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({
-            session_id: sessionId,
-            token: sessionToken,
-            message: message,
-            page: window.location.href,
-            lang: 'en'
-          })
-        });
-
-        if (!response.ok) {
-          throw new Error(\`HTTP \${response.status}: \${response.statusText}\`);
-        }
-
-        const data = await response.json();
-        console.log('📥 Received response:', data);
-        hideTyping();
-
-        if (data.reply) {
-          addBotMessage(data.reply);
-          
-          // Add contextual quick replies based on response
-          const lowerReply = data.reply.toLowerCase();
-          if (lowerReply.includes('register') || lowerReply.includes('account')) {
-            addQuickReplies(['What is KYC?', 'Required documents', 'Contact support']);
-          } else if (lowerReply.includes('sip')) {
-            addQuickReplies(['SIP Calculator', 'Top Mutual Funds', 'Minimum SIP amount']);
-          } else if (lowerReply.includes('kyc')) {
-            addQuickReplies(['How to register?', 'Required documents', 'Talk to advisor']);
-          } else if (lowerReply.includes('fund')) {
-            addQuickReplies(['SIP Calculator', 'How to start SIP?', 'Top Mutual Funds']);
-          } else {
-            addQuickReplies(['How to register?', 'Start SIP', 'Contact support']);
-          }
-        } else {
-          addBotMessage('Sorry, I encountered an error. Please try again.');
-          addQuickReplies(['How to register?', 'Contact support']);
-        }
-      } catch (error) {
-        console.error('❌ Chat error:', error);
-        hideTyping();
-        addBotMessage('Sorry, something went wrong. Please try again.');
-        addQuickReplies(['Contact support', 'Try again']);
-      } finally {
-        // Re-enable input
-        chatInput.disabled = false;
-        sendButton.disabled = false;
-        chatInput.focus();
-      }
-    }
-
-    // Event listeners
-    sendButton.addEventListener('click', sendMessage);
-    chatInput.addEventListener('keypress', (e) => {
-      if (e.key === 'Enter') sendMessage();
+    suggestions.forEach(text => {
+      const btn = document.createElement('button');
+      btn.className = 'quick-reply-btn';
+      btn.textContent = text;
+      btn.onclick = () => {
+        chatInput.value = text;
+        sendMessage();
+      };
+      div.appendChild(btn);
     });
 
-    // Initialize on load
-    console.log('🚀 Starting InvestOnline Buddy...');
-    initSession();
+    chatMessages.appendChild(div);
+    chatMessages.scrollTop = chatMessages.scrollHeight;
+  }
+
+  function showTyping() {
+    const div = document.createElement('div');
+    div.className = 'message bot typing-indicator';
+    div.innerHTML = '<span></span><span></span><span></span>';
+    div.id = 'typing';
+    chatMessages.appendChild(div);
+    chatMessages.scrollTop = chatMessages.scrollHeight;
+  }
+
+  function hideTyping() {
+    const typing = document.getElementById('typing');
+    if (typing) typing.remove();
+  }
+
+  async function initSession() {
+    try {
+      console.log('📡 Creating session...');
+      const res = await fetch(API_URL + '/session/start', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' }
+      });
+      
+      if (!res.ok) {
+        const errorText = await res.text();
+        console.error('Session error response:', errorText);
+        throw new Error('Session failed: ' + res.status);
+      }
+      
+      const data = await res.json();
+      sessionId = data.session_id;
+      sessionToken = data.token;
+      console.log('✅ Session ready:', sessionId);
+      
+      // Show quick replies
+      setTimeout(() => {
+        console.log('📌 Showing quick replies');
+        addQuickReplies([
+          '🎯 How to register?',
+          '📝 What is KYC?',
+          '💰 How to start SIP?',
+          '📊 SIP Calculator',
+          '🏆 Top Mutual Funds',
+          '📞 Contact Support'
+        ]);
+      }, 1000);
+      
+    } catch (err) {
+      console.error('❌ Session error:', err);
+      addMessage('Connection error. Please refresh the page.');
+    }
+  }
+
+  async function sendMessage() {
+    const msg = chatInput.value.trim();
+    if (!msg) return;
+
+    if (!sessionId) {
+      addMessage('Connecting... Please wait.');
+      await initSession();
+      setTimeout(() => {
+        if (sessionId && msg) {
+          chatInput.value = msg;
+          sendMessage();
+        }
+      }, 1500);
+      return;
+    }
+
+    const qr = document.getElementById('quick-replies');
+    if (qr) qr.remove();
+
+    chatInput.disabled = true;
+    sendButton.disabled = true;
+    
+    addMessage(msg, true);
+    chatInput.value = '';
+    showTyping();
+
+    try {
+      console.log('📤 Sending:', msg);
+      const res = await fetch(API_URL + '/chat', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          session_id: sessionId,
+          token: sessionToken,
+          message: msg,
+          page: window.location.href,
+          lang: 'en'
+        })
+      });
+
+      if (!res.ok) {
+        const errorText = await res.text();
+        console.error('Chat error response:', errorText);
+        throw new Error('Chat failed: ' + res.status);
+      }
+      
+      const data = await res.json();
+      console.log('📥 Reply:', data);
+      hideTyping();
+
+      if (data.reply) {
+        addMessage(data.reply);
+        const lower = data.reply.toLowerCase();
+        if (lower.includes('register') || lower.includes('account')) {
+          addQuickReplies(['What is KYC?', 'Documents needed', 'Contact support']);
+        } else if (lower.includes('sip')) {
+          addQuickReplies(['SIP Calculator', 'Top Funds', 'Start SIP']);
+        } else if (lower.includes('kyc')) {
+          addQuickReplies(['How to register?', 'Documents needed', 'Talk to advisor']);
+        } else if (lower.includes('fund')) {
+          addQuickReplies(['SIP Calculator', 'Start SIP', 'Top Funds']);
+        } else {
+          addQuickReplies(['How to register?', 'Start SIP', 'Contact us']);
+        }
+      } else {
+        addMessage('Sorry, please try again.');
+        addQuickReplies(['How to register?', 'Contact support']);
+      }
+    } catch (err) {
+      console.error('❌ Chat error:', err);
+      hideTyping();
+      addMessage('Error. Please try again.');
+      addQuickReplies(['Contact support', 'Try again']);
+    } finally {
+      chatInput.disabled = false;
+      sendButton.disabled = false;
+      chatInput.focus();
+    }
+  }
+
+  sendButton.onclick = sendMessage;
+  chatInput.onkeypress = (e) => { if (e.key === 'Enter') sendMessage(); };
+
+  console.log('🎬 Initializing...');
+  initSession();
+</script>
+</body>
+</html>
+  `);
+});
+
+// ====================================
+// Debug Widget Endpoint
+// ====================================
+
+app.get("/widget-debug", (req, res) => {
+  res.send(`
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>InvestOnline Buddy - Debug</title>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body {
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      height: 100vh;
+      display: flex;
+      flex-direction: column;
+      background: #f8f9fa;
+    }
+    #debug-panel {
+      position: fixed;
+      bottom: 0;
+      left: 0;
+      right: 0;
+      background: #000;
+      color: #0f0;
+      padding: 10px;
+      max-height: 150px;
+      overflow-y: auto;
+      font-family: monospace;
+      font-size: 11px;
+      z-index: 9999;
+    }
+    .debug-line { margin: 2px 0; }
+    .error { color: #f00; }
+    .success { color: #0f0; }
+    .info { color: #ff0; }
+  </style>
+</head>
+<body>
+  <div id="debug-panel"></div>
+  
+  <script>
+    const debugPanel = document.getElementById('debug-panel');
+    
+    function log(message, type = 'info') {
+      const line = document.createElement('div');
+      line.className = 'debug-line ' + type;
+      line.textContent = new Date().toLocaleTimeString() + ' - ' + message;
+      debugPanel.appendChild(line);
+      debugPanel.scrollTop = debugPanel.scrollHeight;
+      console.log(message);
+    }
+    
+    log('Widget loaded', 'success');
+    log('Testing API endpoint...', 'info');
+    
+    // Test session endpoint
+    fetch(window.location.origin + '/session/start', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' }
+    })
+    .then(response => {
+      log('Session response status: ' + response.status, response.ok ? 'success' : 'error');
+      return response.json();
+    })
+    .then(data => {
+      log('Session data: ' + JSON.stringify(data), 'success');
+      log('Session ID: ' + data.session_id, 'success');
+      log('Token: ' + data.token, 'success');
+      
+      // Test chat endpoint
+      return fetch(window.location.origin + '/chat', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          session_id: data.session_id,
+          token: data.token,
+          message: 'test',
+          page: window.location.href,
+          lang: 'en'
+        })
+      });
+    })
+    .then(response => {
+      log('Chat response status: ' + response.status, response.ok ? 'success' : 'error');
+      return response.json();
+    })
+    .then(data => {
+      log('Chat reply: ' + data.reply, 'success');
+    })
+    .catch(error => {
+      log('ERROR: ' + error.message, 'error');
+      log('Error stack: ' + error.stack, 'error');
+    });
   </script>
 </body>
 </html>
   `);
 });
+
 
 // ====================================
 // Session Cleanup
