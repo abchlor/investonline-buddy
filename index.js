@@ -212,6 +212,289 @@ app.post("/chat", async (req, res) => {
 });
 
 // ====================================
+// Widget Endpoint (for iframe embedding)
+// ====================================
+
+app.get("/widget", (req, res) => {
+  res.send(`
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>InvestOnline Buddy</title>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+      height: 100vh;
+      display: flex;
+      flex-direction: column;
+      background: #f5f5f5;
+    }
+    #chat-container {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      max-width: 100%;
+      background: white;
+      overflow: hidden;
+    }
+    #chat-header {
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      color: white;
+      padding: 16px;
+      text-align: center;
+      font-weight: 600;
+      font-size: 18px;
+    }
+    #chat-messages {
+      flex: 1;
+      overflow-y: auto;
+      padding: 16px;
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+    }
+    .message {
+      max-width: 80%;
+      padding: 12px 16px;
+      border-radius: 12px;
+      word-wrap: break-word;
+      animation: slideIn 0.3s ease-out;
+    }
+    @keyframes slideIn {
+      from {
+        opacity: 0;
+        transform: translateY(10px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+    .message.user {
+      background: #667eea;
+      color: white;
+      align-self: flex-end;
+      margin-left: auto;
+    }
+    .message.bot {
+      background: #f0f0f0;
+      color: #333;
+      align-self: flex-start;
+    }
+    #chat-input-container {
+      padding: 16px;
+      background: white;
+      border-top: 1px solid #e0e0e0;
+      display: flex;
+      gap: 8px;
+    }
+    #chat-input {
+      flex: 1;
+      padding: 12px 16px;
+      border: 2px solid #e0e0e0;
+      border-radius: 24px;
+      font-size: 14px;
+      outline: none;
+      transition: border-color 0.3s;
+    }
+    #chat-input:focus {
+      border-color: #667eea;
+    }
+    #send-button {
+      padding: 12px 24px;
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      color: white;
+      border: none;
+      border-radius: 24px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: transform 0.2s, opacity 0.3s;
+    }
+    #send-button:hover:not(:disabled) {
+      transform: scale(1.05);
+    }
+    #send-button:disabled {
+      opacity: 0.5;
+      cursor: not-allowed;
+    }
+    .typing-indicator {
+      display: inline-flex;
+      gap: 4px;
+      padding: 12px 16px;
+    }
+    .typing-indicator span {
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      background: #999;
+      animation: typing 1.4s infinite;
+    }
+    .typing-indicator span:nth-child(2) {
+      animation-delay: 0.2s;
+    }
+    .typing-indicator span:nth-child(3) {
+      animation-delay: 0.4s;
+    }
+    @keyframes typing {
+      0%, 60%, 100% {
+        transform: translateY(0);
+      }
+      30% {
+        transform: translateY(-10px);
+      }
+    }
+  </style>
+</head>
+<body>
+  <div id="chat-container">
+    <div id="chat-header">
+      💬 InvestOnline Buddy
+    </div>
+    <div id="chat-messages">
+      <div class="message bot">
+        Hi! I'm InvestOnline Buddy. I can help you with information about mutual funds, SIPs, account opening, and more. How can I assist you today?
+      </div>
+    </div>
+    <div id="chat-input-container">
+      <input 
+        type="text" 
+        id="chat-input" 
+        placeholder="Type your message..." 
+        autocomplete="off"
+      />
+      <button id="send-button">Send</button>
+    </div>
+  </div>
+
+  <script>
+    let sessionId = null;
+    let sessionToken = null;
+    const API_URL = window.location.origin;
+
+    const chatMessages = document.getElementById('chat-messages');
+    const chatInput = document.getElementById('chat-input');
+    const sendButton = document.getElementById('send-button');
+
+    // Initialize session
+    async function initSession() {
+      try {
+        const response = await fetch(\`\${API_URL}/session/start\`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' }
+        });
+        const data = await response.json();
+        sessionId = data.session_id;
+        sessionToken = data.token;
+        console.log('✅ Session initialized:', sessionId);
+      } catch (error) {
+        console.error('❌ Failed to initialize session:', error);
+        addBotMessage('Sorry, I encountered an error connecting. Please refresh the page.');
+      }
+    }
+
+    // Add message to chat
+    function addMessage(text, isUser = false) {
+      const messageDiv = document.createElement('div');
+      messageDiv.className = \`message \${isUser ? 'user' : 'bot'}\`;
+      messageDiv.textContent = text;
+      chatMessages.appendChild(messageDiv);
+      chatMessages.scrollTop = chatMessages.scrollHeight;
+    }
+
+    function addBotMessage(text) {
+      addMessage(text, false);
+    }
+
+    function addUserMessage(text) {
+      addMessage(text, true);
+    }
+
+    // Show typing indicator
+    function showTyping() {
+      const typingDiv = document.createElement('div');
+      typingDiv.className = 'message bot typing-indicator';
+      typingDiv.innerHTML = '<span></span><span></span><span></span>';
+      typingDiv.id = 'typing-indicator';
+      chatMessages.appendChild(typingDiv);
+      chatMessages.scrollTop = chatMessages.scrollHeight;
+    }
+
+    function hideTyping() {
+      const typing = document.getElementById('typing-indicator');
+      if (typing) typing.remove();
+    }
+
+    // Send message
+    async function sendMessage() {
+      const message = chatInput.value.trim();
+      if (!message) return;
+
+      // Disable input
+      chatInput.disabled = true;
+      sendButton.disabled = true;
+
+      // Add user message
+      addUserMessage(message);
+      chatInput.value = '';
+
+      // Show typing
+      showTyping();
+
+      try {
+        const response = await fetch(\`\${API_URL}/chat\`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            session_id: sessionId,
+            token: sessionToken,
+            message: message,
+            page: window.location.href,
+            lang: 'en'
+          })
+        });
+
+        const data = await response.json();
+        hideTyping();
+
+        if (data.reply) {
+          addBotMessage(data.reply);
+        } else {
+          addBotMessage('Sorry, I encountered an error. Please try again.');
+        }
+      } catch (error) {
+        console.error('❌ Chat error:', error);
+        hideTyping();
+        addBotMessage('Sorry, something went wrong. Please try again.');
+      } finally {
+        // Re-enable input
+        chatInput.disabled = false;
+        sendButton.disabled = false;
+        chatInput.focus();
+      }
+    }
+
+    // Event listeners
+    sendButton.addEventListener('click', sendMessage);
+    chatInput.addEventListener('keypress', (e) => {
+      if (e.key === 'Enter') sendMessage();
+    });
+
+    // Initialize on load
+    initSession();
+  </script>
+</body>
+</html>
+  `);
+});
+
+// ====================================
 // Session Cleanup
 // ====================================
 
