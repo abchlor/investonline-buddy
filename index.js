@@ -232,8 +232,8 @@ app.post("/chat", async (req, res) => {
 });
 
 app.get("/widget", (req, res) => {
-  res.send(`
-<!DOCTYPE html>
+  // Generate the HTML content as a regular string (not template literal)
+  const widgetHTML = `<!DOCTYPE html>
 <html lang="en">
 <head>
   <meta charset="UTF-8">
@@ -426,136 +426,134 @@ app.get("/widget", (req, res) => {
   </div>
 
   <script>
-    let sessionId = null;
-    let sessionToken = null;
-    const API_URL = window.location.origin;
-    const chatMessages = document.getElementById('chat-messages');
-    const chatInput = document.getElementById('chat-input');
-    const sendButton = document.getElementById('send-button');
+    (function() {
+      let sessionId = null;
+      let sessionToken = null;
+      const API_URL = window.location.origin;
+      const chatMessages = document.getElementById('chat-messages');
+      const chatInput = document.getElementById('chat-input');
+      const sendButton = document.getElementById('send-button');
 
-    function addMessage(text, isUser = false) {
-      const messageDiv = document.createElement('div');
-      messageDiv.className = 'message ' + (isUser ? 'user' : 'bot');
-      
-      if (isUser) {
-        messageDiv.textContent = text;
-      } else {
-        // Parse markdown-style links and newlines
-        let html = text
-          // Replace [text](url) with actual links
-          .replace(/\\[([^\\]]+)\\]\\(([^)]+)\\)/g, '<a href="$2" target="_blank" rel="noopener noreferrer">$1</a>')
-          // Split by newlines and wrap in paragraphs
-          .split('\\n')
-          .filter(line => line.trim())
-          .map(line => '<p>' + line.trim() + '</p>')
-          .join('');
-        
-        messageDiv.innerHTML = html;
+      function parseMarkdown(text) {
+        // Convert markdown links [text](url) to HTML
+        const linkPattern = /\\[([^\\]]+)\\]\\(([^)]+)\\)/g;
+        return text.replace(linkPattern, '<a href="$2" target="_blank" rel="noopener noreferrer">$1</a>');
       }
-      
-      chatMessages.appendChild(messageDiv);
-      chatMessages.scrollTop = chatMessages.scrollHeight;
-    }
 
-    function addQuickReplies(suggestions) {
-      const existing = document.getElementById('quick-replies');
-      if (existing) existing.remove();
-      if (!suggestions || !suggestions.length) return;
+      function addMessage(text, isUser) {
+        const messageDiv = document.createElement('div');
+        messageDiv.className = 'message ' + (isUser ? 'user' : 'bot');
+        
+        if (isUser) {
+          messageDiv.textContent = text;
+        } else {
+          // Parse the message
+          const lines = text.split('\\n').filter(function(line) { return line.trim(); });
+          let html = '';
+          
+          for (let i = 0; i < lines.length; i++) {
+            const parsedLine = parseMarkdown(lines[i]);
+            html += '<p>' + parsedLine + '</p>';
+          }
+          
+          messageDiv.innerHTML = html;
+        }
+        
+        chatMessages.appendChild(messageDiv);
+        chatMessages.scrollTop = chatMessages.scrollHeight;
+      }
 
-      const div = document.createElement('div');
-      div.id = 'quick-replies';
-      div.className = 'quick-replies';
+      function addQuickReplies(suggestions) {
+        const existing = document.getElementById('quick-replies');
+        if (existing) existing.remove();
+        if (!suggestions || !suggestions.length) return;
 
-      suggestions.forEach(text => {
-        const btn = document.createElement('button');
-        btn.className = 'quick-reply-btn';
-        btn.textContent = text;
-        btn.onclick = () => {
-          chatInput.value = text;
-          sendMessage();
-        };
-        div.appendChild(btn);
-      });
+        const div = document.createElement('div');
+        div.id = 'quick-replies';
+        div.className = 'quick-replies';
 
-      chatMessages.appendChild(div);
-      chatMessages.scrollTop = chatMessages.scrollHeight;
-    }
+        for (let i = 0; i < suggestions.length; i++) {
+          const btn = document.createElement('button');
+          btn.className = 'quick-reply-btn';
+          btn.textContent = suggestions[i];
+          btn.onclick = function() {
+            chatInput.value = suggestions[i];
+            sendMessage();
+          };
+          div.appendChild(btn);
+        }
 
-    function showTyping() {
-      const div = document.createElement('div');
-      div.className = 'message bot typing-indicator';
-      div.innerHTML = '<span></span><span></span><span></span>';
-      div.id = 'typing';
-      chatMessages.appendChild(div);
-      chatMessages.scrollTop = chatMessages.scrollHeight;
-    }
+        chatMessages.appendChild(div);
+        chatMessages.scrollTop = chatMessages.scrollHeight;
+      }
 
-    function hideTyping() {
-      const typing = document.getElementById('typing');
-      if (typing) typing.remove();
-    }
+      function showTyping() {
+        const div = document.createElement('div');
+        div.className = 'message bot typing-indicator';
+        div.innerHTML = '<span></span><span></span><span></span>';
+        div.id = 'typing';
+        chatMessages.appendChild(div);
+        chatMessages.scrollTop = chatMessages.scrollHeight;
+      }
 
-    async function initSession() {
-      try {
+      function hideTyping() {
+        const typing = document.getElementById('typing');
+        if (typing) typing.remove();
+      }
+
+      function initSession() {
         console.log('📡 Creating session...');
-        const res = await fetch(API_URL + '/session/start', {
+        fetch(API_URL + '/session/start', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' }
+        })
+        .then(function(res) {
+          if (!res.ok) throw new Error('Session failed: ' + res.status);
+          return res.json();
+        })
+        .then(function(data) {
+          sessionId = data.session_id;
+          sessionToken = data.token;
+          console.log('✅ Session ready:', sessionId);
+          
+          setTimeout(function() {
+            addQuickReplies([
+              '🎯 How to register?',
+              '📝 What is KYC?',
+              '💰 How to start SIP?',
+              '📊 SIP Calculator',
+              '🏆 Top Mutual Funds',
+              '📞 Contact Support'
+            ]);
+          }, 1000);
+        })
+        .catch(function(err) {
+          console.error('❌ Session error:', err);
+          addMessage('Connection error. Please refresh the page.', false);
         });
-        
-        if (!res.ok) throw new Error('Session failed: ' + res.status);
-        
-        const data = await res.json();
-        sessionId = data.session_id;
-        sessionToken = data.token;
-        console.log('✅ Session ready:', sessionId);
-        
-        // Show quick replies after session is ready
-        setTimeout(() => {
-          addQuickReplies([
-            '🎯 How to register?',
-            '📝 What is KYC?',
-            '💰 How to start SIP?',
-            '📊 SIP Calculator',
-            '🏆 Top Mutual Funds',
-            '📞 Contact Support'
-          ]);
-        }, 1000);
-        
-      } catch (err) {
-        console.error('❌ Session error:', err);
-        addMessage('Connection error. Please refresh the page.');
-      }
-    }
-
-    async function sendMessage() {
-      const msg = chatInput.value.trim();
-      if (!msg) return;
-
-      if (!sessionId) {
-        addMessage('Connecting... Please wait.');
-        await initSession();
-        setTimeout(() => {
-          if (sessionId && msg) {
-            chatInput.value = msg;
-            sendMessage();
-          }
-        }, 1500);
-        return;
       }
 
-      const qr = document.getElementById('quick-replies');
-      if (qr) qr.remove();
+      function sendMessage() {
+        const msg = chatInput.value.trim();
+        if (!msg) return;
 
-      chatInput.disabled = true;
-      sendButton.disabled = true;
-      
-      addMessage(msg, true);
-      chatInput.value = '';
-      showTyping();
+        if (!sessionId) {
+          addMessage('Connecting... Please wait.', false);
+          initSession();
+          return;
+        }
 
-      try {
-        const res = await fetch(API_URL + '/chat', {
+        const qr = document.getElementById('quick-replies');
+        if (qr) qr.remove();
+
+        chatInput.disabled = true;
+        sendButton.disabled = true;
+        
+        addMessage(msg, true);
+        chatInput.value = '';
+        showTyping();
+
+        fetch(API_URL + '/chat', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({
@@ -565,56 +563,61 @@ app.get("/widget", (req, res) => {
             page: window.location.href,
             lang: 'en'
           })
-        });
+        })
+        .then(function(res) {
+          if (!res.ok) throw new Error('Chat failed: ' + res.status);
+          return res.json();
+        })
+        .then(function(data) {
+          hideTyping();
 
-        if (!res.ok) throw new Error('Chat failed: ' + res.status);
-        
-        const data = await res.json();
-        hideTyping();
-
-        if (data.reply) {
-          addMessage(data.reply);
-          
-          // Add contextual quick replies
-          const lower = data.reply.toLowerCase();
-          if (lower.includes('register') || lower.includes('account')) {
-            addQuickReplies(['What is KYC?', 'Documents needed', 'Contact support']);
-          } else if (lower.includes('sip')) {
-            addQuickReplies(['SIP Calculator', 'Top Funds', 'Start SIP']);
-          } else if (lower.includes('kyc')) {
-            addQuickReplies(['How to register?', 'Documents needed', 'Talk to advisor']);
-          } else if (lower.includes('fund')) {
-            addQuickReplies(['SIP Calculator', 'Start SIP', 'Top Funds']);
+          if (data.reply) {
+            addMessage(data.reply, false);
+            
+            const lower = data.reply.toLowerCase();
+            if (lower.includes('register') || lower.includes('account')) {
+              addQuickReplies(['What is KYC?', 'Documents needed', 'Contact support']);
+            } else if (lower.includes('sip')) {
+              addQuickReplies(['SIP Calculator', 'Top Funds', 'Start SIP']);
+            } else if (lower.includes('kyc')) {
+              addQuickReplies(['How to register?', 'Documents needed', 'Talk to advisor']);
+            } else if (lower.includes('fund')) {
+              addQuickReplies(['SIP Calculator', 'Start SIP', 'Top Funds']);
+            } else {
+              addQuickReplies(['How to register?', 'Start SIP', 'Contact us']);
+            }
           } else {
-            addQuickReplies(['How to register?', 'Start SIP', 'Contact us']);
+            addMessage('Sorry, please try again.', false);
+            addQuickReplies(['How to register?', 'Contact support']);
           }
-        } else {
-          addMessage('Sorry, please try again.');
-          addQuickReplies(['How to register?', 'Contact support']);
-        }
-      } catch (err) {
-        console.error('❌ Chat error:', err);
-        hideTyping();
-        addMessage('Error. Please try again.');
-        addQuickReplies(['Contact support', 'Try again']);
-      } finally {
-        chatInput.disabled = false;
-        sendButton.disabled = false;
-        chatInput.focus();
+          
+          chatInput.disabled = false;
+          sendButton.disabled = false;
+          chatInput.focus();
+        })
+        .catch(function(err) {
+          console.error('❌ Chat error:', err);
+          hideTyping();
+          addMessage('Error. Please try again.', false);
+          addQuickReplies(['Contact support', 'Try again']);
+          chatInput.disabled = false;
+          sendButton.disabled = false;
+          chatInput.focus();
+        });
       }
-    }
 
-    sendButton.addEventListener('click', sendMessage);
-    chatInput.addEventListener('keypress', (e) => {
-      if (e.key === 'Enter') sendMessage();
-    });
+      sendButton.addEventListener('click', sendMessage);
+      chatInput.addEventListener('keypress', function(e) {
+        if (e.key === 'Enter') sendMessage();
+      });
 
-    // Initialize
-    initSession();
+      initSession();
+    })();
   </script>
 </body>
-</html>
-  `);
+</html>`;
+
+  res.send(widgetHTML);
 });
 
 // ====================================
