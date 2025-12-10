@@ -1,7 +1,4 @@
-index.js
-
-Download
-Copy// ====================================
+// ====================================
 // InvestOnline Buddy - Main Server
 // Pure InvestOnline Search Version
 // No AI fallback, No internet knowledge
