@@ -288,6 +288,7 @@ app.post("/lead/capture", async (req, res) => {
 
 // ====================================
 // Widget Endpoint (with Multi-language & Voice)
+// COMPLETE WITH ALL FIXES
 // ====================================
 
 app.get("/widget", (req, res) => {
@@ -380,17 +381,17 @@ app.get("/widget", (req, res) => {
       border-bottom-left-radius: 4px;
       box-shadow: 0 1px 3px rgba(0,0,0,0.05);
     }
-    .message.bot p { margin: 0 0 6px 0; line-height: 1.5; }
+    .message.bot p { margin: 0 0 8px 0; line-height: 1.6; }
     .message.bot p:last-child { margin-bottom: 0; }
-    .message.bot ul { margin: 6px 0; padding-left: 20px; }
-    .message.bot li { margin: 3px 0; }
+    .message.bot ul { margin: 8px 0; padding-left: 20px; list-style: disc; }
+    .message.bot li { margin: 4px 0; line-height: 1.5; }
     .message.bot h4 {
       color: #FF6B35;
       font-size: 15px;
       font-weight: 600;
-      margin: 8px 0 6px 0;
-      border-bottom: 2px solid #FF6B35;
+      margin: 10px 0 6px 0;
       padding-bottom: 4px;
+      border-bottom: 2px solid #FF6B35;
     }
     .message.bot strong {
       color: #FF6B35;
@@ -456,10 +457,15 @@ app.get("/widget", (req, res) => {
       border-radius: 50%;
       cursor: pointer;
       transition: all 0.2s;
+      min-width: 48px;
     }
-    #voice-button:hover {
+    #voice-button:hover:not(:disabled) {
       background: #FF6B35;
       color: white;
+    }
+    #voice-button:disabled {
+      opacity: 0.5;
+      cursor: not-allowed;
     }
     #voice-button.recording {
       background: #e74c3c;
@@ -610,11 +616,21 @@ app.get("/widget", (req, res) => {
       return null;
     }
 
-    // Initialize Web Speech API
+    // FIXED: Initialize Web Speech API with better error handling
     function initVoiceInput() {
-      if (!('webkitSpeechRecognition' in window) && !('SpeechRecognition' in window)) {
-        console.log('Voice input not supported');
+      // Check HTTPS
+      if (window.location.protocol !== 'https:') {
+        console.warn('⚠️ Voice input requires HTTPS');
         voiceButton.style.display = 'none';
+        return;
+      }
+
+      // Check browser support
+      if (!('webkitSpeechRecognition' in window) && !('SpeechRecognition' in window)) {
+        console.warn('⚠️ Voice input not supported in this browser');
+        voiceButton.title = 'Voice input not supported in this browser';
+        voiceButton.style.opacity = '0.5';
+        voiceButton.disabled = true;
         return;
       }
 
@@ -629,6 +645,11 @@ app.get("/widget", (req, res) => {
         isRecording = false;
         voiceButton.classList.remove('recording');
         voiceButton.textContent = '🎤';
+        
+        // Auto-send after voice input
+        setTimeout(function() {
+          if (chatInput.value) sendMessage();
+        }, 500);
       };
 
       recognition.onerror = function(event) {
@@ -636,6 +657,17 @@ app.get("/widget", (req, res) => {
         isRecording = false;
         voiceButton.classList.remove('recording');
         voiceButton.textContent = '🎤';
+        
+        // User-friendly error messages
+        if (event.error === 'not-allowed' || event.error === 'permission-denied') {
+          alert('Microphone access denied. Please enable microphone permissions in your browser settings.');
+        } else if (event.error === 'no-speech') {
+          alert('No speech detected. Please try again.');
+        } else if (event.error === 'network') {
+          alert('Network error. Please check your internet connection.');
+        } else {
+          alert('Voice input error: ' + event.error);
+        }
       };
 
       recognition.onend = function() {
@@ -643,10 +675,16 @@ app.get("/widget", (req, res) => {
         voiceButton.classList.remove('recording');
         voiceButton.textContent = '🎤';
       };
+      
+      console.log('✅ Voice input initialized');
     }
 
+    // FIXED: Toggle voice input with better error handling
     function toggleVoiceInput() {
-      if (!recognition) return;
+      if (!recognition) {
+        alert('Voice input is not available in this browser. Please use Chrome, Edge, or Safari on desktop.');
+        return;
+      }
 
       if (isRecording) {
         recognition.stop();
@@ -654,18 +692,24 @@ app.get("/widget", (req, res) => {
         voiceButton.classList.remove('recording');
         voiceButton.textContent = '🎤';
       } else {
-        recognition.lang = currentLanguage === 'en' ? 'en-US' : 
-                         currentLanguage === 'hi' ? 'hi-IN' :
-                         currentLanguage === 'mr' ? 'mr-IN' :
-                         currentLanguage === 'gu' ? 'gu-IN' :
-                         currentLanguage === 'ta' ? 'ta-IN' : 'en-US';
-        recognition.start();
-        isRecording = true;
-        voiceButton.classList.add('recording');
-        voiceButton.textContent = '⏺';
+        try {
+          recognition.lang = currentLanguage === 'en' ? 'en-US' : 
+                           currentLanguage === 'hi' ? 'hi-IN' :
+                           currentLanguage === 'mr' ? 'mr-IN' :
+                           currentLanguage === 'gu' ? 'gu-IN' :
+                           currentLanguage === 'ta' ? 'ta-IN' : 'en-US';
+          recognition.start();
+          isRecording = true;
+          voiceButton.classList.add('recording');
+          voiceButton.textContent = '⏺';
+        } catch (error) {
+          console.error('Failed to start voice recognition:', error);
+          alert('Could not start voice input. Please try again.');
+        }
       }
     }
 
+    // FIXED: Enhanced markdown parsing
     function addMessage(text, isUser) {
       var messageDiv = document.createElement('div');
       messageDiv.className = 'message ' + (isUser ? 'user' : 'bot');
@@ -673,27 +717,39 @@ app.get("/widget", (req, res) => {
       if (isUser) {
         messageDiv.textContent = text;
       } else {
+        // Enhanced markdown parsing
         var html = text
+          // Convert markdown links [text](url) to HTML
           .replace(/\[([^\]]+)\]\(([^)]+)\)/g, '<a href="$2" target="_blank" rel="noopener noreferrer">$1</a>')
+          // Convert **bold text** to <strong>
+          .replace(/\*\*([^*]+)\*\*/g, '<strong>$1</strong>')
+          // Convert bullet points
+          .replace(/^• (.+)$/gm, '<li>$1</li>')
+          // Split into lines and process
           .split('\n')
           .filter(function(line) { return line.trim(); })
           .map(function(line) {
             var trimmed = line.trim();
             
-            // Convert **Heading:** to <h4>
-            if (/^\*\*(.+):\*\*$/.test(trimmed)) {
-              return '<h4>' + trimmed.replace(/^\*\*(.+):\*\*$/, '$1:') + '</h4>';
+            // Bullet list item
+            if (trimmed.startsWith('<li>')) {
+              return trimmed;
             }
             
-            // Convert **Bold text** to <strong> (but not headings)
-            if (/^\*\*(.+)\*\*$/.test(trimmed) && !trimmed.endsWith(':**')) {
-              return '<p><strong>' + trimmed.replace(/^\*\*(.+)\*\*$/, '$1') + '</strong></p>';
+            // Heading (ends with :)
+            if (/^(.+):$/.test(trimmed) && !trimmed.includes('<a')) {
+              return '<h4>' + trimmed.replace(/:$/, '') + '</h4>';
             }
             
             // Regular paragraph
             return '<p>' + trimmed + '</p>';
           })
           .join('');
+        
+        // Wrap list items in <ul>
+        html = html.replace(/(<li>.*?<\/li>)+/g, function(match) {
+          return '<ul>' + match + '</ul>';
+        });
         
         messageDiv.innerHTML = html;
       }
@@ -793,7 +849,6 @@ app.get("/widget", (req, res) => {
     }
 
     function initSession() {
-      // Check if session exists in cookies
       var savedSessionId = getCookie('io_session_id');
       var savedToken = getCookie('io_session_token');
 
@@ -815,7 +870,6 @@ app.get("/widget", (req, res) => {
         return;
       }
 
-      // Create new session
       console.log('📡 Creating new session...');
       fetch(API_URL + '/session/start', {
         method: 'POST',
@@ -829,7 +883,6 @@ app.get("/widget", (req, res) => {
         sessionId = data.session_id;
         sessionToken = data.token;
         
-        // Store in cookies (7 days)
         setCookie('io_session_id', sessionId, 7);
         setCookie('io_session_token', sessionToken, 7);
         
@@ -908,17 +961,7 @@ app.get("/widget", (req, res) => {
           if (data.suggestions && data.suggestions.length > 0) {
             addQuickReplies(data.suggestions);
           } else {
-            // Contextual fallback
-            var lower = data.reply.toLowerCase();
-            if (lower.includes('register') || lower.includes('account')) {
-              addQuickReplies(['What is KYC?', 'Documents needed', 'Contact support']);
-            } else if (lower.includes('sip')) {
-              addQuickReplies(['SIP Calculator', 'Top Funds', 'Start SIP']);
-            } else if (lower.includes('kyc')) {
-              addQuickReplies(['How to register?', 'Documents needed', 'Talk to advisor']);
-            } else {
-              addQuickReplies(['How to register?', 'Start SIP', 'Contact us']);
-            }
+            addQuickReplies(['How to register?', 'Start SIP', 'Contact us']);
           }
         } else {
           addMessage('Sorry, please try again.', false);
