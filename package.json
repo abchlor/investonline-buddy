@@ -7,7 +7,14 @@
     "start": "node index.js",
     "dev": "nodemon index.js"
   },
-  "keywords": ["chatbot", "investonline", "mutual funds"],
+  "keywords": [
+    "chatbot",
+    "investonline",
+    "mutual funds",
+    "sip",
+    "kyc",
+    "investment"
+  ],
   "author": "InvestOnline",
   "license": "ISC",
   "dependencies": {
