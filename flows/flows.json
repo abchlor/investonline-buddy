@@ -1,607 +1,451 @@
-{
-  "quick_replies": [
-    "🎯 How to register?",
-    "📝 What is KYC?",
-    "💰 How to start SIP?",
-    "📊 SIP Calculator",
-    "🏆 Top Mutual Funds",
-    "📞 Contact Support"
-  ],
-  "categories": [
-    "Investment Concepts",
-    "Fund Categories",
-    "Risk & Returns",
-    "Taxation",
-    "SIP Advanced",
-    "Lumpsum Investment",
-    "Portfolio Management",
-    "Documents & Statements",
-    "Troubleshooting",
-    "Regulatory",
-    "Digital Features",
-    "Special Accounts"
-  ],
-  "intents": {
-    "nav": {
-      "keywords": [
-        "what is nav",
-        "nav meaning",
-        "net asset value",
-        "nav calculation",
-        "nav price"
-      ],
-      "response": "📊 **NAV (Net Asset Value)**\n\nNAV is the per-unit price of a mutual fund.\n\n**Formula:**\nNAV = (Total Assets - Total Liabilities) / Total Units Outstanding\n\n**Example:**\nFund has ₹100 crore assets, ₹5 crore liabilities, 10 crore units\nNAV = (100-5) / 10 = ₹9.50 per unit\n\n**Key Points:**\n• Updated daily (after market close)\n• Your investment value = Units × Current NAV\n• NAV changes based on fund's holdings performance\n• High/Low NAV doesn't indicate good/bad fund\n\n💡 **Tip:** Don't choose funds based on NAV alone. Look at returns, risk, and expense ratio.\n\n[Browse Funds by Performance](https://www.investonline.in/mutual-funds/top-performing-funds)",
-      "suggested": [
-        "What is expense ratio?",
-        "How to compare funds?",
-        "Top performing funds"
-      ]
-    },
-    "expense_ratio": {
-      "keywords": [
-        "expense ratio",
-        "fund charges",
-        "management fee",
-        "ter",
-        "total expense ratio"
-      ],
-      "response": "💰 **Expense Ratio**\n\nAnnual fee charged by the fund house to manage your investment.\n\n**What it includes:**\n• Fund manager's fee\n• Administrative costs\n• Marketing expenses\n• Operational charges\n\n**Impact on Returns:**\nLower expense ratio = Higher returns for you\n\n**Example:**\nFund A: 12% return, 1% expense = **11% net**\nFund B: 12% return, 2% expense = **10% net**\n\n**SEBI Limits:**\n• Equity funds: Max 2.25%\n• Debt funds: Max 2.00%\n• Index funds: Usually 0.10-0.50%\n\n💡 **Tip:** Compare expense ratios within same category.\n\n[Compare Fund Expense Ratios](https://www.investonline.in/mutual-funds/compare-schemes)",
-      "suggested": [
-        "What is NAV?",
-        "Index funds vs actively managed",
-        "Compare funds"
-      ]
-    },
-    "exit_load": {
-      "keywords": [
-        "exit load",
-        "redemption charges",
-        "early exit fee",
-        "exit penalty"
-      ],
-      "response": "🚪 **Exit Load**\n\nFee charged when you redeem (sell) units before a specific period.\n\n**Common Structure:**\n• **Equity Funds:** 1% if redeemed within 1 year\n• **Debt Funds:** 0.25-1% if redeemed within 3-6 months\n• **ELSS:** 3-year lock-in (can't redeem at all)\n\n**Example:**\nYou redeem ₹1,00,000 within 1 year\nExit load: 1%\nYou receive: ₹99,000\n\n**Why Exit Load?**\n• Discourages short-term trading\n• Protects long-term investors\n• Covers fund's transaction costs\n\n💡 **Tip:** Check exit load before investing. Plan holding period accordingly.\n\n[View Fund Details](https://www.investonline.in/mutual-funds/funds-explorer)",
-      "suggested": [
-        "Lock-in period",
-        "How to redeem?",
-        "ELSS tax benefits"
-      ]
-    },
-    "lock_in": {
-      "keywords": [
-        "lock-in",
-        "lock in period",
-        "elss lock-in",
-        "cannot redeem",
-        "locked funds"
-      ],
-      "response": "🔒 **Lock-in Period**\n\nPeriod during which you **cannot** redeem your investment.\n\n**Lock-in Types:**\n• **ELSS (Tax-saving):** 3 years mandatory\n• **Close-ended Funds:** Until maturity (3-5 years)\n• **Most Open-ended Funds:** No lock-in (only exit load)\n\n**ELSS Lock-in Rules:**\n• Shortest lock-in among tax-saving options\n• PPF: 15 years | NSC: 5 years | FD: 5 years\n• SIP: Each installment has separate 3-year lock-in\n• Cannot redeem, switch, or pledge during lock-in\n\n💡 **Tip:** ELSS gives ₹1.5 lakh deduction under Section 80C with only 3-year lock-in!\n\n[Browse ELSS Funds](https://www.investonline.in/mutual-funds/tax-saving-elss)",
-      "suggested": [
-        "ELSS tax benefits",
-        "Exit load",
-        "80C deduction"
-      ]
-    },
-    "aum": {
-      "keywords": [
-        "aum",
-        "assets under management",
-        "fund size",
-        "corpus"
-      ],
-      "response": "📈 **AUM (Assets Under Management)**\n\nTotal market value of assets managed by a fund.\n\n**What it means:**\n• Large AUM (₹10,000+ crore): Established, liquid\n• Medium AUM (₹1,000-10,000 crore): Balanced\n• Small AUM (<₹1,000 crore): New, nimble\n\n**Impact:**\n**Large Cap Funds:** Large AUM is good\n**Small/Mid Cap Funds:** Very large AUM can reduce agility\n\n**Example:**\nFund with ₹5,000 crore AUM\nIf NAV = ₹50\nTotal units = 10 crore\n\n💡 **Don't choose based on AUM alone.** Focus on performance & risk.\n\n[View Top Performing Funds](https://www.investonline.in/mutual-funds/top-performing-funds)",
-      "suggested": [
-        "NAV meaning",
-        "Large cap vs small cap",
-        "Fund manager role"
-      ]
-    },
-    "large_cap": {
-      "keywords": [
-        "large cap",
-        "largecap",
-        "blue chip",
-        "large cap funds"
-      ],
-      "response": "🏢 **Large Cap Funds**\n\nInvest in top 100 companies by market capitalization.\n\n**Characteristics:**\n• **Risk:** Low to Moderate\n• **Returns:** Stable, 10-12% CAGR\n• **Volatility:** Lower than mid/small cap\n• **Companies:** TCS, Reliance, HDFC Bank, Infosys\n\n**Who should invest:**\n• New investors\n• Conservative risk appetite\n• Short to medium term (3-5 years)\n\n**SEBI Rule:** Must invest ≥80% in top 100 stocks\n\n[Browse Large Cap Funds](https://www.investonline.in/mutual-funds/funds-explorer?category=large-cap)\n[Compare Large Cap Funds](https://www.investonline.in/mutual-funds/compare-schemes)",
-      "suggested": [
-        "Mid cap funds",
-        "Small cap funds",
-        "Flexi cap funds",
-        "Start SIP"
-      ]
-    },
-    "mid_cap": {
-      "keywords": [
-        "mid cap",
-        "midcap",
-        "mid cap funds"
-      ],
-      "response": "🏭 **Mid Cap Funds**\n\nInvest in companies ranked 101-250 by market cap.\n\n**Characteristics:**\n• **Risk:** Moderate to High\n• **Returns:** 12-15% CAGR (long term)\n• **Volatility:** Higher than large cap\n• **Growth Potential:** Better than large cap\n\n**Who should invest:**\n• Moderate risk appetite\n• Investment horizon: 5-7 years minimum\n• Want higher growth than large cap\n\n**SEBI Rule:** Must invest ≥65% in 101-250 ranked stocks\n\n💡 **Tip:** Mid caps can give higher returns but are more volatile. Stay invested long-term.\n\n[Browse Mid Cap Funds](https://www.investonline.in/mutual-funds/funds-explorer?category=mid-cap)",
-      "suggested": [
-        "Small cap funds",
-        "Large cap funds",
-        "Flexi cap",
-        "SIP for mid cap"
-      ]
-    },
-    "small_cap": {
-      "keywords": [
-        "small cap",
-        "smallcap",
-        "small cap funds"
-      ],
-      "response": "🚀 **Small Cap Funds**\n\nInvest in companies ranked 251+ by market cap.\n\n**Characteristics:**\n• **Risk:** High\n• **Returns:** 15-18% CAGR (long term, volatile)\n• **Volatility:** Highest among all categories\n• **Growth Potential:** Highest, but risky\n\n**Who should invest:**\n• High risk appetite\n• Investment horizon: 7-10 years minimum\n• Can tolerate 30-40% drawdowns\n• Already have large/mid cap exposure\n\n**SEBI Rule:** Must invest ≥65% in 251+ ranked stocks\n\n⚠️ **Warning:** Can fall 40-50% in bear markets. Only for experienced investors.\n\n[Browse Small Cap Funds](https://www.investonline.in/mutual-funds/funds-explorer?category=small-cap)",
-      "suggested": [
-        "Mid cap funds",
-        "Flexi cap funds",
-        "Risk assessment",
-        "Diversification"
-      ]
-    },
-    "flexi_cap": {
-      "keywords": [
-        "flexi cap",
-        "flexicap",
-        "flexi cap funds",
-        "flexible cap"
-      ],
-      "response": "🎯 **Flexi Cap Funds**\n\nInvest across large, mid, and small cap stocks with flexibility.\n\n**Characteristics:**\n• **Risk:** Moderate\n• **Returns:** 11-14% CAGR\n• **Flexibility:** Fund manager decides allocation\n• **Diversification:** Across all market caps\n\n**SEBI Rule:** Must invest ≥65% in equity\n• No minimum in any specific market cap\n• Fund manager has full flexibility\n\n**vs Multi Cap:**\nFlexi Cap: No mandate on market cap split\nMulti Cap: Must invest ≥25% each in large/mid/small\n\n💡 **Best for:** One-fund solution for beginners\n\n[Browse Flexi Cap Funds](https://www.investonline.in/mutual-funds/funds-explorer?category=flexi-cap)",
-      "suggested": [
-        "Multi cap funds",
-        "Large cap",
-        "Mid cap",
-        "Small cap",
-        "Start SIP"
-      ]
-    },
-    "index_funds": {
-      "keywords": [
-        "index fund",
-        "index funds",
-        "passive investing",
-        "nifty 50 fund",
-        "sensex fund"
-      ],
-      "response": "📊 **Index Funds**\n\nPassive funds that replicate a market index (Nifty 50, Sensex, etc.)\n\n**How it works:**\n• Buys same stocks as index\n• Same weightage as index\n• No active stock selection\n• Tracks index performance closely\n\n**Advantages:**\n• **Low cost:** 0.1-0.5% expense ratio\n• **Transparent:** You know exactly what you own\n• **No fund manager risk**\n• **Beats 70-80% of active funds** long-term\n\n**Disadvantages:**\n• Won't beat the market\n• Falls with the market (no downside protection)\n\n**Popular Indexes:**\n• Nifty 50 (top 50 companies)\n• Nifty Next 50 (51-100 companies)\n• Sensex (top 30 companies)\n\n[Browse Index Funds](https://www.investonline.in/mutual-funds/funds-explorer?category=index)",
-      "suggested": [
-        "ETF vs index fund",
-        "Active vs passive",
-        "Expense ratio",
-        "Start SIP in index"
-      ]
-    },
-    "etf": {
-      "keywords": [
-        "etf",
-        "exchange traded fund",
-        "gold etf",
-        "nifty etf"
-      ],
-      "response": "🎫 **ETF (Exchange Traded Fund)**\n\nIndex funds that trade on stock exchange like stocks.\n\n**How it's different from Index Funds:**\n| Feature | Index Fund | ETF |\n|---------|-----------|-----|\n| Trading | Once/day (NAV) | Real-time (market price) |\n| Account | Only MF account | Demat + Trading required |\n| SIP | Easy via MF platform | Manual buying needed |\n| Expense Ratio | 0.1-0.5% | 0.05-0.30% (lower) |\n| Liquidity | High | Depends on volume |\n\n**Types:**\n• Equity ETF (Nifty, Sensex)\n• Gold ETF\n• International ETF (US stocks)\n• Debt ETF\n\n💡 **For SIP:** Index Funds are easier\n💡 **For lumpsum:** ETF can be slightly cheaper\n\n[Browse ETFs](https://www.investonline.in/mutual-funds/funds-explorer?category=etf)",
-      "suggested": [
-        "Index funds",
-        "Gold investment",
-        "Demat account",
-        "SIP in ETF"
-      ]
-    },
-    "debt_funds": {
-      "keywords": [
-        "debt fund",
-        "debt funds",
-        "fixed income",
-        "bond fund"
-      ],
-      "response": "🏦 **Debt Funds**\n\nInvest in fixed-income securities like bonds, government securities, corporate bonds.\n\n**Types:**\n• **Liquid Funds:** 1-91 days, parking money\n• **Ultra Short Duration:** 3-6 months\n• **Short Duration:** 1-3 years\n• **Medium Duration:** 3-4 years\n• **Long Duration:** 7+ years\n• **Corporate Bond:** High-rated company bonds\n• **Gilt Funds:** Only government securities\n\n**Returns:** 6-8% (typically better than FD)\n\n**Risk:** Low, but credit risk exists\n\n**Taxation:**\nHolding < 3 years: STCG (your tax slab)\nHolding > 3 years: LTCG 20% with indexation\n\n[Browse Debt Funds](https://www.investonline.in/mutual-funds/funds-explorer?category=debt)",
-      "suggested": [
-        "Liquid funds",
-        "FD vs debt fund",
-        "Taxation on debt",
-        "Credit risk"
-      ]
-    },
-    "liquid_funds": {
-      "keywords": [
-        "liquid fund",
-        "liquid funds",
-        "parking money",
-        "emergency fund"
-      ],
-      "response": "💧 **Liquid Funds**\n\nDebt funds for parking money for very short term (1 day to 90 days).\n\n**Features:**\n• **Returns:** 6-7% annually\n• **Risk:** Very low\n• **Redemption:** T+1 working day\n• **Instant Redemption:** ₹50,000 limit in 30 mins\n• **No exit load**\n• **No lock-in**\n\n**Best for:**\n• Emergency fund\n• Parking money between investments\n• Better alternative to savings account\n• Short-term goals (1-3 months)\n\n**vs Savings Account:**\nSavings: 3-4% interest\nLiquid Fund: 6-7% returns\n\n💡 **Tip:** Keep 3-6 months expenses in liquid fund as emergency fund.\n\n[Browse Liquid Funds](https://www.investonline.in/mutual-funds/funds-explorer?category=liquid)",
-      "suggested": [
-        "Emergency fund planning",
-        "Debt funds",
-        "Instant redemption",
-        "Ultra short funds"
-      ]
-    },
-    "elss": {
-      "keywords": [
-        "elss",
-        "tax saving",
-        "80c",
-        "tax saving fund",
-        "elss fund"
-      ],
-      "response": "💸 **ELSS (Equity Linked Savings Scheme)**\n\nTax-saving mutual fund with 3-year lock-in.\n\n**Tax Benefits:**\n• **Deduction:** Up to ₹1.5 lakh under Section 80C\n• **Tax saved:** Up to ₹46,800 (30% tax bracket)\n\n**Features:**\n• **Lock-in:** 3 years (shortest among 80C options)\n• **Returns:** 10-15% CAGR (market-linked)\n• **Risk:** Moderate to High (equity fund)\n• **Investment:** Lumpsum or SIP\n\n**Comparison:**\n| Option | Lock-in | Returns | Risk |\n|--------|---------|---------|------|\n| ELSS | 3 years | 10-15% | High |\n| PPF | 15 years | 7-7.5% | Low |\n| NSC | 5 years | 7% | Low |\n| Tax FD | 5 years | 6-7% | Low |\n\n💡 **Best 80C option** for young investors with long horizon.\n\n[Browse ELSS Funds](https://www.investonline.in/mutual-funds/tax-saving-elss)\n[ELSS Tax Calculator](https://www.investonline.in/financial-calculators/elss-calculator)",
-      "suggested": [
-        "80C deduction",
-        "Lock-in period",
-        "Top ELSS funds",
-        "Start ELSS SIP"
-      ]
-    },
-    "ltcg": {
-      "keywords": [
-        "ltcg",
-        "long term capital gains",
-        "ltcg tax",
-        "long term tax"
-      ],
-      "response": "📊 **LTCG (Long Term Capital Gains)**\n\nTax on profits from selling mutual fund units held long-term.\n\n**Equity Funds:**\n• **Holding Period:** > 1 year\n• **Tax Rate:** 12.5% on gains > ₹1.25 lakh/year\n• **Exempt:** First ₹1.25 lakh gains per year\n\n**Example (Equity):**\nGain: ₹3,00,000\nExempt: ₹1,25,000\nTaxable: ₹1,75,000\nTax: 12.5% of ₹1,75,000 = ₹21,875\n\n**Debt Funds:**\n• **Holding Period:** > 3 years\n• **Tax Rate:** 20% with indexation benefit\n\n💡 **Tip:** Plan redemptions to use ₹1.25L exemption every year.\n\n[Read More on Taxation](https://www.investonline.in/tax-guide)",
-      "suggested": [
-        "STCG tax",
-        "Indexation benefit",
-        "Tax harvesting",
-        "Capital gains statement"
-      ]
-    },
-    "stcg": {
-      "keywords": [
-        "stcg",
-        "short term capital gains",
-        "stcg tax",
-        "short term tax"
-      ],
-      "response": "⚡ **STCG (Short Term Capital Gains)**\n\nTax on profits from selling mutual fund units held short-term.\n\n**Equity Funds:**\n• **Holding Period:** ≤ 1 year\n• **Tax Rate:** 20% flat\n\n**Example (Equity):**\nBuy: ₹1,00,000\nSell within 1 year: ₹1,50,000\nGain: ₹50,000\nTax: 20% of ₹50,000 = ₹10,000\n\n**Debt Funds:**\n• **Holding Period:** ≤ 3 years\n• **Tax Rate:** As per your income tax slab (10-30%)\n\n💡 **Tip:** Hold equity funds > 1 year to pay lower LTCG (12.5%) instead of STCG (20%).\n\n[Read More on Taxation](https://www.investonline.in/tax-guide)\n[Calculate Tax Impact](https://www.investonline.in/financial-calculators/tax-calculator)",
-      "suggested": [
-        "LTCG tax",
-        "Tax saving strategies",
-        "Holding period",
-        "Redemption planning"
-      ]
-    },
-    "step_up_sip": {
-      "keywords": [
-        "step up sip",
-        "stepup sip",
-        "increase sip",
-        "top up sip",
-        "sip increase"
-      ],
-      "response": "📈 **Step-up SIP (Top-up SIP)**\n\nAutomatically increase your SIP amount periodically.\n\n**How it works:**\n• Start SIP: ₹5,000/month\n• Annual increase: ₹500 or 10%\n• Year 1: ₹5,000\n• Year 2: ₹5,500\n• Year 3: ₹6,000\n\n**Benefits:**\n• Matches income growth\n• Builds larger corpus\n• Disciplined investing\n• Helps beat inflation\n\n**Impact Example:**\nNormal SIP: ₹5,000/month for 20 years = ₹46 lakh (12% return)\nStep-up SIP: Start ₹5,000, increase 10%/year = ₹1.03 crore (12% return)\n\n💡 **Huge difference!** More than double the corpus.\n\n[Calculate Step-up SIP](https://www.investonline.in/financial-calculators/step-up-sip-calculator)\n[Start Step-up SIP](https://www.investonline.in/mutual-funds)",
-      "suggested": [
-        "SIP calculator",
-        "Goal-based SIP",
-        "How to increase SIP amount",
-        "SIP benefits"
-      ]
-    },
-    "stp": {
-      "keywords": [
-        "stp",
-        "systematic transfer plan",
-        "transfer plan",
-        "shift from debt to equity"
-      ],
-      "response": "🔄 **STP (Systematic Transfer Plan)**\n\nAutomatically transfer fixed amount from one fund to another periodically.\n\n**Common Use:**\nLiquid/Debt Fund → Equity Fund (monthly)\n\n**How it works:**\n1. Invest lumpsum in liquid fund: ₹6,00,000\n2. Set STP: ₹50,000/month to equity fund\n3. For 12 months, money moves to equity\n\n**Benefits:**\n• Rupee cost averaging on lumpsum\n• Remaining money earns liquid fund returns\n• Reduces market timing risk\n• Disciplined equity deployment\n\n**Perfect for:**\n• Got lumpsum (bonus, inheritance)\n• Market at highs, want to invest gradually\n• Want SIP-like benefits with lumpsum\n\n[Set up STP](https://www.investonline.in/mutual-funds/systematic-transfer)\n[Calculate STP Returns](https://www.investonline.in/financial-calculators/stp-calculator)",
-      "suggested": [
-        "SWP",
-        "Lumpsum vs SIP",
-        "Liquid funds",
-        "Market timing"
-      ]
-    },
-    "swp": {
-      "keywords": [
-        "swp",
-        "systematic withdrawal plan",
-        "monthly income",
-        "pension from mutual fund"
-      ],
-      "response": "💰 **SWP (Systematic Withdrawal Plan)**\n\nAutomatically withdraw fixed amount from your investment periodically.\n\n**How it works:**\n• Invest: ₹50 lakh in mutual fund\n• Set SWP: Withdraw ₹50,000/month\n• Remaining amount continues to grow\n\n**Perfect for:**\n• Retirees needing regular income\n• Supplement pension/salary\n• Create monthly cash flow\n\n**Benefits:**\n• Tax-efficient income (vs FD)\n• Remaining corpus grows\n• Flexibility to change amount\n• No TDS deducted\n\n**Example:**\n₹50L invested, withdraw ₹40,000/month\nFund grows at 12%\nCorpus can last 20+ years!\n\n💡 **Tip:** SWP from equity funds taxed as LTCG (better than FD interest tax).\n\n[Set up SWP](https://www.investonline.in/mutual-funds/systematic-withdrawal)\n[Calculate SWP Duration](https://www.investonline.in/financial-calculators/swp-calculator)",
-      "suggested": [
-        "STP",
-        "Retirement planning",
-        "LTCG tax",
-        "Pension alternative"
-      ]
-    },
-    "diversification": {
-      "keywords": [
-        "diversification",
-        "diversify",
-        "how many funds",
-        "portfolio allocation"
-      ],
-      "response": "🎯 **Diversification**\n\nSpread investments across different asset classes, sectors, and funds to reduce risk.\n\n**Ideal Portfolio:**\n**By Asset Class:**\n• Equity: 60-80% (age-based)\n• Debt: 20-30%\n• Gold: 5-10%\n• International: 10-20% (optional)\n\n**By Market Cap (Equity portion):**\n• Large Cap: 50-60%\n• Mid Cap: 20-30%\n• Small Cap: 10-20%\n\n**How Many Funds?**\n• **4-6 funds** is ideal\n• 1-2 Large Cap\n• 1-2 Mid/Small Cap\n• 1-2 Debt/Liquid\n• 1 International (optional)\n\n⚠️ **Over-diversification:** >10 funds is too much. Returns will just mirror the index.\n\n[Asset Allocation Calculator](https://www.investonline.in/financial-calculators/asset-allocation-calculator)",
-      "suggested": [
-        "Rebalancing",
-        "Asset allocation",
-        "How many funds to invest",
-        "Portfolio review"
-      ]
-    },
-    "rebalancing": {
-      "keywords": [
-        "rebalancing",
-        "rebalance portfolio",
-        "portfolio rebalancing",
-        "when to rebalance"
-      ],
-      "response": "⚖️ **Portfolio Rebalancing**\n\nPeriodically adjusting your portfolio back to target allocation.\n\n**Why Rebalance?**\nOriginal: 60% Equity, 40% Debt\nAfter 2 years: 75% Equity, 25% Debt (equity grew more)\n\n**Action:** Sell some equity, buy debt to restore 60:40\n\n**When to Rebalance:**\n• **Time-based:** Once a year\n• **Threshold-based:** When allocation drifts >5-10%\n• **Event-based:** After major market movement\n\n**How:**\n1. Check current allocation\n2. Calculate target allocation\n3. Sell over-weight, buy under-weight\n4. Or direct new investments to under-weight\n\n💡 **Tip:** Rebalancing = Sell high, buy low automatically!\n\n[Portfolio Tracker](https://www.investonline.in/portfolio)\n[Asset Allocation Tool](https://www.investonline.in/financial-calculators/asset-allocation-calculator)",
-      "suggested": [
-        "Diversification",
-        "Asset allocation",
-        "Portfolio review",
-        "Switch funds"
-      ]
-    },
-    "statement": {
-      "keywords": [
-        "statement",
-        "account statement",
-        "download statement",
-        "portfolio statement",
-        "cas"
-      ],
-      "response": "📄 **Account Statement / CAS**\n\n**Types:**\n1. **Folio Statement:** Single fund, single folio\n2. **Consolidated Account Statement (CAS):** All investments across all AMCs\n\n**How to Download:**\n**On InvestOnline:**\n1. Login to dashboard\n2. Go to 'Reports' → 'Statements'\n3. Select date range\n4. Download PDF\n\n**CAS (from CAMS/Karvy):**\n• Emailed monthly (if you have transactions)\n• Shows all MF holdings across India\n• Includes: Units, NAV, current value\n\n**What's in Statement:**\n• Purchase date & units\n• Current NAV & value\n• Folio number\n• Transaction history\n• Capital gains (yearly)\n\n[Download Statement](https://www.investonline.in/portfolio/statements)\n[View Portfolio](https://www.investonline.in/portfolio)",
-      "suggested": [
-        "Capital gains statement",
-        "Folio consolidation",
-        "Tax reporting",
-        "Portfolio tracking"
-      ]
-    },
-    "capital_gains_statement": {
-      "keywords": [
-        "capital gains statement",
-        "gains statement",
-        "tax statement",
-        "capital gains report"
-      ],
-      "response": "📊 **Capital Gains Statement**\n\nReport showing all your realized gains (from redemptions) for tax filing.\n\n**What it includes:**\n• Purchase date & NAV\n• Redemption date & NAV\n• Units sold\n• Short-term gains (STCG)\n• Long-term gains (LTCG)\n• Tax liability\n\n**How to Download:**\n1. Login to InvestOnline\n2. Go to 'Reports' → 'Tax Reports'\n3. Select financial year\n4. Download PDF\n\n**When you need it:**\n• Filing ITR (Income Tax Return)\n• Calculating tax liability\n• Tax planning\n\n💡 **Tip:** Download this before filing ITR to report accurate capital gains.\n\n[Download Capital Gains Report](https://www.investonline.in/portfolio/tax-report)\n[Tax Guide](https://www.investonline.in/tax-guide)",
-      "suggested": [
-        "LTCG tax",
-        "STCG tax",
-        "ITR filing",
-        "Tax planning"
-      ]
-    },
-    "payment_failed": {
-      "keywords": [
-        "payment failed",
-        "payment not successful",
-        "sip failed",
-        "transaction failed",
-        "payment issue"
-      ],
-      "response": "⚠️ **Payment Failed - What to Do**\n\n**Common Reasons:**\n1. **Insufficient balance** in bank\n2. **Bank limit exceeded** (daily/monthly)\n3. **Wrong bank details**\n4. **Mandate not registered**\n5. **Bank server down**\n\n**Solutions:**\n1. **Check bank balance:** Ensure sufficient funds\n2. **Retry payment:** Go to 'My Orders' → 'Retry'\n3. **Check mandate:** Go to 'Profile' → 'Mandates'\n4. **Contact bank:** Verify online transaction limits\n5. **Try different payment:** Net banking/UPI/NEFT\n\n**SIP Bounce:**\n• Missed 3 consecutive SIPs → SIP cancelled\n• Penalty: ₹300-500 per bounce (bank charges)\n\n📞 **Need Help?**\nEmail: wealth@investonline.in\nPhone: 1800-2222-65\n\n[View My Orders](https://www.investonline.in/orders)\n[Manage Mandates](https://www.investonline.in/profile/mandates)",
-      "suggested": [
-        "Mandate registration",
-        "SIP pause",
-        "Bank details update",
-        "Contact support"
-      ]
-    },
-    "mandate": {
-      "keywords": [
-        "mandate",
-        "emandate",
-        "auto debit",
-        "mandate registration",
-        "sip mandate"
-      ],
-      "response": "📝 **Mandate (Auto-debit for SIP)**\n\nOne-time authorization to auto-debit SIP amount from your bank.\n\n**Types:**\n**1. E-mandate (Instant):**\n• Online registration via net banking\n• No paperwork\n• Active in 2-3 days\n• Limit: As per bank\n\n**2. Physical Mandate:**\n• Submit signed form + cancelled cheque\n• Takes 7-10 days\n• Higher limits possible\n\n**How to Register E-mandate:**\n1. Login → Profile → Mandates\n2. Click 'Register New Mandate'\n3. Enter bank details & max amount\n4. Authorize via net banking\n5. Done!\n\n**Max Limit:** Usually ₹1,00,000/transaction\n\n💡 **Tip:** Register mandate before starting SIP for hassle-free investments.\n\n[Register E-mandate](https://www.investonline.in/profile/mandates)\n[Start SIP](https://www.investonline.in/mutual-funds)",
-      "suggested": [
-        "SIP setup",
-        "Payment failed",
-        "Bank details update",
-        "E-mandate vs physical"
-      ]
-    },
-    "minor_account": {
-      "keywords": [
-        "minor account",
-        "child account",
-        "invest for minor",
-        "kids investment",
-        "below 18"
-      ],
-      "response": "👶 **Investing for Minors (Below 18)**\n\nYou can invest in mutual funds on behalf of your child.\n\n**Documents Required:**\n• Minor's birth certificate\n• Minor's PAN (if >5 years, optional)\n• Minor's Aadhaar (optional)\n• Guardian's KYC (mandatory)\n• Guardian's bank account\n• Proof of relationship (birth certificate)\n\n**Key Points:**\n• Guardian operates account till minor turns 18\n• All redemptions to guardian's bank only\n• Can do SIP/lumpsum\n• Nomination not allowed\n\n**After 18:**\n• Account auto-transfers to child\n• Child needs to complete KYC\n• Can change bank account\n\n💡 **Tax:** Income taxed in guardian's hands if minor's income >₹1,500/year\n\n[Open Minor Account](https://www.investonline.in/account/minor)\n[Goal: Child's Education](https://www.investonline.in/financial-calculators/education-goal-calculator)",
-      "suggested": [
-        "Education goal planning",
-        "Sukanya Samriddhi vs MF",
-        "Tax on minor income",
-        "Long-term SIP"
-      ]
-    },
-    "nri_investment": {
-      "keywords": [
-        "nri",
-        "nri investment",
-        "nri mutual fund",
-        "non resident",
-        "overseas investor"
-      ],
-      "response": "🌍 **NRI Investment in Mutual Funds**\n\nNRIs can invest in Indian mutual funds with some restrictions.\n\n**Eligible:**\n• NRIs from FATF-compliant countries ✅\n• PIOs (Persons of Indian Origin) ✅\n\n**Not Eligible:**\n• Citizens of USA/Canada ❌ (most AMCs don't allow due to FATCA)\n\n**Documents Required:**\n• Valid passport\n• Overseas address proof\n• NRE/NRO bank account in India\n• PAN card\n• Foreign address & tax residency proof\n\n**Repatriation:**\n• Via NRE account: Fully repatriable\n• Via NRO account: Subject to limits\n\n**Tax:**\n• Same as residents\n• Need to file tax return in India\n• TDS on capital gains\n\n[NRI Account Opening](https://www.investonline.in/nri-investment)\n[Contact NRI Support](https://www.investonline.in/contact-us)",
-      "suggested": [
-        "NRE vs NRO account",
-        "Repatriation rules",
-        "NRI taxation",
-        "FATCA compliance"
-      ]
-    },
-    "top_funds": {
-      "keywords": [
-        "top fund",
-        "top funds",
-        "best fund",
-        "best funds",
-        "top mutual fund",
-        "best mutual fund",
-        "top performing",
-        "highest return",
-        "which fund",
-        "recommend fund",
-        "suggest fund",
-        "good fund"
-      ],
-      "response": "🏆 **Top Performing Funds**\n\nI can't recommend specific funds as the 'best' choice depends on YOUR:\n• Financial goals (retirement, house, child education)\n• Risk appetite (conservative, moderate, aggressive)\n• Investment horizon (short-term, long-term)\n\n**However**, InvestOnline has curated category-wise top performers:\n\n[📊 View Top Performing Funds](https://www.investonline.in/mutual-funds/top-performing-funds)\n\nHere you'll find:\n✅ Category-wise top funds (Large Cap, Mid Cap, etc.)\n✅ 1-year, 3-year, 5-year returns\n✅ Risk ratings\n✅ Expense ratios\n\n**For personalized recommendations** based on YOUR goals:\n📞 Talk to InvestOnline Advisors: **1800-2222-65**\n📧 Email: **wealth@investonline.in**\n\nThey'll analyze your profile and suggest suitable funds! 😊",
-      "suggested": [
-        "SIP Calculator",
-        "Compare Funds",
-        "Talk to Advisor",
-        "Fund Categories"
-      ]
-    },
-    "documents_needed": {
-      "keywords": [
-        "document needed",
-        "documents needed",
-        "documents required",
-        "what documents",
-        "which documents",
-        "document require",
-        "kyc document",
-        "proof needed",
-        "id proof",
-        "address proof"
-      ],
-      "response": "📄 **Documents Needed for InvestOnline Registration**\n\n**For KYC Verification:**\n\n**1. Identity Proof** (any one):\n• PAN Card (mandatory)\n• Aadhaar Card\n• Passport\n• Voter ID\n• Driving License\n\n**2. Address Proof** (any one):\n• Aadhaar Card\n• Passport\n• Utility Bill (electricity, gas) - within 3 months\n• Bank Statement - within 3 months\n• Rent Agreement\n\n**3. Bank Proof:**\n• Cancelled cheque OR\n• Bank statement with your name & account number\n\n**4. Recent Photo:**\n• Passport-size photograph\n• Or live selfie (for e-KYC)\n\n**Fast Track: e-KYC via Aadhaar**\nComplete in 3 minutes using Aadhaar + OTP!\n\n[Start Registration](https://www.investonline.in)\n\n**Need help?**\n📞 Call: 1800-2222-65\n📧 Email: wealth@investonline.in",
-      "suggested": [
-        "What is KYC?",
-        "How to register?",
-        "e-KYC process",
-        "Start Registration"
-      ]
-    },
-    "compare_funds": {
-      "keywords": [
-        "compare fund",
-        "compare funds",
-        "fund comparison",
-        "compare scheme",
-        "difference between funds"
-      ],
-      "response": "⚖️ **Compare Mutual Funds**\n\nTo compare funds effectively, look at:\n\n**1. Returns:**\n• 1-year, 3-year, 5-year performance\n• Compare with benchmark & category average\n\n**2. Risk:**\n• Standard deviation (volatility)\n• Sharpe ratio (risk-adjusted return)\n• Max drawdown\n\n**3. Costs:**\n• Expense ratio\n• Exit load\n\n**4. Fund Manager:**\n• Experience\n• Track record\n\n**Use InvestOnline Fund Compare Tool:**\n[Compare Funds Side-by-Side](https://www.investonline.in/mutual-funds/compare-schemes)\n\nSelect 2-4 funds and see detailed comparison!\n\n**Need guidance?**\n📞 Talk to InvestOnline Advisors: 1800-2222-65\n📧 Email: wealth@investonline.in",
-      "suggested": [
-        "Top Funds",
-        "Expense Ratio",
-        "Fund Categories",
-        "SIP Calculator"
-      ]
-    },
-    "talk_to_support": {
-      "keywords": [
-        "talk to support",
-        "contact support",
-        "call support",
-        "speak to advisor",
-        "talk to advisor",
-        "human support",
-        "customer care",
-        "helpline",
-        "customer service"
-      ],
-      "response": "📞 **Contact InvestOnline Support**\n\nOur team is here to help! 😊\n\n**Phone Support:**\n📞 Toll Free: **1800-2222-65**\n📱 Direct: **+91-22-4071-3333**\n⏰ Mon-Sat: 9 AM - 6 PM\n\n**Email Support:**\n📧 General: **wealth@investonline.in**\n📧 KYC/Account: **support@investonline.in**\n\n**Live Chat:**\n💬 Available on website: [InvestOnline.in](https://www.investonline.in)\n\n**Office Address:**\nInvestOnline.in\nMumbai, Maharashtra, India\n\n**Response Time:**\n• Phone: Immediate\n• Email: Within 24 hours\n• Chat: Within 5 minutes\n\nHow else can I help you? 🤗",
-      "suggested": [
-        "How to register?",
-        "What is KYC?",
-        "Start SIP",
-        "Request Callback"
-      ]
-    },
-    "email_support": {
-      "keywords": [
-        "email support",
-        "send email",
-        "email address",
-        "contact email",
-        "support email"
-      ],
-      "response": "📧 **Email InvestOnline Support**\n\n**General Queries:**\n✉️ **wealth@investonline.in**\n\n**Account & KYC Issues:**\n✉️ **support@investonline.in**\n\n**Technical Issues:**\n✉️ **tech@investonline.in**\n\n**Grievances:**\n✉️ **grievance@investonline.in**\n\n**Response Time:** Within 24 hours\n\n**For urgent issues:**\n📞 Call: **1800-2222-65** (faster!)\n\n**Include in your email:**\n• Your registered mobile/email\n• Folio number (if applicable)\n• Detailed description of issue\n• Screenshots (if relevant)\n\n[Visit InvestOnline.in](https://www.investonline.in)",
-      "suggested": [
-        "Call Support",
-        "How to register?",
-        "Technical Issues",
-        "Account Help"
-      ]
-    },
-    "call_support": {
-      "keywords": [
-        "call support",
-        "phone number",
-        "call now",
-        "toll free",
-        "helpline number",
-        "contact number"
-      ],
-      "response": "📞 **Call InvestOnline Support**\n\n**Toll Free Number:**\n☎️ **1800-2222-65**\n(Free from any mobile/landline in India)\n\n**Direct Line:**\n📱 **+91-22-4071-3333**\n\n**Timings:**\n⏰ Monday to Saturday: 9:00 AM - 6:00 PM\n⏰ Sunday: Closed\n\n**What to keep ready:**\n• Your registered mobile number\n• PAN card (for verification)\n• Folio number (if you're an existing investor)\n\n**Call For:**\n✅ New account registration\n✅ KYC assistance\n✅ Investment guidance\n✅ Technical issues\n✅ Transaction status\n\n**Average wait time:** < 2 minutes\n\n[Visit InvestOnline.in](https://www.investonline.in)",
-      "suggested": [
-        "Email Support",
-        "How to register?",
-        "What is SIP?",
-        "Documents Needed"
-      ]
-    },
-    "mutual_fund_basics": {
-      "keywords": [
-        "what is mutual fund",
-        "mutual fund kya hai",
-        "mutual fund meaning",
-        "explain mutual fund",
-        "मुचुअल फंड क्या है"
-      ],
-      "response": "💼 **What is a Mutual Fund?**\n\nA mutual fund is a **pooled investment vehicle** where money from many investors is collected and invested in stocks, bonds, or other securities.\n\n**Simple Example:**\n10 friends pool ₹10,000 each = ₹1,00,000\nProfessional fund manager invests this ₹1L\nProfits/losses shared proportionally\n\n**Key Benefits:**\n✅ **Professional Management**: Expert fund managers\n✅ **Diversification**: Your ₹500 spread across 50+ stocks!\n✅ **Low Investment**: Start with just ₹500/month\n✅ **Liquidity**: Redeem anytime (except ELSS)\n✅ **Regulated**: SEBI-regulated, safe\n\n**How You Earn:**\n• **NAV Growth**: Your units' value increases\n• **Dividends**: Fund distributes profits (optional)\n\n**Types:**\n• Equity Funds (stocks)\n• Debt Funds (bonds)\n• Hybrid Funds (mix)\n\n**Best Way to Invest:** SIP (₹500/month)\n\n[Start SIP Now](https://www.investonline.in/mutual-funds)\n[SIP Calculator](https://www.investonline.in/calculators/sip-calculator)\n\n**Questions?**\n📞 Talk to InvestOnline Advisors: 1800-2222-65",
-      "suggested": [
-        "What is SIP?",
-        "What is NAV?",
-        "How to start?",
-        "Fund Categories"
-      ]
-    },
-    "request_callback": {
-      "keywords": [
-        "request callback",
-        "call me back",
-        "call me",
-        "callback",
-        "schedule call"
-      ],
-      "response": "📞 **Request a Callback from InvestOnline**\n\nI'll help you get in touch with our team!\n\n**Quick Options:**\n\n**Option 1: Instant Call**\n📞 Call now: **1800-2222-65** (Toll Free)\n⏰ Available: Mon-Sat, 9 AM - 6 PM\n\n**Option 2: Request Callback**\nClick the form below to share:\n• Your name\n• Phone number\n• Best time to call\n• Your query\n\nOur team will call you within 2 hours! ⏱️\n\n**Option 3: WhatsApp**\n💬 Message us: [WhatsApp InvestOnline](https://wa.me/919876543210)\n\n**What our advisors can help with:**\n✅ Account opening & KYC\n✅ Investment planning\n✅ Fund selection\n✅ SIP guidance\n✅ Portfolio review\n\nLet me know if you'd like to submit your details! 😊",
-      "suggested": [
-        "Share Details",
-        "Call Now",
-        "WhatsApp Support",
-        "Email Support"
-      ]
+// ====================================
+// chat_handler_WITH_TRANSLATION.js
+// COMPLETE FIX: Smart Intent Matching + Contextual Suggestions + Category Filtering
+// ====================================
+
+const fs = require('fs');
+const path = require('path');
+const { search } = require('./search');
+const OpenAI = require('openai');
+
+const openai = new OpenAI({
+  apiKey: process.env.OPENAI_API_KEY,
+});
+
+// Load knowledge base
+const flows = require('../flows/flows.json');
+
+// Constants
+const QUESTION_LIMIT = 15;
+const QUESTION_WARNING_THRESHOLD = 10;
+
+// InvestOnline URLs
+const INVESTONLINE_URLS = {
+  register: 'https://www.investonline.in/registration',
+  login: 'https://www.investonline.in/login',
+  topFunds: 'https://www.investonline.in/mutual-funds/top-performing-funds',
+  largeCap: 'https://www.investonline.in/mutual-funds/large-cap-funds',
+  midCap: 'https://www.investonline.in/mutual-funds/mid-cap-funds',
+  smallCap: 'https://www.investonline.in/mutual-funds/small-cap-funds',
+  elss: 'https://www.investonline.in/mutual-funds/tax-saving-elss',
+  compareFunds: 'https://www.investonline.in/mutual-funds/compare-schemes',
+  sipCalculator: 'https://www.investonline.in/financial-calculators/sip-calculator',
+  calculators: 'https://www.investonline.in/financial-calculators/calculators',
+  magazine: 'https://www.investonline.in/magazine/investguide',
+  contact: 'https://www.investonline.in/contact-us',
+};
+
+// Contact info
+const SUPPORT_INFO = {
+  phone: '1800-2222-65',
+  phoneDirect: '+91-22-4071-3333',
+  email: 'wealth@investonline.in',
+  whatsapp: '+91-9820119909',
+};
+
+// ====================================
+// FIXED: Enhanced Intent Matching with Category Awareness
+// ====================================
+function matchIntentWithCategory(userMessage) {
+  const msg = userMessage.toLowerCase();
+  
+  // Category keywords for fund types
+  const categoryMap = {
+    'large cap': ['large cap', 'largecap', 'blue chip', 'large-cap'],
+    'mid cap': ['mid cap', 'midcap', 'mid-cap'],
+    'small cap': ['small cap', 'smallcap', 'small-cap'],
+    'flexi cap': ['flexi cap', 'flexicap', 'flexi-cap'],
+    'elss': ['elss', 'tax saving', 'tax saver', '80c'],
+    'debt': ['debt fund', 'debt', 'fixed income'],
+    'index': ['index fund', 'index', 'passive'],
+    'etf': ['etf', 'exchange traded'],
+  };
+
+  // Check for each intent in flows.json
+  for (const intent of flows.intents) {
+    const keywords = intent.keywords || [];
+    
+    // Check if any keyword matches
+    const keywordMatch = keywords.some(kw => msg.includes(kw.toLowerCase()));
+    
+    if (keywordMatch) {
+      // Check for category-specific requests
+      let detectedCategory = null;
+      for (const [category, patterns] of Object.entries(categoryMap)) {
+        if (patterns.some(pattern => msg.includes(pattern))) {
+          detectedCategory = category;
+          break;
+        }
+      }
+      
+      return {
+        intent: intent.intent,
+        response: intent.response,
+        suggestions: intent.suggestions || [],
+        category: detectedCategory,
+        urls: intent.urls || [],
+      };
     }
-  },
-  "site": {
-    "contact": {
-      "keywords": [
-        "support",
-        "help",
-        "contact",
-        "customer care",
-        "help center"
-      ],
-      "response": "📞 **Contact Customer Support:**\n\n📧 **Email:** wealth@investonline.in\n📞 **Toll-Free:** 1800-2222-65\n📞 **Direct:** +91-22-4071-3333\n\n⏰ **Timings:** Mon-Fri, 9:30 AM - 6:00 PM IST\n\n[Visit Contact Page](https://www.investonline.in/contact-us)",
-      "suggested": [
-        "Email support",
-        "Call support",
-        "Talk to advisor",
-        "Schedule callback"
-      ]
+  }
+  
+  return null;
+}
+
+// ====================================
+// FIXED: Context-Aware Smart Suggestions
+// ====================================
+function getContextualSuggestions(intent, language = 'en') {
+  const suggestionMap = {
+    // SIP related
+    'sip': ['How to start SIP?', 'SIP Calculator', 'Types of SIP', 'Top SIP funds'],
+    'sip_calculator': ['Start SIP now', 'What is Top-up SIP?', 'SIP vs Lumpsum'],
+    'step_up_sip': ['SIP Calculator', 'How to modify SIP?', 'Best SIP funds'],
+    
+    // Fund categories
+    'large_cap': ['Mid Cap funds', 'Compare funds', 'Top Large Cap funds', 'SIP in Large Cap'],
+    'mid_cap': ['Large Cap funds', 'Small Cap funds', 'Top performing funds'],
+    'small_cap': ['Mid Cap funds', 'Risk in Small Cap', 'SIP in Small Cap'],
+    'elss': ['Tax benefits', 'Lock-in period', 'ELSS Calculator', 'Top ELSS funds'],
+    
+    // Investment concepts
+    'nav': ['Expense Ratio', 'Exit Load', 'How to invest?'],
+    'expense_ratio': ['NAV', 'Compare funds', 'Low cost funds'],
+    'exit_load': ['NAV', 'Lock-in period', 'Redemption process'],
+    
+    // Account & KYC
+    'kyc': ['How to register?', 'KYC status check', 'Documents needed'],
+    'registration': ['Complete KYC', 'Start investing', 'First SIP'],
+    'documents_needed': ['Complete KYC', 'Upload documents', 'KYC status'],
+    
+    // Top funds
+    'top_funds': ['Compare funds', 'Large Cap funds', 'SIP Calculator', 'Start investing'],
+    
+    // Calculators
+    'retirement_calculator': ['SIP Calculator', 'Asset Allocation', 'Goal Planning'],
+    'asset_allocation': ['Risk Profile', 'Portfolio Review', 'Retirement Planning'],
+    
+    // Magazine
+    'invest_guide': ['Latest articles', 'Investment tips', 'Market insights'],
+  };
+
+  // Get suggestions for this intent
+  let suggestions = suggestionMap[intent] || [
+    'Top Mutual Funds',
+    'SIP Calculator', 
+    'How to register?',
+    'Contact Support'
+  ];
+
+  // Translate if not English
+  if (language !== 'en') {
+    // Return English suggestions - will be translated by frontend or kept as is
+    // For now, keep English suggestions for consistency
+  }
+
+  return suggestions;
+}
+
+// ====================================
+// FIXED: Enhanced Response with CTAs
+// ====================================
+function enhanceResponseWithCTA(response, intent, category = null, urls = []) {
+  let enhanced = response;
+  
+  // Add category-specific URL if available
+  if (category) {
+    if (category === 'large cap' && !enhanced.includes(INVESTONLINE_URLS.largeCap)) {
+      enhanced += `\n\n**[Explore Large Cap Funds →](${INVESTONLINE_URLS.largeCap})**`;
+    } else if (category === 'mid cap' && !enhanced.includes(INVESTONLINE_URLS.midCap)) {
+      enhanced += `\n\n**[Explore Mid Cap Funds →](${INVESTONLINE_URLS.midCap})**`;
+    } else if (category === 'small cap' && !enhanced.includes(INVESTONLINE_URLS.smallCap)) {
+      enhanced += `\n\n**[Explore Small Cap Funds →](${INVESTONLINE_URLS.smallCap})**`;
+    } else if (category === 'elss' && !enhanced.includes(INVESTONLINE_URLS.elss)) {
+      enhanced += `\n\n**[Explore ELSS Funds →](${INVESTONLINE_URLS.elss})**`;
     }
-  },
-  "global": {
-    "support_block": {
-      "email": "wealth@investonline.in",
-      "phone_primary": "1800-2222-65",
-      "phone_secondary": "+91-22-4071-3333"
-    },
-    "fallback_message": "I can help with mutual funds, SIPs, fund categories, taxation, portfolio management, and all investment processes. For anything else, reach out to our support team."
+  }
+  
+  // Add general CTAs based on intent
+  if (intent === 'sip_calculator' && !enhanced.includes(INVESTONLINE_URLS.sipCalculator)) {
+    enhanced += `\n\n**[Calculate SIP Returns →](${INVESTONLINE_URLS.sipCalculator})**`;
+  } else if (intent === 'top_funds' && !enhanced.includes(INVESTONLINE_URLS.topFunds)) {
+    enhanced += `\n\n**[View Top Funds →](${INVESTONLINE_URLS.topFunds})**`;
+  } else if ((intent === 'retirement_calculator' || intent === 'asset_allocation') && !enhanced.includes(INVESTONLINE_URLS.calculators)) {
+    enhanced += `\n\n**[Try Calculator →](${INVESTONLINE_URLS.calculators})**`;
+  } else if (intent === 'invest_guide' && !enhanced.includes(INVESTONLINE_URLS.magazine)) {
+    enhanced += `\n\n**[Read Invest Guide →](${INVESTONLINE_URLS.magazine})**`;
+  } else if (intent === 'compare_funds' && !enhanced.includes(INVESTONLINE_URLS.compareFunds)) {
+    enhanced += `\n\n**[Compare Funds →](${INVESTONLINE_URLS.compareFunds})**`;
+  }
+  
+  // If no CTA added yet and URLs provided in flows.json, add first URL
+  if (!enhanced.match(/\[.*→\]/) && urls && urls.length > 0) {
+    enhanced += `\n\n**[Learn More →](${urls[0]})**`;
+  }
+  
+  return enhanced;
+}
+
+// ====================================
+// Translation function
+// ====================================
+async function translateText(text, targetLanguage) {
+  if (targetLanguage === 'en') return text;
+
+  const languageNames = {
+    hi: 'Hindi',
+    mr: 'Marathi',
+    gu: 'Gujarati',
+    ta: 'Tamil',
+  };
+
+  try {
+    console.log(`🌐 Translating response to ${languageNames[targetLanguage]}...`);
+    
+    const completion = await openai.chat.completions.create({
+      model: 'gpt-4o-mini',
+      messages: [
+        {
+          role: 'system',
+          content: `You are a professional translator for InvestOnline, an Indian mutual fund investment platform.
+
+TRANSLATION RULES:
+1. Translate the text to ${languageNames[targetLanguage]}
+2. Keep ALL URLs, markdown formatting [text](url), and **bold** syntax EXACTLY as is
+3. Keep ALL numbers, percentages, and financial terms in their original form
+4. Keep brand names like "InvestOnline" unchanged
+5. Keep financial terms like "NAV", "SIP", "KYC", "ELSS" in English
+6. Translate only the natural language text
+7. Maintain all newlines and formatting
+8. Keep emojis unchanged
+
+EXAMPLE:
+Input: "NAV stands for **Net Asset Value**. [Learn More](https://url)"
+Output: "NAV का मतलब है **Net Asset Value**। [और जानें](https://url)"`,
+        },
+        {
+          role: 'user',
+          content: text,
+        },
+      ],
+      temperature: 0.3,
+    });
+
+    return completion.choices[0].message.content;
+  } catch (error) {
+    console.error('❌ Translation error:', error.message);
+    return text; // Return original if translation fails
   }
 }
+
+// ====================================
+// Detect if message is investment-related
+// ====================================
+function isInvestmentRelated(message) {
+  const msg = message.toLowerCase();
+  
+  const investmentKeywords = [
+    // Core investment terms
+    'mutual fund', 'sip', 'invest', 'portfolio', 'return', 'nav', 'aum',
+    'expense ratio', 'exit load', 'scheme', 'fund', 'equity', 'debt',
+    
+    // Fund categories
+    'large cap', 'mid cap', 'small cap', 'flexi cap', 'index', 'etf',
+    'elss', 'tax saving', 'liquid', 'gilt', 'balanced', 'hybrid',
+    
+    // Investment actions
+    'buy', 'sell', 'redeem', 'switch', 'lumpsum', 'stp', 'swp',
+    'systematic', 'top up', 'pause', 'cancel', 'modify',
+    
+    // Account & KYC
+    'account', 'kyc', 'register', 'login', 'profile', 'nominee',
+    'bank', 'mandate', 'ekyc', 'aadhar', 'pan', 'document',
+    
+    // Queries
+    'how to', 'what is', 'which fund', 'best fund', 'top fund',
+    'compare', 'calculator', 'status', 'track', 'statement',
+    
+    // Issues
+    'payment', 'failed', 'pending', 'rejected', 'error', 'problem',
+    'help', 'support', 'contact',
+    
+    // Hinglish/Hindi
+    'निवेश', 'म्यूचुअल फंड', 'केवाईसी', 'रजिस्टर',
+  ];
+
+  return investmentKeywords.some(keyword => msg.includes(keyword));
+}
+
+// ====================================
+// Main Chat Handler
+// ====================================
+async function handleChat({ sessionId, message, page, language = 'en', SESSION_STORE }) {
+  console.log(`\n📨 [${sessionId}] Message: "${message}" | Language: ${language}`);
+
+  const session = SESSION_STORE.get(sessionId);
+  if (!session) {
+    return {
+      error: 'invalid_session',
+      reply: 'Session expired. Please refresh the page.',
+    };
+  }
+
+  // Initialize conversation history
+  if (!session.conversationHistory) {
+    session.conversationHistory = [];
+  }
+
+  // Increment question count
+  session.questionCount = (session.questionCount || 0) + 1;
+  session.language = language;
+
+  // Check question limit
+  if (session.questionCount > QUESTION_LIMIT) {
+    const limitMessage = language === 'en' 
+      ? `🎯 You've asked ${QUESTION_LIMIT} questions! To continue getting personalized investment advice, please register or sign in.\n\n**Benefits of Registration:**\n• Unlimited queries\n• Personalized portfolio tracking\n• Direct investment facility\n• Priority support\n\n**[Register Now →](${INVESTONLINE_URLS.register})** | **[Sign In →](${INVESTONLINE_URLS.login})**\n\nOr contact our team:\n📞 ${SUPPORT_INFO.phone}\n📧 ${SUPPORT_INFO.email}`
+      : await translateText(`You've asked ${QUESTION_LIMIT} questions! To continue getting personalized investment advice, please register or sign in.\n\nBenefits of Registration:\n• Unlimited queries\n• Personalized portfolio tracking\n• Direct investment facility\n• Priority support\n\n[Register Now](${INVESTONLINE_URLS.register}) | [Sign In](${INVESTONLINE_URLS.login})\n\nOr contact our team:\n📞 ${SUPPORT_INFO.phone}\n📧 ${SUPPORT_INFO.email}`, language);
+
+    return {
+      reply: limitMessage,
+      questionLimitReached: true,
+    };
+  }
+
+  // Check if investment-related
+  if (!isInvestmentRelated(message)) {
+    const nonInvestmentMessage = language === 'en'
+      ? "I'm specialized in helping with mutual fund investments, SIPs, account opening, KYC, nominations, and all InvestOnline.in processes. 😊\n\nI can't answer questions outside of investment and finance topics.\n\nHow can I help you with your investments today?"
+      : await translateText("I'm specialized in helping with mutual fund investments, SIPs, account opening, KYC, nominations, and all InvestOnline.in processes. 😊\n\nI can't answer questions outside of investment and finance topics.\n\nHow can I help you with your investments today?", language);
+
+    return {
+      reply: nonInvestmentMessage,
+      suggestions: getContextualSuggestions('general', language),
+    };
+  }
+
+  // PRIORITY 1: Check knowledge base with category awareness
+  const matchedIntent = matchIntentWithCategory(message);
+  
+  if (matchedIntent) {
+    console.log(`✅ Matched intent: ${matchedIntent.intent}${matchedIntent.category ? ' (Category: ' + matchedIntent.category + ')' : ''}`);
+    
+    // Enhance response with CTA
+    let enhancedResponse = enhanceResponseWithCTA(
+      matchedIntent.response,
+      matchedIntent.intent,
+      matchedIntent.category,
+      matchedIntent.urls
+    );
+    
+    // Translate if needed
+    if (language !== 'en') {
+      enhancedResponse = await translateText(enhancedResponse, language);
+    }
+    
+    // Get contextual suggestions
+    const suggestions = getContextualSuggestions(matchedIntent.intent, language);
+    
+    // Add to conversation history
+    session.conversationHistory.push({
+      role: 'user',
+      content: message,
+    });
+    session.conversationHistory.push({
+      role: 'assistant',
+      content: enhancedResponse,
+    });
+
+    return {
+      reply: enhancedResponse,
+      suggestions: suggestions,
+    };
+  }
+
+  // PRIORITY 2: Fallback to OpenAI with strict InvestOnline context
+  console.log('🤖 No intent match, using OpenAI fallback...');
+
+  try {
+    // Keep last 6 messages for context
+    const recentHistory = session.conversationHistory.slice(-6);
+
+    const completion = await openai.chat.completions.create({
+      model: 'gpt-4o-mini',
+      messages: [
+        {
+          role: 'system',
+          content: `You are InvestOnline Buddy, an AI assistant for InvestOnline.in - India's leading mutual fund investment platform.
+
+STRICT RULES:
+1. **InvestOnline ONLY**: Mention ONLY InvestOnline.in, its services, and Indian mutual funds. NEVER mention competitors.
+2. **Indian Funds ONLY**: When giving examples, use ONLY Indian mutual fund schemes (e.g., ICICI Prudential, Axis, HDFC, SBI, Aditya Birla, etc.). NEVER mention foreign funds.
+3. **No Generic Advice**: Don't say "consult financial advisor" - say "contact InvestOnline advisors at ${SUPPORT_INFO.phone} or ${SUPPORT_INFO.email}"
+4. **Always Add CTAs**: Every response MUST include relevant links:
+   - Top Funds: ${INVESTONLINE_URLS.topFunds}
+   - Large Cap: ${INVESTONLINE_URLS.largeCap}
+   - Mid Cap: ${INVESTONLINE_URLS.midCap}
+   - Small Cap: ${INVESTONLINE_URLS.smallCap}
+   - ELSS: ${INVESTONLINE_URLS.elss}
+   - Compare Funds: ${INVESTONLINE_URLS.compareFunds}
+   - SIP Calculator: ${INVESTONLINE_URLS.sipCalculator}
+   - Calculators: ${INVESTONLINE_URLS.calculators}
+   - Magazine: ${INVESTONLINE_URLS.magazine}
+   - Register: ${INVESTONLINE_URLS.register}
+
+5. **Response Format**:
+   - Use markdown: **bold**, [links](url)
+   - Add emojis appropriately
+   - End with CTA like: **[View Top Funds →](url)** or **[Try Calculator →](url)**
+   - For fund recommendations, direct to InvestOnline's curated lists
+
+6. **Language**: Respond in ${language === 'en' ? 'English' : language === 'hi' ? 'Hindi' : language === 'mr' ? 'Marathi' : language === 'gu' ? 'Gujarati' : 'Tamil'} but keep URLs, brand names, and financial terms in English.
+
+7. **Tone**: Friendly, helpful, InvestOnline-centric. Always brand as "InvestOnline advisors" not "financial advisors".
+
+EXAMPLE:
+User: "Best large cap funds?"
+You: "For top performing Large Cap funds, check InvestOnline's curated list! 🎯\n\nWe regularly update our rankings based on performance, risk, and consistency. You'll find detailed analysis and ratings.\n\n**[View Top Large Cap Funds →](${INVESTONLINE_URLS.largeCap})**\n\nFor personalized recommendations, contact InvestOnline advisors:\n📞 ${SUPPORT_INFO.phone}\n📧 ${SUPPORT_INFO.email}"`,
+        },
+        ...recentHistory,
+        {
+          role: 'user',
+          content: message,
+        },
+      ],
+      temperature: 0.7,
+      max_tokens: 500,
+    });
+
+    let reply = completion.choices[0].message.content;
+
+    // Add to conversation history
+    session.conversationHistory.push({
+      role: 'user',
+      content: message,
+    });
+    session.conversationHistory.push({
+      role: 'assistant',
+      content: reply,
+    });
+
+    // Get contextual suggestions
+    const suggestions = getContextualSuggestions('general', language);
+
+    return {
+      reply: reply,
+      suggestions: suggestions,
+    };
+
+  } catch (error) {
+    console.error('❌ OpenAI error:', error);
+    
+    const fallbackMessage = language === 'en'
+      ? `I apologize, but I'm having trouble processing your request. 😔\n\nPlease contact our InvestOnline support team:\n📞 **${SUPPORT_INFO.phone}** (Toll-Free)\n📧 **${SUPPORT_INFO.email}**\n\n**[Contact Us →](${INVESTONLINE_URLS.contact})**\n\nWe're here to help!`
+      : await translateText(`I apologize, but I'm having trouble processing your request. 😔\n\nPlease contact our InvestOnline support team:\n📞 ${SUPPORT_INFO.phone} (Toll-Free)\n📧 ${SUPPORT_INFO.email}\n\n[Contact Us](${INVESTONLINE_URLS.contact})\n\nWe're here to help!`, language);
+
+    return {
+      reply: fallbackMessage,
+      suggestions: ['Contact Support', 'Try again', 'How to register?'],
+    };
+  }
+}
+
+module.exports = { handleChat };
