@@ -8,161 +8,360 @@
     "📞 Contact Support"
   ],
   "categories": [
+    "Getting Started",
     "Investment Concepts",
     "Fund Categories",
-    "Risk & Returns",
-    "Taxation",
-    "SIP Advanced",
-    "Portfolio Management",
+    "Transactions",
+    "Account Management",
+    "Documents & Reports",
+    "Troubleshooting",
     "Tools & Calculators",
-    "Resources & Guides",
-    "Account & KYC"
+    "Tax & Compliance"
   ],
   "intents": [
     {
-      "intent": "top_funds",
-      "keywords": ["top funds", "best funds", "top performing", "high return funds", "best mutual funds", "recommended funds"],
-      "response": "🏆 **Top Performing Mutual Funds**\n\nWe curate and regularly update lists of top-performing funds across all categories based on:\n• Consistent returns\n• Risk-adjusted performance\n• Fund manager track record\n• Expense ratios\n\n**Important:** Past performance doesn't guarantee future results. We provide curated lists, not investment advice.\n\nFor personalized recommendations based on your goals and risk appetite, contact InvestOnline advisors:\n📞 1800-2222-65\n📧 wealth@investonline.in",
-      "suggestions": ["Large Cap funds", "Mid Cap funds", "ELSS funds", "Compare funds"],
-      "urls": ["https://www.investonline.in/mutual-funds/top-performing-funds"]
+      "intent": "registration",
+      "keywords": [
+        "register", "sign up", "create account", "new account", "registration",
+        "open account", "start account", "register kaise kare", "account banao",
+        "how to join", "become member", "enroll", "signup",
+        "नया खाता", "रजिस्ट्रेशन", "खाता खोलना", "साइन अप",
+        "નવું એકાઉન્ટ", "રજિસ્ટ્રેશન", "ખાતું ખોલવું",
+        "புதிய கணக்கு", "பதிவு", "கணக்கு திறக்க",
+        "नवीन खाते", "नोंदणी", "खाते उघडणे",
+        "account kaise banaye", "registration process", "naya khata"
+      ],
+      "response": "🎯 **Register with InvestOnline**\n\nStart your investment journey in 3 easy steps!\n\n**What You'll Get:**\n• Free portfolio tracker\n• Paperless investing\n• 5000+ mutual funds\n• Expert research & reports\n• Priority customer support\n• Goal-based planning tools\n• Tax reports & statements\n\n**Registration Steps:**\n1. Enter mobile & email\n2. Complete e-KYC (5 mins)\n3. Add bank account\n4. Start investing!\n\n**Already Registered?** Sign in to access your portfolio.\n\n💡 **Zero registration fees!** Start with as low as ₹500!",
+      "suggestions": ["Complete KYC", "Documents needed", "First investment", "Contact support"],
+      "urls": ["https://www.investonline.in/registration", "https://www.investonline.in/login"]
     },
     {
-      "intent": "large_cap",
-      "keywords": ["large cap", "largecap", "large-cap", "blue chip", "big companies"],
-      "response": "💼 **Large Cap Funds**\n\nInvest in India's top 100 companies by market cap (₹20,000+ crore).\n\n**Examples:** Reliance, TCS, HDFC Bank, Infosys, ITC\n\n**Characteristics:**\n• Lower volatility\n• Stable returns (10-12% historical)\n• Good for conservative investors\n• Better liquidity\n\n**Ideal For:**\n• Risk-averse investors\n• Retirement planning\n• First-time investors\n• 3-5 year+ goals\n\n💡 Browse our curated list of top Large Cap funds with detailed analysis and ratings.",
-      "suggestions": ["Mid Cap funds", "Top Large Cap funds", "SIP in Large Cap", "Compare Large Cap funds"],
-      "urls": ["https://www.investonline.in/mutual-funds/large-cap-funds", "https://www.investonline.in/mutual-funds/compare-schemes"]
-    },
-    {
-      "intent": "mid_cap",
-      "keywords": ["mid cap", "midcap", "mid-cap", "medium cap"],
-      "response": "📊 **Mid Cap Funds**\n\nInvest in companies ranked 101-250 by market cap (₹5,000-20,000 crore).\n\n**Characteristics:**\n• Higher growth potential than Large Cap\n• Moderate volatility\n• Historical returns: 12-15%\n• Good balance of risk & return\n\n**Ideal For:**\n• Moderate risk appetite\n• 5-7 year+ investment horizon\n• Wealth creation goals\n• Diversification from Large Cap\n\n**Risk:** More volatile than Large Cap, less than Small Cap.\n\n💡 View our curated Mid Cap funds list with performance metrics.",
-      "suggestions": ["Large Cap funds", "Small Cap funds", "Top Mid Cap funds", "Compare funds"],
-      "urls": ["https://www.investonline.in/mutual-funds/mid-cap-funds"]
-    },
-    {
-      "intent": "small_cap",
-      "keywords": ["small cap", "smallcap", "small-cap"],
-      "response": "🚀 **Small Cap Funds**\n\nInvest in companies ranked 251+ by market cap (<₹5,000 crore).\n\n**Characteristics:**\n• Highest growth potential\n• High volatility\n• Historical returns: 15-18%+\n• Can outperform significantly in bull markets\n\n**Risks:**\n• Sharp corrections possible\n• Lower liquidity\n• Fund performance varies widely\n• Not suitable for short-term\n\n**Ideal For:**\n• Aggressive investors\n• 7-10 year+ horizon\n• High risk tolerance\n• Portfolio diversification (10-15% allocation)\n\n💡 Explore Small Cap funds - review risk and performance before investing.",
-      "suggestions": ["Mid Cap funds", "Risk in Small Cap", "Top Small Cap funds", "SIP strategy"],
-      "urls": ["https://www.investonline.in/mutual-funds/small-cap-funds"]
-    },
-    {
-      "intent": "elss",
-      "keywords": ["elss", "tax saving", "tax saver", "80c", "tax benefit fund"],
-      "response": "💰 **ELSS (Equity Linked Savings Scheme)**\n\nTax-saving mutual funds under Section 80C with 3-year lock-in.\n\n**Benefits:**\n• Save up to ₹46,800 tax (₹1.5L investment at 30% tax)\n• Shortest lock-in among 80C options\n• Potential for 12-15% returns\n• Equity exposure for wealth creation\n\n**Lock-in:**\n• 3 years mandatory\n• Each SIP has separate 3-year lock-in\n• No redemption/switch allowed\n\n**vs Other 80C Options:**\n• PPF: 15 years, 7-7.5% returns\n• NSC/FD: 5 years, 6-7% returns\n• ELSS: 3 years, 12-15% potential\n\n💡 Invest before March 31 to claim tax benefits!",
-      "suggestions": ["Top ELSS funds", "80C deduction", "Lock-in period", "Tax benefits"],
-      "urls": ["https://www.investonline.in/mutual-funds/tax-saving-elss"]
-    },
-    {
-      "intent": "sip_calculator",
-      "keywords": ["sip calculator", "calculate sip", "sip returns", "sip amount calculator"],
-      "response": "🧮 **SIP Calculator**\n\nPlan your SIP investments with our free calculator!\n\n**Calculate:**\n• Future value of your SIP\n• Monthly SIP needed for goal\n• Wealth created over time\n• Power of compounding\n\n**Example:**\n₹10,000/month for 10 years @ 12%\n= ₹23.23 lakhs (Invested: ₹12 lakhs)\n\n**Features:**\n• Goal-based planning\n• Multiple scenarios\n• Step-up SIP calculation\n• Retirement planning\n\n💡 Try different amounts and durations to find your perfect SIP!",
-      "suggestions": ["Start SIP", "What is Step-up SIP?", "Goal calculator", "Top SIP funds"],
-      "urls": ["https://www.investonline.in/financial-calculators/sip-calculator"]
-    },
-    {
-      "intent": "retirement_calculator",
-      "keywords": ["retirement calculator", "retirement planning", "retire", "pension planning"],
-      "response": "🏖️ **Retirement Planning Calculator**\n\nPlan for a comfortable retirement with our calculator!\n\n**What it does:**\n• Estimates retirement corpus needed\n• Calculates monthly SIP required\n• Factors in inflation\n• Plans post-retirement income\n\n**Key Inputs:**\n• Current age & retirement age\n• Monthly expenses today\n• Expected inflation (6-7%)\n• Life expectancy\n\n**Example:**\nAge 30, retire at 60\nCurrent expenses: ₹50,000/month\nCorpus needed: ₹4-5 crores\n\n💡 Start early - 30 years vs 20 years = 50% less monthly SIP!",
-      "suggestions": ["SIP Calculator", "Asset Allocation", "ELSS funds", "Long-term funds"],
-      "urls": ["https://www.investonline.in/financial-calculators/retirement-calculator"]
-    },
-    {
-      "intent": "asset_allocation",
-      "keywords": ["asset allocation", "portfolio allocation", "diversification", "risk profile"],
-      "response": "📊 **Asset Allocation Calculator**\n\nFind your ideal investment mix based on age, goals, and risk appetite!\n\n**What it suggests:**\n• Equity vs Debt ratio\n• Fund category allocation\n• Risk-appropriate portfolio\n• Rebalancing needs\n\n**Common Strategies:**\n• **Aggressive (80:20):** Young investors, long horizon\n• **Balanced (60:40):** Mid-age, moderate risk\n• **Conservative (40:60):** Near retirement, low risk\n\n**Rule of Thumb:**\nEquity % = 100 - Your Age\nAge 30 = 70% equity, 30% debt\n\n💡 Proper allocation reduces risk while maintaining returns!",
-      "suggestions": ["Risk profile", "Retirement planning", "Diversification", "Rebalancing"],
-      "urls": ["https://www.investonline.in/financial-calculators/asset-allocation-calculator"]
-    },
-    {
-      "intent": "compounding_calculator",
-      "keywords": ["compounding calculator", "compound interest", "power of compounding", "wealth calculator"],
-      "response": "💫 **Compounding Returns Calculator**\n\nSee the magic of compounding - earning returns on your returns!\n\n**How Compounding Works:**\nYear 1: ₹1L @ 12% = ₹1.12L\nYear 2: ₹1.12L @ 12% = ₹1.25L\nYear 10: ₹3.11L (₹2.11L from compounding!)\n\n**The Power of Time:**\n₹10,000/month @ 12%\n• 10 years: ₹23.2L\n• 20 years: ₹99.9L\n• 30 years: ₹3.52 Crores!\n\n💡 **Start early!** 5 extra years can double your wealth!",
-      "suggestions": ["SIP Calculator", "Goal calculator", "Start SIP now", "Long-term investing"],
-      "urls": ["https://www.investonline.in/financial-calculators/compounding-returns-calculator"]
-    },
-    {
-      "intent": "goal_calculator",
-      "keywords": ["goal calculator", "goal planning", "financial goal", "goal based sip"],
-      "response": "🎯 **Goal-Based SIP Calculator**\n\nPlan SIPs for specific life goals!\n\n**Common Goals:**\n• Child's education (15-20 years)\n• Home down payment (5-7 years)\n• Car purchase (3-5 years)\n• Marriage (10-15 years)\n• Dream vacation (2-3 years)\n\n**How it works:**\n1. Enter your goal amount\n2. Set time horizon\n3. Choose expected returns\n4. Get your SIP amount\n\n**Example:**\n₹25L for education in 15 years\n@ 12% returns = ₹6,200/month SIP\n\n💡 Multiple goals? Calculate separate SIPs for each!",
-      "suggestions": ["SIP Calculator", "Start SIP", "Education planning", "Child future"],
-      "urls": ["https://www.investonline.in/financial-calculators/goal-based-sip-calculator"]
-    },
-    {
-      "intent": "compare_funds",
-      "keywords": ["compare funds", "compare mutual funds", "fund comparison", "vs funds"],
-      "response": "🔍 **Compare Mutual Funds**\n\nCompare any funds side-by-side with our comparison tool!\n\n**What you can compare:**\n• Returns (1Y, 3Y, 5Y, 10Y)\n• Risk metrics (Std Dev, Beta, Sharpe)\n• Expense ratios\n• Fund size (AUM)\n• Holdings & sectors\n• Fund manager tenure\n\n**How to use:**\n1. Search fund names\n2. Select up to 4 funds\n3. View detailed comparison\n4. Check benchmark performance\n\n💡 Don't just chase returns - compare risk-adjusted performance!",
-      "suggestions": ["Top funds", "Large Cap funds", "Expense ratio", "Risk metrics"],
-      "urls": ["https://www.investonline.in/mutual-funds/compare-schemes"]
-    },
-    {
-      "intent": "invest_guide",
-      "keywords": ["invest guide", "magazine", "investment magazine", "articles", "market insights"],
-      "response": "📚 **Invest Guide - Our Quarterly Magazine**\n\nFREE investment magazine with expert insights!\n\n**What's Inside:**\n• Market analysis & outlook\n• Fund manager interviews\n• Investment strategies\n• Tax planning tips\n• Portfolio building guides\n• Reader Q&A\n\n**Latest Topics:**\n• SIP strategies for 2025\n• Navigating market volatility\n• Retirement planning checklist\n• Sector rotation insights\n\n**Published:** Quarterly (Jan, Apr, Jul, Oct)\n**Access:** Free for all investors\n\n💡 Subscribe to get new issues directly!",
-      "suggestions": ["Latest articles", "Investment tips", "Market outlook", "Tax planning"],
-      "urls": ["https://www.investonline.in/magazine/investguide"]
-    },
-    {
-      "intent": "all_calculators",
-      "keywords": ["calculators", "financial calculators", "planning tools", "all calculator"],
-      "response": "🧮 **Financial Calculators - All Tools**\n\nAccess all our FREE financial planning calculators!\n\n**Available Calculators:**\n• **SIP Calculator** - Plan monthly investments\n• **Goal SIP Calculator** - Achieve specific goals\n• **Lumpsum Calculator** - One-time investment\n• **SWP Calculator** - Systematic withdrawal\n• **STP Calculator** - Fund transfer planning\n• **Retirement Calculator** - Pension planning\n• **Asset Allocation** - Portfolio distribution\n• **Compounding Calculator** - See growth power\n• **EMI Calculator** - Loan planning\n• **Future Value** - Investment growth\n\n💡 Use multiple calculators for comprehensive planning!",
-      "suggestions": ["SIP Calculator", "Retirement Planning", "Goal Planning", "Asset Allocation"],
-      "urls": ["https://www.investonline.in/financial-calculators/calculators"]
+      "intent": "registration_benefits",
+      "keywords": [
+        "registration benefits", "why register", "benefits of registration",
+        "advantages of registration", "registration advantages", "why create account",
+        "benefits of account", "registration ke fayde", "account ke benefits",
+        "रजिस्ट्रेशन के फायदे", "खाता खोलने के लाभ",
+        "રજિસ્ટ્રેશનના ફાયદા", "ખાતાના લાભો",
+        "பதிவின் நன்மைகள்", "கணக்கின் பலன்கள்",
+        "नोंदणीचे फायदे", "खात्याचे फायदे",
+        "kya milega register karne se", "benefits kya hai"
+      ],
+      "response": "🌟 **Benefits of Registration**\n\nUnlock premium features with your free InvestOnline account!\n\n**Investment Benefits:**\n• Access to 5000+ mutual fund schemes\n• Paperless, hassle-free investing\n• Start SIP from ₹500/month\n• One-click fund purchases\n• Portfolio tracking & analysis\n\n**Tools & Features:**\n• Free SIP Calculator\n• Goal-based planning\n• Retirement calculator\n• Tax planning reports\n• Capital gains statements\n\n**Support & Service:**\n• Priority customer support\n• Dedicated relationship manager\n• Expert investment guidance\n• Regular market updates\n• Quarterly investment magazine\n\n**Security:**\n• SEBI registered platform\n• Bank-level encryption\n• Secure payment gateway\n• 2-factor authentication\n\n💡 **Best part:** Absolutely FREE! No hidden charges, no account fees!",
+      "suggestions": ["How to register?", "KYC process", "First SIP", "Calculator"],
+      "urls": ["https://www.investonline.in/registration"]
     },
     {
       "intent": "kyc",
-      "keywords": ["kyc", "know your customer", "kyc process", "kyc documents", "ekyc"],
+      "keywords": [
+        "kyc", "know your customer", "kyc process", "kyc documents", "ekyc",
+        "kyc kaise kare", "kyc status", "kyc verification", "kyc approval",
+        "केवाईसी", "केवाईसी कैसे करें", "केवाईसी दस्तावेज",
+        "કેવાયસી", "કેવાયસી કેવી રીતે કરવું",
+        "கேவைசி", "கேவைசி எப்படி செய்வது",
+        "केवायसी", "केवायसी कसे करावे",
+        "kyc complete karna", "kyc documents chahiye", "ekyc kaise hota hai",
+        "kyc approved kab hoga", "kyc pending hai"
+      ],
       "response": "📋 **KYC (Know Your Customer)**\n\nOne-time KYC process mandatory for mutual fund investments.\n\n**Required Documents:**\n• PAN Card (mandatory)\n• Aadhaar Card\n• Address Proof\n• Bank details (cancelled cheque)\n• Passport-size photo\n\n**KYC Types:**\n• **e-KYC:** Instant via Aadhaar OTP (5 minutes)\n• **Offline KYC:** Physical documents (5-7 days)\n\n**KYC Status:**\nOnce done, valid across all mutual funds & platforms!\n\n💡 Complete e-KYC instantly and start investing today!",
       "suggestions": ["How to register?", "Documents needed", "Check KYC status", "e-KYC process"],
       "urls": ["https://www.investonline.in/kyc", "https://www.investonline.in/registration"]
     },
     {
-      "intent": "registration",
-      "keywords": ["register", "sign up", "create account", "new account", "registration"],
-      "response": "🎯 **Register with InvestOnline**\n\nStart your investment journey in 3 easy steps!\n\n**What You'll Get:**\n• Free portfolio tracker\n• Paperless investing\n• 5000+ mutual funds\n• Expert research & reports\n• Priority customer support\n• Goal-based planning tools\n\n**Registration Steps:**\n1. Enter mobile & email\n2. Complete e-KYC (5 mins)\n3. Add bank account\n4. Start investing!\n\n**Already Registered?** Sign in to access your portfolio.\n\n💡 **Zero registration fees!** Start with as low as ₹500!",
-      "suggestions": ["Complete KYC", "First SIP", "Investment guide", "Contact support"],
-      "urls": ["https://www.investonline.in/registration", "https://www.investonline.in/login"]
+      "intent": "redemption",
+      "keywords": [
+        "redemption", "redeem", "sell units", "withdraw money", "withdraw investment",
+        "how to redeem", "redemption process", "redeem kaise kare", "units bechna",
+        "encash", "liquidate", "exit", "sell mutual fund",
+        "रिडेम्पशन", "यूनिट्स बेचना", "पैसे निकालना",
+        "રિડેમ્પશન", "યુનિટ્સ વેચવા", "પૈસા કાઢવા",
+        "மீட்பு", "யூனிட்களை விற்பனை", "பணம் எடுக்க",
+        "रिडेम्पशन", "युनिट्स विकणे", "पैसे काढणे",
+        "paisa kaise nikale", "units kab bech sakte hai", "redemption kitne din me"
+      ],
+      "response": "💰 **Redemption (Selling Units)**\n\nWithdraw your mutual fund investment anytime!\n\n**How to Redeem:**\n1. Login to InvestOnline\n2. Go to 'My Investments'\n3. Select fund to redeem\n4. Choose: Full/Partial redemption\n5. Confirm & submit\n\n**Money Credit Time:**\n• **Liquid Funds:** 1 working day\n• **Debt Funds:** 2-3 working days\n• **Equity Funds:** 3-4 working days\n\n**Important Points:**\n• Check exit load before redeeming\n• ELSS has 3-year lock-in\n• Capital gains tax applicable\n• Money credited to registered bank\n\n💡 **Tip:** Consider switching instead of redeeming to avoid tax!",
+      "suggestions": ["Exit load", "Switch funds", "Tax on redemption", "How long for money?"],
+      "urls": ["https://www.investonline.in/mutual-funds/redemption"]
     },
     {
-      "intent": "documents_needed",
-      "keywords": ["documents needed", "required documents", "what documents", "documentation"],
-      "response": "📄 **Documents Required**\n\nFor Account Opening & KYC:\n\n**Mandatory:**\n• **PAN Card** - For all investors\n• **Aadhaar Card** - For e-KYC\n• **Bank Proof** - Cancelled cheque/passbook\n• **Photo** - Recent passport-size\n\n**Address Proof (any one):**\n• Aadhaar Card\n• Passport\n• Voter ID\n• Driving License\n• Utility bill (< 3 months)\n\n**For Minors:**\n• Birth certificate\n• Guardian's KYC documents\n\n💡 **e-KYC:** Only Aadhaar + PAN needed!",
-      "suggestions": ["Complete KYC", "Registration process", "e-KYC", "Upload documents"],
-      "urls": ["https://www.investonline.in/kyc"]
+      "intent": "switch",
+      "keywords": [
+        "switch", "switching", "switch funds", "change fund", "move to another fund",
+        "switch kaise kare", "fund badalna", "transfer to another fund",
+        "switch in", "switch out", "fund switch",
+        "स्विच", "फंड बदलना", "दूसरे फंड में",
+        "સ્વિચ", "ફંડ બદલવું", "બીજા ફંડમાં",
+        "மாற்றம்", "நிதி மாற்றம்", "வேறு நிதிக்கு",
+        "स्विच", "फंड बदलणे", "दुसऱ्या फंडमध्ये",
+        "fund change karna", "kya switch kar sakte hai", "switch karne me tax"
+      ],
+      "response": "🔄 **Switch Funds**\n\nMove your investment from one fund to another!\n\n**How to Switch:**\n1. Login to InvestOnline\n2. Go to 'Switch' option\n3. Select source fund (switch out)\n4. Select target fund (switch in)\n5. Enter amount/units\n6. Confirm\n\n**Benefits of Switching:**\n• Rebalance portfolio\n• Move to better performing fund\n• Adjust risk level\n• Tax advantage over redemption\n\n**Important:**\n• Same AMC switching usually free\n• Different AMC = Redemption + Purchase\n• Exit load may apply\n• Tax implications on gains\n\n💡 **Smart Move:** Switch from equity to debt near goals to protect gains!",
+      "suggestions": ["Rebalancing", "Exit load", "Best time to switch", "Tax implications"],
+      "urls": ["https://www.investonline.in/mutual-funds/switch"]
+    },
+    {
+      "intent": "transmission",
+      "keywords": [
+        "transmission", "transmission of units", "transfer units", "nominee claim",
+        "death of investor", "legal heir", "transmission process", "units transfer",
+        "inheritance", "succession",
+        "ट्रांसमिशन", "यूनिट्स ट्रांसफर", "नॉमिनी क्लेम",
+        "ટ્રાન્સમિશન", "યુનિટ્સ ટ્રાન્સફર", "નોમિની દાવો",
+        "பரிமாற்றம்", "யூனிட் மாற்றம்", "நாமினி உரிமை",
+        "ट्रान्समिशन", "युनिट्स ट्रान्सफर", "नॉमिनी दावा",
+        "mrityu ke baad", "nominee ko units", "transmission kaise hota hai"
+      ],
+      "response": "📜 **Transmission of Units**\n\nTransfer units to nominee/legal heir after investor's demise.\n\n**Documents Required:**\n• Death certificate (original)\n• Claimant's ID & address proof\n• Cancelled cheque (claimant's bank)\n• Notarized indemnity bond\n• Succession certificate (if no nominee)\n\n**Process:**\n1. Contact InvestOnline support\n2. Submit transmission request form\n3. Provide required documents\n4. AMC verification (15-30 days)\n5. Units transferred to nominee/heir\n\n**Important:**\n• With Nominee: 15-20 days\n• Without Nominee: 45-60 days\n• Original documents required\n• Tax-free transmission\n\n📞 **Support:** Call 1800-2222-65 for assistance\n📧 **Email:** wealth@investonline.in",
+      "suggestions": ["Add nominee", "Required documents", "Transmission timeline", "Contact support"],
+      "urls": []
+    },
+    {
+      "intent": "nomination",
+      "keywords": [
+        "nomination", "nominee", "add nominee", "change nominee", "nominee kaise add kare",
+        "beneficiary", "add beneficiary", "nominee update", "nomination process",
+        "नॉमिनेशन", "नॉमिनी जोड़ना", "नॉमिनी बदलना",
+        "નોમિનેશન", "નોમિની ઉમેરવું", "નોમિની બદલવું",
+        "நாமினி", "நாமினி சேர்க்க", "நாமினி மாற்ற",
+        "नॉमिनेशन", "नॉमिनी जोडणे", "नॉमिनी बदलणे",
+        "nominee kaun hona chahiye", "nominee kaise banaye", "nominee badalna hai"
+      ],
+      "response": "👤 **Nomination**\n\nAdd nominee to ensure smooth transmission of units.\n\n**Why Add Nominee?**\n• Units transfer directly to nominee\n• Avoid lengthy legal process\n• No succession certificate needed\n• Peace of mind for family\n\n**How to Add Nominee:**\n1. Login to InvestOnline\n2. Go to 'Profile' > 'Nomination'\n3. Enter nominee details\n4. Submit\n\n**Nominee Details Needed:**\n• Name, DOB, relationship\n• Address\n• Allocation % (multiple nominees)\n• Minor nominee: Guardian details\n\n**Update Anytime:**\nChange or add nominees at any time for free!\n\n💡 **Tip:** You can add up to 3 nominees with different allocations!",
+      "suggestions": ["How to add?", "Multiple nominees", "Minor nominee", "Change nominee"],
+      "urls": []
+    },
+    {
+      "intent": "mandate",
+      "keywords": [
+        "mandate", "auto debit", "bank mandate", "sip mandate", "mandate registration",
+        "mandate kaise banaye", "auto pay", "emandate", "ach mandate",
+        "मैंडेट", "ऑटो डेबिट", "बैंक मैंडेट",
+        "મેન્ડેટ", "ઓટો ડેબિટ", "બેંક મેન્ડેટ",
+        "ஆணை", "தானியங்கி பற்று", "வங்கி ஆணை",
+        "मँडेट", "ऑटो डेबिट", "बँक मँडेट",
+        "mandate kya hai", "sip auto pay", "auto debit kaise set kare",
+        "emandate register", "mandate kitne din me"
+      ],
+      "response": "🏦 **Bank Mandate / Auto-Debit**\n\nSet up automatic SIP payments from your bank!\n\n**What is Mandate?**\nOne-time authorization for auto-debiting SIP amount from your bank account.\n\n**How to Register:**\n1. Go to 'SIP' > 'Register Mandate'\n2. Enter bank details\n3. Set maximum amount\n4. Complete bank verification\n5. e-Mandate: Instant via net banking\n6. Physical Mandate: 7-10 days\n\n**Benefits:**\n• Hassle-free SIP payments\n• Never miss a SIP\n• Modify anytime\n• Secure & safe\n\n**Mandate Limits:**\n• e-Mandate: Up to ₹1 crore\n• Physical Mandate: No limit\n\n💡 **Set mandate higher than your SIP amount for future top-ups!**",
+      "suggestions": ["Start SIP", "e-Mandate", "Mandate rejection", "Change bank"],
+      "urls": []
+    },
+    {
+      "intent": "payment_failed",
+      "keywords": [
+        "payment failed", "payment failure", "sip failed", "debit failed",
+        "payment reject", "transaction failed", "payment nahi hua", "sip bounce",
+        "insufficient balance", "payment declined",
+        "पेमेंट फेल", "एसआईपी फेल", "डेबिट नहीं हुआ",
+        "પેમેન્ટ નિષ્ફળ", "એસઆઈપી નિષ્ફળ", "ડેબિટ નહીં થયું",
+        "பணம் செலுத்துதல் தோல்வி", "எஸ்ஐபி தோல்வி",
+        "पेमेंट फेल", "एसआयपी फेल", "डेबिट झाले नाही",
+        "sip cut nahi hua", "payment kyun fail hua", "bounce ho gaya",
+        "insufficient funds", "balance kam tha"
+      ],
+      "response": "❌ **Payment Failure**\n\nSIP/Investment payment failed? Here's how to fix it!\n\n**Common Reasons:**\n• Insufficient balance in bank\n• Mandate expired/not registered\n• Bank account frozen/inactive\n• Wrong bank details\n• Technical issue\n\n**How to Fix:**\n1. Check bank balance\n2. Verify mandate status\n3. Retry payment manually\n4. Update bank details if changed\n5. Contact bank if issue persists\n\n**Impact:**\n• SIP installment skipped (not cancelled)\n• Can resume next month\n• 3 consecutive failures: SIP may pause\n• No penalty charged\n\n📞 **Need Help?** Call 1800-2222-65\n\n💡 **Pro Tip:** Keep extra buffer in account on SIP date!",
+      "suggestions": ["How to retry?", "Register mandate", "Change bank", "SIP missed"],
+      "urls": []
+    },
+    {
+      "intent": "statement",
+      "keywords": [
+        "statement", "account statement", "investment statement", "cas statement",
+        "consolidated statement", "portfolio statement", "statement kaise download kare",
+        "download statement", "view statement",
+        "स्टेटमेंट", "खाता विवरण", "निवेश विवरण",
+        "સ્ટેટમેન્ટ", "ખાતાનો વિવરણ", "રોકાણ વિવરણ",
+        "அறிக்கை", "கணக்கு அறிக்கை", "முதலீட்டு அறிக்கை",
+        "स्टेटमेंट", "खात्याचा तपशील", "गुंतवणूक तपशील",
+        "statement kaha se milega", "cas kya hai", "portfolio kaise dekhe",
+        "statement download", "cas password"
+      ],
+      "response": "📄 **Account Statement**\n\nDownload your investment statements anytime!\n\n**Types of Statements:**\n\n**1. CAS (Consolidated Account Statement)**\n• All mutual fund holdings\n• Across all platforms\n• Emailed monthly by CAMS/Karvy\n\n**2. Portfolio Statement**\n• InvestOnline holdings only\n• Current value & returns\n• Download anytime\n\n**3. Transaction Statement**\n• Purchase, redemption, switch history\n• Date-wise transactions\n• Filter by period\n\n**How to Download:**\n1. Login to InvestOnline\n2. Go to 'Reports' > 'Statements'\n3. Select type & period\n4. Download PDF\n\n💡 **CAS password:** Your PAN (all capitals) or DOB (DDMMYYYY)",
+      "suggestions": ["Capital gains report", "Tax statement", "Portfolio value", "Transaction history"],
+      "urls": []
+    },
+    {
+      "intent": "capital_gains",
+      "keywords": [
+        "capital gains", "capital gain statement", "tax statement", "gains report",
+        "profit loss statement", "capital gains kaise check kare", "tax report",
+        "short term capital gain", "long term capital gain", "stcg", "ltcg",
+        "कैपिटल गेन", "टैक्स स्टेटमेंट", "लाभ विवरण",
+        "કેપિટલ ગેઈન", "ટેક્સ સ્ટેટમેન્ટ", "લાભ રિપોર્ટ",
+        "மூலதன ஆதாயம்", "வரி அறிக்கை", "லாப அறிக்கை",
+        "भांडवली नफा", "कर अहवाल", "नफा तपशील",
+        "tax kitna lagega", "profit par tax", "capital gains tax calculator",
+        "stcg ltcg difference", "tax kaise bachaye"
+      ],
+      "response": "📊 **Capital Gains Statement**\n\nDownload tax-ready capital gains report for ITR filing!\n\n**What's Included:**\n• All redemptions/switches\n• Purchase & sell dates\n• Profit/Loss calculation\n• STCG vs LTCG breakup\n• Tax liability estimate\n\n**How to Download:**\n1. Login to InvestOnline\n2. Go to 'Tax Reports'\n3. Select Financial Year\n4. Download PDF\n\n**Tax Rates (as of FY 2024-25):**\n• **LTCG (Equity):** 12.5% above ₹1.25L\n• **STCG (Equity):** 20%\n• **LTCG (Debt):** As per slab\n• **STCG (Debt):** As per slab\n\n💡 **File ITR easily with our ready-to-use report!**",
+      "suggestions": ["Tax calculator", "How to save tax?", "ELSS funds", "Download report"],
+      "urls": []
     },
     {
       "intent": "sip",
-      "keywords": ["sip", "systematic investment plan", "monthly investment", "start sip"],
+      "keywords": [
+        "sip", "systematic investment plan", "monthly investment", "start sip",
+        "sip kaise shuru kare", "auto invest", "recurring investment", "sip meaning",
+        "एसआईपी", "मासिक निवेश", "एसआईपी शुरू करें",
+        "એસઆઈપી", "માસિક રોકાણ", "એસઆઈપી શરૂ કરો",
+        "எஸ்ஐபி", "மாதாந்திர முதலீடு", "எஸ்ஐபி தொடங்க",
+        "एसआयपी", "मासिक गुंतवणूक", "एसआयपी सुरू करा",
+        "sip kya hai", "syp", "sipp", "monthly invest", "sip benefits",
+        "sip se kitna milega", "sip calculator", "best sip amount"
+      ],
       "response": "💰 **SIP (Systematic Investment Plan)**\n\nInvest a fixed amount regularly (monthly/quarterly/weekly).\n\n**Benefits:**\n• Start with just ₹500\n• Rupee Cost Averaging\n• Power of compounding\n• Disciplined investing\n• Flexible (pause/stop anytime)\n\n**How it works:**\nAuto-debit from your bank on chosen date each month.\n\n**Example:**\n₹5,000/month in equity fund\n10 years @ 12% = ₹11.6L\nYour investment: ₹6L\nGains: ₹5.6L!\n\n💡 **Best strategy:** Start small, increase annually!",
       "suggestions": ["SIP Calculator", "Types of SIP", "Start SIP now", "Top SIP funds"],
       "urls": ["https://www.investonline.in/mutual-funds/systematic-investment-plan", "https://www.investonline.in/financial-calculators/sip-calculator"]
     },
     {
-      "intent": "nav",
-      "keywords": ["nav", "net asset value", "nav meaning", "nav price"],
-      "response": "📊 **NAV (Net Asset Value)**\n\nPer-unit price of a mutual fund scheme.\n\n**Formula:**\nNAV = (Total Assets - Total Liabilities) / Total Units\n\n**Example:**\nFund with ₹100 cr assets, ₹5 cr liabilities, 10 cr units\nNAV = (100-5)/10 = ₹9.50\n\n**Key Facts:**\n• Updated daily after market close\n• Your investment value = Units × NAV\n• Higher NAV ≠ Expensive fund\n• Focus on returns, not NAV value\n\n💡 Don't choose funds by NAV - a ₹500 NAV fund can give better returns than ₹10 NAV fund!",
-      "suggestions": ["Expense ratio", "How NAV is calculated", "Fund returns", "Compare funds"],
-      "urls": ["https://www.investonline.in/mutual-funds/top-performing-funds"]
+      "intent": "sip_modify",
+      "keywords": [
+        "modify sip", "change sip", "increase sip", "decrease sip", "sip amount change",
+        "sip badalna", "sip modify kaise kare", "update sip", "sip date change",
+        "एसआईपी बदलना", "एसआईपी अमाउंट बढ़ाना",
+        "એસઆઈપી બદલવું", "એસઆઈપી રકમ વધારવી",
+        "எஸ்ஐபி மாற்றம்", "எஸ்ஐபி தொகை அதிகரிக்க",
+        "एसआयपी बदलणे", "एसआयपी रक्कम वाढवणे",
+        "sip amount badhana", "sip date change karna", "sip modify process"
+      ],
+      "response": "✏️ **Modify SIP**\n\nChange SIP amount, date, or frequency anytime!\n\n**What You Can Modify:**\n• **Amount:** Increase/decrease\n• **Date:** Change debit date\n• **Frequency:** Monthly/quarterly\n• **Bank:** Change bank account\n\n**How to Modify:**\n1. Login to InvestOnline\n2. Go to 'My SIPs'\n3. Select SIP to modify\n4. Choose modification type\n5. Submit request\n\n**Processing Time:**\n• Takes 1 billing cycle\n• New settings from next month\n• No charges for modification\n\n💡 **Pro Tip:** Increase SIP by 10-15% yearly with salary hikes!",
+      "suggestions": ["Step-up SIP", "Pause SIP", "Stop SIP", "SIP Calculator"],
+      "urls": []
     },
     {
-      "intent": "expense_ratio",
-      "keywords": ["expense ratio", "fund charges", "management fee", "ter"],
-      "response": "💰 **Expense Ratio**\n\nAnnual fee for managing your mutual fund (as % of AUM).\n\n**Includes:**\n• Fund manager fees\n• Administrative costs\n• Marketing expenses\n• Transaction costs\n\n**Impact:**\nFund A: 12% return, 1% expense = **11% to you**\nFund B: 12% return, 2% expense = **10% to you**\n\n**SEBI Limits:**\n• Equity: Max 2.25%\n• Debt: Max 2%\n• Index: Usually 0.1-0.5%\n\n💡 Lower expense ratio = More money in your pocket!",
-      "suggestions": ["NAV", "Index funds", "Compare expense ratios", "Low-cost funds"],
-      "urls": ["https://www.investonline.in/mutual-funds/compare-schemes"]
+      "intent": "sip_pause",
+      "keywords": [
+        "pause sip", "stop sip", "sip pause kaise kare", "hold sip", "sip cancel",
+        "temporarily stop sip", "sip skip", "sip hold karna",
+        "एसआईपी रोकना", "एसआईपी पॉज़ करना",
+        "એસઆઈપી બંધ કરવું", "એસઆઈપી પોઝ કરવું",
+        "எஸ்ஐபி நிறுத்த", "எஸ்ஐபி இடைநிறுத்த",
+        "एसआयपी थांबवणे", "एसआयपी पॉज करणे",
+        "sip band karna", "sip temporarily rokna", "sip cancel kaise kare"
+      ],
+      "response": "⏸️ **Pause/Stop SIP**\n\nTemporarily pause or permanently stop your SIP.\n\n**Pause SIP (Temporary):**\n• Hold SIP for 1-3 months\n• Auto-resumes after pause period\n• Useful during: Job change, emergency\n• No cancellation, just hold\n\n**Stop SIP (Permanent):**\n• Completely cancel SIP\n• Can restart anytime\n• Existing units remain invested\n\n**How to Pause/Stop:**\n1. Login to InvestOnline\n2. Go to 'My SIPs'\n3. Select SIP\n4. Choose 'Pause' or 'Stop'\n5. Confirm\n\n**Processing:** Takes 1 billing cycle\n\n💡 **Better than stopping:** Consider reducing amount instead!",
+      "suggestions": ["Reduce SIP amount", "Resume SIP", "Emergency fund", "Why continue SIP?"],
+      "urls": []
     },
     {
-      "intent": "exit_load",
-      "keywords": ["exit load", "redemption charges", "early exit", "exit fee"],
-      "response": "🚪 **Exit Load**\n\nFee charged when redeeming units before specified period.\n\n**Typical Structure:**\n• **Equity:** 1% if within 1 year\n• **Debt:** 0.25-1% if within 3-6 months\n• **ELSS:** 3-year lock-in (can't exit)\n\n**Example:**\nRedeem ₹1,00,000 within 1 year\nExit load: 1%\nYou get: ₹99,000\n\n**Purpose:**\n• Discourages short-term trading\n• Protects long-term investors\n\n💡 Plan your holding period before investing!",
-      "suggestions": ["Lock-in period", "ELSS", "When to redeem", "Redemption process"],
-      "urls": ["https://www.investonline.in/mutual-funds/funds-explorer"]
+      "intent": "step_up_sip",
+      "keywords": [
+        "step up sip", "top up sip", "increase sip annually", "stepup sip kya hai",
+        "sip increment", "automatic sip increase", "progressive sip",
+        "स्टेप अप एसआईपी", "एसआईपी बढ़ाना",
+        "સ્ટેપ અપ એસઆઈપી", "એસઆઈપી વધારવું",
+        "ஸ்டெப் அப் எஸ்ஐபி", "எஸ்ஐபி அதிகரிப்பு",
+        "स्टेप अप एसआयपी", "एसआयपी वाढवणे",
+        "step up kya hai", "sip automatic increase", "top up sip meaning"
+      ],
+      "response": "📈 **Step-Up SIP**\n\nAuto-increase your SIP amount every year!\n\n**How it Works:**\n• Start: ₹5,000/month\n• Annual increase: 10%\n• Year 2: ₹5,500/month\n• Year 3: ₹6,050/month\n\n**Benefits:**\n• Matches salary increments\n• Massive wealth creation\n• Disciplined increase\n• No manual intervention\n\n**Power of Step-Up:**\nRegular SIP vs Step-Up (10 years):\n• Regular ₹5,000: ₹11.6L\n• Step-Up 10%: ₹15.8L\n• **Extra gain: ₹4.2L!**\n\n💡 Set step-up % = your expected salary hike %",
+      "suggestions": ["SIP Calculator", "Start Step-up SIP", "How much to invest?", "Goal planning"],
+      "urls": ["https://www.investonline.in/mutual-funds/top-up-sip"]
+    },
+    {
+      "intent": "swp",
+      "keywords": [
+        "swp", "systematic withdrawal plan", "monthly income", "pension from mutual fund",
+        "swp kya hai", "withdraw monthly", "retirement income", "regular withdrawal",
+        "एसडब्ल्यूपी", "मासिक आय", "पेंशन",
+        "એસડબ્લ્યુપી", "માસિક આવક", "પેન્શન",
+        "எஸ்டபிள்யூபி", "மாதாந்திர வருமானம்", "ஓய்வூதியம்",
+        "एसडब्ल्यूपी", "मासिक उत्पन्न", "निवृत्तीवेतन",
+        "monthly income chahiye", "retirement ke liye", "regular payout",
+        "swp tax", "swp calculator"
+      ],
+      "response": "💸 **SWP (Systematic Withdrawal Plan)**\n\nWithdraw fixed amount regularly from your mutual fund!\n\n**Perfect For:**\n• Retirement income\n• Monthly expenses\n• Regular cash flow\n• Children's education\n\n**How it Works:**\n• Invest lumpsum in fund\n• Set monthly withdrawal (e.g., ₹25,000)\n• Amount auto-credited to bank\n• Remaining stays invested\n\n**Tax Benefit:**\nOnly gains taxed, not principal!\n\n**Example:**\nInvest ₹50L, withdraw ₹25,000/month\n• Monthly income: ₹25,000\n• Tax-efficient vs FD\n• Capital keeps growing\n\n💡 **Ideal for retirees:** Better than FD interest!",
+      "suggestions": ["SWP Calculator", "Best funds for SWP", "Retirement planning", "Tax on SWP"],
+      "urls": []
+    },
+    {
+      "intent": "stp",
+      "keywords": [
+        "stp", "systematic transfer plan", "stp kya hai", "transfer plan",
+        "debt to equity transfer", "auto transfer", "phased transfer",
+        "एसटीपी", "ट्रांसफर प्लान", "डेट से इक्विटी",
+        "એસટીપી", "ટ્રાન્સફર પ્લાન", "ડેટથી ઈક્વિટી",
+        "எஸ்டிபி", "பரிமாற்ற திட்டம்", "கடனிலிருந்து பங்கு",
+        "एसटीपी", "ट्रान्सफर योजना", "कर्जातून इक्विटी",
+        "stp meaning", "debt se equity me transfer", "stp process"
+      ],
+      "response": "🔄 **STP (Systematic Transfer Plan)**\n\nGradually transfer money from one fund to another!\n\n**How it Works:**\n• Park lumpsum in debt fund\n• Transfer fixed amount monthly to equity\n• Rupee cost averaging benefit\n• Safer than lumpsum equity investment\n\n**Example:**\n₹10L in debt fund\nTransfer ₹50,000/month to equity (20 months)\n\n**Benefits:**\n• Reduce timing risk\n• Earn returns on waiting amount\n• Systematic equity entry\n• Peace of mind\n\n**Types:**\n• **Fixed STP:** Fixed amount\n• **Capital STP:** Only gains transferred\n• **Flexi STP:** Market-linked amount\n\n💡 **Got bonus/lumpsum?** Use STP instead of direct equity investment!",
+      "suggestions": ["How to start STP?", "STP vs Lumpsum", "Best time for STP", "STP Calculator"],
+      "urls": []
+    },
+    {
+      "intent": "dividend",
+      "keywords": [
+        "dividend", "dividend payout", "dividend option", "dividend kab milega",
+        "dividend vs growth", "dividend reinvestment", "dividend history",
+        "डिविडेंड", "लाभांश", "डिविडेंड कब मिलेगा",
+        "ડિવિડન્ડ", "લાભાંશ", "ડિવિડન્ડ ક્યારે મળશે",
+        "ஈவுத்தொகை", "ஈவு விருப்பம்", "ஈவு எப்போது",
+        "डिव्हिडंड", "लाभांश", "डिव्हिडंड कधी मिळेल",
+        "dividend milta hai kya", "dividend ya growth", "dividend tax"
+      ],
+      "response": "💵 **Dividend Option**\n\nReceive periodic payouts from mutual fund profits.\n\n**Dividend vs Growth:**\n\n**Dividend Option:**\n• Fund declares dividend periodically\n• Payout credited to bank\n• NAV reduces by dividend amount\n• Tax: As per income slab\n• Suitable for: Regular income needs\n\n**Growth Option:**\n• No payouts, reinvested\n• NAV keeps growing\n• Tax: Only on redemption\n• Suitable for: Long-term wealth\n\n**Important:**\n• Dividend NOT guaranteed\n• Fund decides amount & timing\n• TDS applicable (if applicable)\n\n**Tax (from April 2020):**\nDividend added to income, taxed as per slab\n\n💡 **For wealth creation:** Choose Growth, not Dividend!",
+      "suggestions": ["Growth vs Dividend", "SWP alternative", "Dividend tax", "Best option?"],
+      "urls": []
+    },
+    {
+      "intent": "folio",
+      "keywords": [
+        "folio", "folio number", "folio consolidation", "multiple folios",
+        "folio kya hai", "folio merge", "single folio", "folio meaning",
+        "फोलियो", "फोलियो नंबर", "फोलियो क्या है",
+        "ફોલિયો", "ફોલિયો નંબર", "ફોલિયો શું છે",
+        "ஃபோலியோ", "ஃபோலியோ எண்", "ஃபோலியோ என்றால் என்ன",
+        "फोलिओ", "फोलिओ नंबर", "फोलिओ म्हणजे काय",
+        "folio kitne hai", "folio merge kaise kare", "ek folio banana"
+      ],
+      "response": "📁 **Folio Number**\n\nYour unique account number with each AMC (fund house).\n\n**What is Folio?**\nLike a bank account number for your mutual fund investments with that AMC.\n\n**Multiple Folios:**\nYou may have multiple folios with same AMC if:\n• Invested through different platforms\n• Different investment modes\n• Different nominees\n\n**Folio Consolidation:**\nMerge multiple folios into one for:\n• Easy tracking\n• Single statement\n• Simplified management\n\n**How to Consolidate:**\n1. Contact InvestOnline support\n2. Provide folio numbers\n3. Submit consolidation request\n4. AMC will merge (10-15 days)\n\n📞 **Support:** 1800-2222-65",
+      "suggestions": ["View my folios", "Consolidate folios", "Folio statement", "Contact support"],
+      "urls": []
+    },
+    {
+      "intent": "nfo",
+      "keywords": [
+        "nfo", "new fund offer", "nfo kya hai", "new scheme", "nfo invest",
+        "new fund launch", "should i invest in nfo",
+        "एनएफओ", "नया फंड", "एनएफओ में निवेश",
+        "એનએફઓ", "નવું ફંડ", "એનએફઓમાં રોકાણ",
+        "என்எஃப்ஓ", "புதிய நிதி", "என்எஃப்ஓவில் முதலீடு",
+        "एनएफओ", "नवीन फंड", "एनएफओमध्ये गुंतवणूक",
+        "nfo me invest kare ya nahi", "nfo vs existing fund", "nfo benefits"
+      ],
+      "response": "🆕 **NFO (New Fund Offer)**\n\nNew mutual fund scheme launched by AMC.\n\n**What is NFO?**\n• New fund's initial offer period\n• Units at ₹10 (standard)\n• Limited subscription period (15-30 days)\n• Fund starts after NFO closes\n\n**Should You Invest?**\n\n**Pros:**\n• Fresh start, no baggage\n• Lower NAV (₹10)\n• New investment theme\n\n**Cons:**\n• No track record\n• No performance history\n• Lock-in period (usually)\n• May take time to build portfolio\n\n**Better Alternative:**\nInvest in proven funds with 3-5 year track record!\n\n💡 **Low NAV doesn't mean cheap!** ₹10 NFO vs ₹500 fund - returns matter, not NAV!",
+      "suggestions": ["Top performing funds", "How to choose funds?", "NAV meaning", "Fund performance"],
+      "urls": []
+    },
+    {
+      "intent": "bank_change",
+      "keywords": [
+        "change bank", "update bank", "bank account change", "bank details update",
+        "bank badalna", "switch bank account", "new bank account",
+        "बैंक बदलना", "बैंक अपडेट", "बैंक खाता बदलना",
+        "બેંક બદલવું", "બેંક અપડેટ", "બેંક ખાતું બદલવું",
+        "வங்கி மாற்றம்", "வங்கி புதுப்பித்தல்", "வங்கி கணக்கு மாற்றம்",
+        "बँक बदलणे", "बँक अपडेट", "बँक खाते बदलणे",
+        "bank kaise badle", "bank update karna", "naya bank add karna"
+      ],
+      "response": "🏦 **Change Bank Account**\n\nUpdate your registered bank account details.\n\n**How to Change:**\n1. Login to InvestOnline\n2. Go to 'Profile' > 'Bank Details'\n3. Add new bank account\n4. Upload cancelled cheque\n5. Verify via penny drop\n6. Submit for approval\n\n**Verification Time:** 2-3 working days\n\n**Important:**\n• You can have multiple banks\n• Set one as primary\n• SIP mandate needs re-registration\n• Redemption to primary bank only\n\n**Documents Needed:**\n• Cancelled cheque\n• Bank statement (first page)\n• Passbook copy\n\n💡 **Keep old bank active until new bank is verified!**",
+      "suggestions": ["Register mandate", "Primary bank", "Add secondary bank", "Verification pending"],
+      "urls": []
     },
     {
       "intent": "contact",
-      "keywords": ["contact", "support", "help", "customer care", "phone number", "email"],
-      "response": "📞 **Contact InvestOnline Support**\n\nWe're here to help you!\n\n**Customer Support:**\n📞 **1800-2222-65** (Toll-Free)\n📞 **+91-22-4071-3333** (Direct)\n📧 **wealth@investonline.in**\n💬 **WhatsApp: +91-9820119909**\n\n**Office Hours:**\nMon-Fri: 9:30 AM - 6:30 PM\nSat: 9:30 AM - 2:00 PM\n\n**For Quick Help:**\n• Investment queries\n• Account issues\n• Transaction support\n• Technical assistance\n• Expert advice\n\n💡 Average response time: < 2 hours!",
+      "keywords": [
+        "contact", "support", "help", "customer care", "phone number", "email",
+        "helpline", "contact kaise kare", "support number", "customer support",
+        "संपर्क", "सहायता", "फोन नंबर", "ईमेल",
+        "સંપર્ક", "મદદ", "ફોન નંબર", "ઈમેલ",
+        "தொடர்பு", "உதவி", "தொலைபேசி எண்", "மின்னஞ்சல்",
+        "संपर्क", "मदत", "फोन नंबर", "ईमेल",
+        "help chahiye", "kaise contact kare", "phone kya hai",
+        "whatsapp number", "email address"
+      ],
+      "response": "📞 **Contact InvestOnline Support**\n\nWe're here to help you!\n\n**Customer Support:**\n📞 **1800-2222-65** (Toll-Free)\n📞 **+91-22-4071-3333** (Direct)\n📧 **wealth@investonline.in**\n💬 **WhatsApp: +91-77770-24447**\n\n**Office Hours:**\nMon-Fri: 9:30 AM - 6:30 PM\nSat: 9:30 AM - 2:00 PM\n\n**For Quick Help:**\n• Investment queries\n• Account issues\n• Transaction support\n• Technical assistance\n• Expert advice\n\n💡 Average response time: < 2 hours!",
       "suggestions": ["Registration help", "Transaction issue", "Account query", "Investment advice"],
       "urls": ["https://www.investonline.in/contact-us"]
     }
@@ -173,11 +372,11 @@
     "support_phone": "1800-2222-65",
     "support_phone_direct": "+91-22-4071-3333",
     "support_email": "wealth@investonline.in",
-    "support_whatsapp": "+91-9820119909"
+    "support_whatsapp": "+91-77770-24447"
   },
   "global_support": {
-    "message": "For personalized investment advice and support, contact our expert team:\n📞 1800-2222-65 (Toll-Free)\n📧 wealth@investonline.in",
-    "whatsapp": "+91-9820119909"
+    "message": "For personalized investment advice and support, contact our expert team:\n📞 1800-2222-65 (Toll-Free)\n💬 WhatsApp: +91-77770-24447\n📧 wealth@investonline.in",
+    "whatsapp": "+91-77770-24447"
   },
   "fallback_message": "I specialize in helping with InvestOnline mutual fund investments, SIPs, KYC, account opening, and all investment-related queries. 😊\n\nHow can I assist you with your investments today?"
 }
