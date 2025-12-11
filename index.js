@@ -1,7 +1,7 @@
 // ====================================
 // InvestOnline Buddy - Main Server
 // Pure InvestOnline Search Version
-// No AI fallback, No internet knowledge
+// FIXED: Sticky header, Language reset, No repetition
 // ====================================
 
 require("dotenv").config();
@@ -287,8 +287,8 @@ app.post("/lead/capture", async (req, res) => {
 });
 
 // ====================================
-// Widget Endpoint (with Multi-language & Voice)
-// COMPLETE WITH ALL FIXES
+// Widget Endpoint - COMPLETE FIX
+// Fixed: Sticky header, Language reset, No duplication
 // ====================================
 
 app.get("/widget", (req, res) => {
@@ -301,19 +301,29 @@ app.get("/widget", (req, res) => {
   <title>InvestOnline Buddy</title>
   <style>
     * { margin: 0; padding: 0; box-sizing: border-box; }
-    body {
+    
+    html, body {
+      height: 100%;
+      overflow: hidden;
       font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-      height: 100vh;
+    }
+    
+    body {
       display: flex;
       flex-direction: column;
       background: #f8f9fa;
     }
+    
     #chat-container {
-      flex: 1;
       display: flex;
       flex-direction: column;
+      height: 100vh;
+      width: 100%;
       background: white;
+      position: relative;
     }
+    
+    /* FIXED: Sticky header that never scrolls */
     #chat-header {
       background: linear-gradient(135deg, #FF6B35 0%, #F7931E 100%);
       color: white;
@@ -322,7 +332,14 @@ app.get("/widget", (req, res) => {
       align-items: center;
       gap: 12px;
       box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      z-index: 1000;
+      min-height: 68px;
     }
+    
     #chat-header-logo {
       width: 36px;
       height: 36px;
@@ -334,10 +351,13 @@ app.get("/widget", (req, res) => {
       font-weight: bold;
       color: #FF6B35;
       font-size: 16px;
+      flex-shrink: 0;
     }
+    
     #chat-header-text { flex: 1; }
     #chat-header-title { font-weight: 600; font-size: 16px; }
     #chat-header-subtitle { font-size: 11px; opacity: 0.9; }
+    
     #language-selector {
       background: rgba(255, 255, 255, 0.2);
       border: 1px solid rgba(255, 255, 255, 0.4);
@@ -346,33 +366,44 @@ app.get("/widget", (req, res) => {
       border-radius: 6px;
       font-size: 12px;
       cursor: pointer;
+      flex-shrink: 0;
     }
+    
+    /* FIXED: Messages area with proper spacing for fixed header */
     #chat-messages {
       flex: 1;
       overflow-y: auto;
+      overflow-x: hidden;
       padding: 16px;
       display: flex;
       flex-direction: column;
       gap: 10px;
       background: #f8f9fa;
+      margin-top: 68px;
+      margin-bottom: 80px;
     }
+    
     .message {
       max-width: 80%;
       padding: 10px 14px;
       border-radius: 12px;
       line-height: 1.5;
       animation: slideIn 0.3s ease-out;
+      word-wrap: break-word;
     }
+    
     @keyframes slideIn {
       from { opacity: 0; transform: translateY(10px); }
       to { opacity: 1; transform: translateY(0); }
     }
+    
     .message.user {
       background: #FF6B35;
       color: white;
       align-self: flex-end;
       border-bottom-right-radius: 4px;
     }
+    
     .message.bot {
       background: white;
       color: #2c3e50;
@@ -381,6 +412,7 @@ app.get("/widget", (req, res) => {
       border-bottom-left-radius: 4px;
       box-shadow: 0 1px 3px rgba(0,0,0,0.05);
     }
+    
     .message.bot p { margin: 0 0 8px 0; line-height: 1.6; }
     .message.bot p:last-child { margin-bottom: 0; }
     .message.bot ul { margin: 8px 0; padding-left: 20px; list-style: disc; }
@@ -408,6 +440,7 @@ app.get("/widget", (req, res) => {
       color: #F7931E;
       border-bottom-color: #F7931E;
     }
+    
     .quick-replies {
       display: flex;
       flex-wrap: wrap;
@@ -415,6 +448,7 @@ app.get("/widget", (req, res) => {
       padding: 8px 0;
       max-width: 100%;
     }
+    
     .quick-reply-btn {
       padding: 7px 12px;
       background: white;
@@ -426,19 +460,28 @@ app.get("/widget", (req, res) => {
       cursor: pointer;
       transition: all 0.2s;
     }
+    
     .quick-reply-btn:hover {
       background: #FF6B35;
       color: white;
       transform: translateY(-2px);
       box-shadow: 0 2px 8px rgba(255, 107, 53, 0.3);
     }
+    
+    /* FIXED: Input container at bottom */
     #chat-input-container {
+      position: fixed;
+      bottom: 0;
+      left: 0;
+      right: 0;
       padding: 16px;
       background: white;
       border-top: 1px solid #e0e0e0;
       display: flex;
       gap: 8px;
+      z-index: 999;
     }
+    
     #chat-input {
       flex: 1;
       padding: 12px 16px;
@@ -448,7 +491,9 @@ app.get("/widget", (req, res) => {
       outline: none;
       transition: border-color 0.3s;
     }
+    
     #chat-input:focus { border-color: #FF6B35; }
+    
     #voice-button {
       padding: 12px 16px;
       background: white;
@@ -458,25 +503,31 @@ app.get("/widget", (req, res) => {
       cursor: pointer;
       transition: all 0.2s;
       min-width: 48px;
+      flex-shrink: 0;
     }
+    
     #voice-button:hover:not(:disabled) {
       background: #FF6B35;
       color: white;
     }
+    
     #voice-button:disabled {
       opacity: 0.5;
       cursor: not-allowed;
     }
+    
     #voice-button.recording {
       background: #e74c3c;
       border-color: #e74c3c;
       color: white;
       animation: pulse 1s infinite;
     }
+    
     @keyframes pulse {
       0%, 100% { transform: scale(1); }
       50% { transform: scale(1.1); }
     }
+    
     #send-button {
       padding: 12px 24px;
       background: linear-gradient(135deg, #FF6B35 0%, #F7931E 100%);
@@ -486,17 +537,22 @@ app.get("/widget", (req, res) => {
       font-weight: 600;
       cursor: pointer;
       transition: all 0.2s;
+      flex-shrink: 0;
     }
+    
     #send-button:hover:not(:disabled) {
       transform: scale(1.05);
       box-shadow: 0 4px 12px rgba(255, 107, 53, 0.3);
     }
+    
     #send-button:disabled { opacity: 0.5; cursor: not-allowed; }
+    
     .typing-indicator {
       display: flex;
       gap: 4px;
       padding: 12px 16px;
     }
+    
     .typing-indicator span {
       width: 8px;
       height: 8px;
@@ -504,12 +560,15 @@ app.get("/widget", (req, res) => {
       background: #FF6B35;
       animation: typing 1.4s infinite;
     }
+    
     .typing-indicator span:nth-child(2) { animation-delay: 0.2s; }
     .typing-indicator span:nth-child(3) { animation-delay: 0.4s; }
+    
     @keyframes typing {
       0%, 60%, 100% { transform: translateY(0); opacity: 0.5; }
       30% { transform: translateY(-10px); opacity: 1; }
     }
+    
     .lead-form {
       background: white;
       padding: 16px;
@@ -518,11 +577,13 @@ app.get("/widget", (req, res) => {
       max-width: 90%;
       align-self: flex-start;
     }
+    
     .lead-form h4 {
       color: #FF6B35;
       margin-bottom: 12px;
       font-size: 16px;
     }
+    
     .lead-form input, .lead-form textarea {
       width: 100%;
       padding: 10px;
@@ -532,10 +593,12 @@ app.get("/widget", (req, res) => {
       font-size: 14px;
       font-family: inherit;
     }
+    
     .lead-form input:focus, .lead-form textarea:focus {
       outline: none;
       border-color: #FF6B35;
     }
+    
     .lead-form button {
       width: 100%;
       padding: 12px;
@@ -547,6 +610,7 @@ app.get("/widget", (req, res) => {
       cursor: pointer;
       margin-top: 8px;
     }
+    
     .lead-form button:hover {
       background: #F7931E;
     }
@@ -569,10 +633,7 @@ app.get("/widget", (req, res) => {
       </select>
     </div>
     <div id="chat-messages">
-      <div class="message bot">
-        <p>Hi! I'm InvestOnline Buddy. 👋</p>
-        <p>I can help you with information about mutual funds, SIPs, account opening, and more. How can I assist you today?</p>
-      </div>
+      <!-- Initial welcome message will be inserted here -->
     </div>
     <div id="chat-input-container">
       <input type="text" id="chat-input" placeholder="Type your message..." autocomplete="off" />
@@ -593,6 +654,15 @@ app.get("/widget", (req, res) => {
     var sendButton = document.getElementById('send-button');
     var voiceButton = document.getElementById('voice-button');
     var languageSelector = document.getElementById('language-selector');
+
+    // Language welcome messages
+    var welcomeMessages = {
+      'en': '<p>Hi! I\'m InvestOnline Buddy. 👋</p><p>I can help you with information about mutual funds, SIPs, account opening, and more. How can I assist you today?</p>',
+      'hi': '<p>नमस्ते! मैं InvestOnline Buddy हूं। 👋</p><p>मैं म्यूचुअल फंड, SIP, खाता खोलने और अधिक जानकारी में आपकी मदद कर सकता हूं। आज मैं आपकी कैसे सहायता कर सकता हूं?</p>',
+      'mr': '<p>नमस्कार! मी InvestOnline Buddy आहे। 👋</p><p>मी तुम्हाला म्युच्युअल फंड, SIP, खाते उघडणे आणि अधिक माहितीमध्ये मदत करू शकतो। आज मी तुम्हाला कशी मदत करू शकतो?</p>',
+      'gu': '<p>નમસ્તે! હું InvestOnline Buddy છું। 👋</p><p>હું તમને મ્યુચ્યુઅલ ફંડ, SIP, ખાતું ખોલવા અને વધુ વિશે માહિતી આપવામાં મદદ કરી શકું છું. આજે હું તમને કેવી રીતે મદદ કરી શકું?</p>',
+      'ta': '<p>வணக்கம்! நான் InvestOnline Buddy. 👋</p><p>நான் உங்களுக்கு மியூச்சுவல் ஃபண்ட்ஸ், SIP, கணக்கு திறப்பு மற்றும் பல குறித்த தகவல்களில் உதவ முடியும். இன்று நான் உங்களுக்கு எப்படி உதவ முடியும்?</p>'
+    };
 
     // Cookie utilities
     function setCookie(name, value, days) {
@@ -616,19 +686,17 @@ app.get("/widget", (req, res) => {
       return null;
     }
 
-    // FIXED: Initialize Web Speech API with better error handling
+    // Voice input initialization
     function initVoiceInput() {
-      // Check HTTPS
       if (window.location.protocol !== 'https:') {
         console.warn('⚠️ Voice input requires HTTPS');
         voiceButton.style.display = 'none';
         return;
       }
 
-      // Check browser support
       if (!('webkitSpeechRecognition' in window) && !('SpeechRecognition' in window)) {
-        console.warn('⚠️ Voice input not supported in this browser');
-        voiceButton.title = 'Voice input not supported in this browser';
+        console.warn('⚠️ Voice input not supported');
+        voiceButton.title = 'Voice input not supported';
         voiceButton.style.opacity = '0.5';
         voiceButton.disabled = true;
         return;
@@ -646,27 +714,21 @@ app.get("/widget", (req, res) => {
         voiceButton.classList.remove('recording');
         voiceButton.textContent = '🎤';
         
-        // Auto-send after voice input
         setTimeout(function() {
           if (chatInput.value) sendMessage();
         }, 500);
       };
 
       recognition.onerror = function(event) {
-        console.error('Voice recognition error:', event.error);
+        console.error('Voice error:', event.error);
         isRecording = false;
         voiceButton.classList.remove('recording');
         voiceButton.textContent = '🎤';
         
-        // User-friendly error messages
         if (event.error === 'not-allowed' || event.error === 'permission-denied') {
-          alert('Microphone access denied. Please enable microphone permissions in your browser settings.');
+          alert('Microphone access denied. Please enable in browser settings.');
         } else if (event.error === 'no-speech') {
           alert('No speech detected. Please try again.');
-        } else if (event.error === 'network') {
-          alert('Network error. Please check your internet connection.');
-        } else {
-          alert('Voice input error: ' + event.error);
         }
       };
 
@@ -679,18 +741,14 @@ app.get("/widget", (req, res) => {
       console.log('✅ Voice input initialized');
     }
 
-    // FIXED: Toggle voice input with better error handling
     function toggleVoiceInput() {
       if (!recognition) {
-        alert('Voice input is not available in this browser. Please use Chrome, Edge, or Safari on desktop.');
+        alert('Voice input not available in this browser.');
         return;
       }
 
       if (isRecording) {
         recognition.stop();
-        isRecording = false;
-        voiceButton.classList.remove('recording');
-        voiceButton.textContent = '🎤';
       } else {
         try {
           recognition.lang = currentLanguage === 'en' ? 'en-US' : 
@@ -703,13 +761,13 @@ app.get("/widget", (req, res) => {
           voiceButton.classList.add('recording');
           voiceButton.textContent = '⏺';
         } catch (error) {
-          console.error('Failed to start voice recognition:', error);
-          alert('Could not start voice input. Please try again.');
+          console.error('Voice start error:', error);
+          alert('Could not start voice input.');
         }
       }
     }
 
-    // FIXED: Enhanced markdown parsing
+    // Enhanced markdown parsing
     function addMessage(text, isUser) {
       var messageDiv = document.createElement('div');
       messageDiv.className = 'message ' + (isUser ? 'user' : 'bot');
@@ -717,36 +775,22 @@ app.get("/widget", (req, res) => {
       if (isUser) {
         messageDiv.textContent = text;
       } else {
-        // Enhanced markdown parsing
         var html = text
-          // Convert markdown links [text](url) to HTML
-          .replace(/\[([^\]]+)\]\(([^)]+)\)/g, '<a href="$2" target="_blank" rel="noopener noreferrer">$1</a>')
-          // Convert **bold text** to <strong>
+          .replace(/\[([^\]]+)\]\(([^)]+)\)/g, '<a href="$2" target="_blank" rel="noopener">$1</a>')
           .replace(/\*\*([^*]+)\*\*/g, '<strong>$1</strong>')
-          // Convert bullet points
           .replace(/^• (.+)$/gm, '<li>$1</li>')
-          // Split into lines and process
           .split('\n')
           .filter(function(line) { return line.trim(); })
           .map(function(line) {
             var trimmed = line.trim();
-            
-            // Bullet list item
-            if (trimmed.startsWith('<li>')) {
-              return trimmed;
-            }
-            
-            // Heading (ends with :)
+            if (trimmed.startsWith('<li>')) return trimmed;
             if (/^(.+):$/.test(trimmed) && !trimmed.includes('<a')) {
               return '<h4>' + trimmed.replace(/:$/, '') + '</h4>';
             }
-            
-            // Regular paragraph
             return '<p>' + trimmed + '</p>';
           })
           .join('');
         
-        // Wrap list items in <ul>
         html = html.replace(/(<li>.*?<\/li>)+/g, function(match) {
           return '<ul>' + match + '</ul>';
         });
@@ -825,16 +869,19 @@ app.get("/widget", (req, res) => {
           addMessage('✅ ' + data.message + '\n\nMeanwhile, feel free to continue asking questions!', false);
           document.querySelector('.lead-form').remove();
         } else {
-          alert(data.message || 'Failed to submit. Please try again.');
+          alert(data.message || 'Failed to submit.');
         }
       })
       .catch(function(err) {
-        console.error('Lead submission error:', err);
+        console.error('Lead error:', err);
         alert('Network error. Please try again.');
       });
     }
 
     function showTyping() {
+      var existing = document.getElementById('typing');
+      if (existing) return;  // FIXED: Prevent duplicate typing indicators
+      
       var div = document.createElement('div');
       div.className = 'message bot typing-indicator';
       div.innerHTML = '<span></span><span></span><span></span>';
@@ -848,6 +895,37 @@ app.get("/widget", (req, res) => {
       if (typing) typing.remove();
     }
 
+    // FIXED: Clear chat completely
+    function clearChat() {
+      chatMessages.innerHTML = '';
+      var qr = document.getElementById('quick-replies');
+      if (qr) qr.remove();
+      console.log('✅ Chat cleared');
+    }
+
+    // FIXED: Show welcome message in selected language
+    function showWelcomeMessage(lang) {
+      clearChat();
+      
+      var welcomeDiv = document.createElement('div');
+      welcomeDiv.className = 'message bot';
+      welcomeDiv.innerHTML = welcomeMessages[lang] || welcomeMessages['en'];
+      chatMessages.appendChild(welcomeDiv);
+      
+      setTimeout(function() {
+        addQuickReplies([
+          '🎯 How to register?',
+          '📝 What is KYC?',
+          '💰 How to start SIP?',
+          '📊 SIP Calculator',
+          '🏆 Top Mutual Funds',
+          '📞 Contact Support'
+        ]);
+      }, 500);
+      
+      console.log('✅ Welcome message shown in:', lang);
+    }
+
     function initSession() {
       var savedSessionId = getCookie('io_session_id');
       var savedToken = getCookie('io_session_token');
@@ -855,28 +933,18 @@ app.get("/widget", (req, res) => {
       if (savedSessionId && savedToken) {
         sessionId = savedSessionId;
         sessionToken = savedToken;
-        console.log('✅ Session restored from cookies');
-        
-        setTimeout(function() {
-          addQuickReplies([
-            '🎯 How to register?',
-            '📝 What is KYC?',
-            '💰 How to start SIP?',
-            '📊 SIP Calculator',
-            '🏆 Top Mutual Funds',
-            '📞 Contact Support'
-          ]);
-        }, 800);
+        console.log('✅ Session restored');
+        showWelcomeMessage(currentLanguage);
         return;
       }
 
-      console.log('📡 Creating new session...');
+      console.log('📡 Creating session...');
       fetch(API_URL + '/session/start', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' }
       })
       .then(function(res) {
-        if (!res.ok) throw new Error('Session failed: ' + res.status);
+        if (!res.ok) throw new Error('Session failed');
         return res.json();
       })
       .then(function(data) {
@@ -886,22 +954,12 @@ app.get("/widget", (req, res) => {
         setCookie('io_session_id', sessionId, 7);
         setCookie('io_session_token', sessionToken, 7);
         
-        console.log('✅ Session created:', sessionId);
-        
-        setTimeout(function() {
-          addQuickReplies([
-            '🎯 How to register?',
-            '📝 What is KYC?',
-            '💰 How to start SIP?',
-            '📊 SIP Calculator',
-            '🏆 Top Mutual Funds',
-            '📞 Contact Support'
-          ]);
-        }, 800);
+        console.log('✅ Session created');
+        showWelcomeMessage(currentLanguage);
       })
       .catch(function(err) {
         console.error('❌ Session error:', err);
-        addMessage('Connection error. Please refresh the page.', false);
+        addMessage('Connection error. Please refresh.', false);
       });
     }
 
@@ -910,7 +968,7 @@ app.get("/widget", (req, res) => {
       if (!msg) return;
 
       if (!sessionId) {
-        addMessage('Connecting... Please wait.', false);
+        addMessage('Connecting...', false);
         initSession();
         setTimeout(function() {
           if (sessionId && msg) {
@@ -943,7 +1001,7 @@ app.get("/widget", (req, res) => {
         })
       })
       .then(function(res) {
-        if (!res.ok) throw new Error('Chat failed: ' + res.status);
+        if (!res.ok) throw new Error('Chat failed');
         return res.json();
       })
       .then(function(data) {
@@ -960,19 +1018,15 @@ app.get("/widget", (req, res) => {
           
           if (data.suggestions && data.suggestions.length > 0) {
             addQuickReplies(data.suggestions);
-          } else {
-            addQuickReplies(['How to register?', 'Start SIP', 'Contact us']);
           }
         } else {
           addMessage('Sorry, please try again.', false);
-          addQuickReplies(['How to register?', 'Contact support']);
         }
       })
       .catch(function(err) {
         console.error('❌ Chat error:', err);
         hideTyping();
         addMessage('Error. Please try again.', false);
-        addQuickReplies(['Contact support', 'Try again']);
       })
       .finally(function() {
         chatInput.disabled = false;
@@ -987,15 +1041,18 @@ app.get("/widget", (req, res) => {
       if (e.key === 'Enter') sendMessage();
     });
     voiceButton.addEventListener('click', toggleVoiceInput);
+    
+    // FIXED: Language change clears chat and shows welcome
     languageSelector.addEventListener('change', function() {
+      var oldLang = currentLanguage;
       currentLanguage = this.value;
-      console.log('Language changed to:', currentLanguage);
+      console.log('🌐 Language changed:', oldLang, '→', currentLanguage);
+      showWelcomeMessage(currentLanguage);
     });
 
-    // Make submitLead global
     window.submitLead = submitLead;
 
-    // Initialize
+    // Initialize on load
     initVoiceInput();
     initSession();
   </script>
@@ -1005,7 +1062,7 @@ app.get("/widget", (req, res) => {
 });
 
 // ====================================
-// Session Cleanup (Hourly)
+// Session Cleanup
 // ====================================
 
 setInterval(() => {
@@ -1037,7 +1094,4 @@ app.listen(PORT, "0.0.0.0", () => {
   console.log(`✅ InvestOnline Buddy running on ${PORT}`);
   console.log(`📊 Session TTL: ${SESSION_TTL / (60 * 60 * 1000)} hours`);
   console.log(`🔒 CORS origins: ${ALLOWED_ORIGIN.join(", ")}`);
-  console.log(
-    `🖼️ Iframe embedding allowed from: ${ALLOWED_ORIGIN.join(", ")}`
-  );
 });
