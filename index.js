@@ -905,26 +905,58 @@ app.get("/widget", (req, res) => {
 
     // FIXED: Show welcome message in selected language
     function showWelcomeMessage(lang) {
-      clearChat();
-      
-      var welcomeDiv = document.createElement('div');
-      welcomeDiv.className = 'message bot';
-      welcomeDiv.innerHTML = welcomeMessages[lang] || welcomeMessages['en'];
-      chatMessages.appendChild(welcomeDiv);
-      
-      setTimeout(function() {
-        addQuickReplies([
-          '🎯 How to register?',
-          '📝 What is KYC?',
-          '💰 How to start SIP?',
-          '📊 SIP Calculator',
-          '🏆 Top Mutual Funds',
-          '📞 Contact Support'
-        ]);
-      }, 500);
-      
-      console.log('✅ Welcome message shown in:', lang);
-    }
+  // ... existing code (keep everything before setTimeout) ...
+  
+  // FIXED: Translated quick reply buttons
+  var quickReplies = {
+    'en': [
+      '🎯 How to register?',
+      '📝 What is KYC?',
+      '💰 How to start SIP?',
+      '📊 SIP Calculator',
+      '🏆 Top Mutual Funds',
+      '📞 Contact Support'
+    ],
+    'hi': [
+      '🎯 रजिस्टर कैसे करें?',
+      '📝 KYC क्या है?',
+      '💰 SIP कैसे शुरू करें?',
+      '📊 SIP कैलकुलेटर',
+      '🏆 टॉप म्यूचुअल फंड',
+      '📞 सपोर्ट से संपर्क करें'
+    ],
+    'mr': [
+      '🎯 नोंदणी कशी करावी?',
+      '📝 KYC म्हणजे काय?',
+      '💰 SIP कसे सुरू करावे?',
+      '📊 SIP कॅल्क्युलेटर',
+      '🏆 टॉप म्युच्युअल फंड',
+      '📞 सपोर्टशी संपर्क करा'
+    ],
+    'gu': [
+      '🎯 નોંધણી કેવી રીતે કરવી?',
+      '📝 KYC શું છે?',
+      '💰 SIP કેવી રીતે શરૂ કરવું?',
+      '📊 SIP કેલ્ક્યુલેટર',
+      '🏆 ટોપ મ્યુચ્યુઅલ ફંડ',
+      '📞 સપોર્ટનો સંપર્ક કરો'
+    ],
+    'ta': [
+      '🎯 பதிவு எப்படி செய்வது?',
+      '📝 KYC என்றால் என்ன?',
+      '💰 SIP எப்படி தொடங்குவது?',
+      '📊 SIP கால்குலேட்டர்',
+      '🏆 சிறந்த மியூச்சுவல் ஃபண்டுகள்',
+      '📞 ஆதரவை தொடர்பு கொள்ளுங்கள்'
+    ]
+  };
+  
+  setTimeout(function() {
+    addQuickReplies(quickReplies[lang] || quickReplies['en']);
+  }, 500);
+  
+  console.log('✅ Welcome message shown in:', lang);
+}
 
     function initSession() {
       var savedSessionId = getCookie('io_session_id');
