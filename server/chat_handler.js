@@ -335,10 +335,18 @@ function isInvestmentRelated(message) {
     'help', 'support', 'contact',
     
     // Hinglish/Hindi
-    'निवेश', 'म्यूचुअल फंड', 'केवाईसी', 'रजिस्टर',
+    'निवेश', 'म्यूचुअल फंड', 'केवाईसी', 'रजिस्टर' 'एसेट', 'पोर्टफोलियो', 'योजना', 'फंड',
     'kaise', 'kya hai', 'chahiye', 'banao', 'shuru',
+
+    // ✅ NEW KEYWORDS:
+    'asset allocation', 'allocation', 'diversification', 'rebalancing',
+    'portfolio mix', 'asset distribution', 'investment strategy',
+    'wealth', 'savings', 'goals', 'retirement', 'planning',
+    'risk', 'returns', 'performance', 'analysis', 'comparison',
+    'top funds', 'best funds', 'calculator', 'nfo', 'ipo',
   ];
 
+  const msg = message.toLowerCase();
   return investmentKeywords.some(keyword => msg.includes(keyword));
 }
 
