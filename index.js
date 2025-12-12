@@ -1,7 +1,7 @@
 // ====================================
 // InvestOnline Buddy - Main Server
 // Pure InvestOnline Search Version
-// FIXED: Sticky header, Language reset, No repetition
+// FIXED v7: Language change clears chat, Asset Allocation, Top Funds
 // ====================================
 
 require("dotenv").config();
@@ -81,7 +81,7 @@ app.use(express.json({ limit: "10kb" }));
 // Initialize Search Module
 // ====================================
 
-console.log("🚀 Starting InvestOnline Buddy - Pure Search Version");
+console.log("🚀 Starting InvestOnline Buddy v7 - Pure Search Version");
 console.log("📌 Searching only InvestOnline.in");
 console.log("⚠️ No AI fallback, No internet knowledge");
 
@@ -104,8 +104,8 @@ const SESSION_TTL = 12 * 60 * 60 * 1000; // 12 hours
 app.get("/", (req, res) => {
   res.json({
     status: "ok",
-    service: "InvestOnline Buddy - Pure Search Version",
-    version: "1.0.0",
+    service: "InvestOnline Buddy v7 - Pure Search Version",
+    version: "7.0.0",
     searchDomains: [
       "https://www.investonline.in",
       "https://beta.investonline.in",
@@ -117,6 +117,9 @@ app.get("/", (req, res) => {
       "No internet knowledge",
       "Uses flows.json for keyword matching",
       "Fallback: Contact support if info not found",
+      "NEW: Asset Allocation support",
+      "NEW: Top Funds queries",
+      "FIXED: Language change clears chat",
     ],
     support: {
       email: "wealth@investonline.in",
@@ -287,8 +290,8 @@ app.post("/lead/capture", async (req, res) => {
 });
 
 // ====================================
-// Widget Endpoint - COMPLETE FIX
-// Fixed: Sticky header, Language reset, No duplication
+// Widget Endpoint - v7 COMPLETE FIX
+// Fixed: Language change clears chat, No duplication
 // ====================================
 
 app.get("/widget", (req, res) => {
@@ -298,7 +301,7 @@ app.get("/widget", (req, res) => {
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>InvestOnline Buddy</title>
+  <title>InvestOnline Buddy v7</title>
   <style>
     * { margin: 0; padding: 0; box-sizing: border-box; }
     
@@ -367,6 +370,11 @@ app.get("/widget", (req, res) => {
       font-size: 12px;
       cursor: pointer;
       flex-shrink: 0;
+    }
+    
+    #language-selector option {
+      background: #FF6B35;
+      color: white;
     }
     
     /* FIXED: Messages area with proper spacing for fixed header */
@@ -621,7 +629,7 @@ app.get("/widget", (req, res) => {
     <div id="chat-header">
       <div id="chat-header-logo">IO</div>
       <div id="chat-header-text">
-        <div id="chat-header-title">InvestOnline Buddy</div>
+        <div id="chat-header-title">InvestOnline Buddy v7</div>
         <div id="chat-header-subtitle">Your Investment Assistant</div>
       </div>
       <select id="language-selector">
@@ -654,15 +662,6 @@ app.get("/widget", (req, res) => {
     var sendButton = document.getElementById('send-button');
     var voiceButton = document.getElementById('voice-button');
     var languageSelector = document.getElementById('language-selector');
-
-    // Language welcome messages
-    var welcomeMessages = {
-      'en': '<p>Hi! I\'m InvestOnline Buddy. 👋</p><p>I can help you with information about mutual funds, SIPs, account opening, and more. How can I assist you today?</p>',
-      'hi': '<p>नमस्ते! मैं InvestOnline Buddy हूं। 👋</p><p>मैं म्यूचुअल फंड, SIP, खाता खोलने और अधिक जानकारी में आपकी मदद कर सकता हूं। आज मैं आपकी कैसे सहायता कर सकता हूं?</p>',
-      'mr': '<p>नमस्कार! मी InvestOnline Buddy आहे। 👋</p><p>मी तुम्हाला म्युच्युअल फंड, SIP, खाते उघडणे आणि अधिक माहितीमध्ये मदत करू शकतो। आज मी तुम्हाला कशी मदत करू शकतो?</p>',
-      'gu': '<p>નમસ્તે! હું InvestOnline Buddy છું। 👋</p><p>હું તમને મ્યુચ્યુઅલ ફંડ, SIP, ખાતું ખોલવા અને વધુ વિશે માહિતી આપવામાં મદદ કરી શકું છું. આજે હું તમને કેવી રીતે મદદ કરી શકું?</p>',
-      'ta': '<p>வணக்கம்! நான் InvestOnline Buddy. 👋</p><p>நான் உங்களுக்கு மியூச்சுவல் ஃபண்ட்ஸ், SIP, கணக்கு திறப்பு மற்றும் பல குறித்த தகவல்களில் உதவ முடியும். இன்று நான் உங்களுக்கு எப்படி உதவ முடியும்?</p>'
-    };
 
     // Cookie utilities
     function setCookie(name, value, days) {
@@ -895,86 +894,72 @@ app.get("/widget", (req, res) => {
       if (typing) typing.remove();
     }
 
-    // FIXED: Clear chat completely
-    function clearChat() {
-      chatMessages.innerHTML = '';
-      var qr = document.getElementById('quick-replies');
-      if (qr) qr.remove();
-      console.log('✅ Chat cleared');
-    }
-
-    // FIXED: Show welcome message in selected language
+    // ✅ CRITICAL FIX v7: Show welcome message in selected language
     function showWelcomeMessage(lang) {
-  var welcomeMessages = {
-    'en': '<strong>Welcome to InvestOnline! 👋</strong><br><br>I\'m your investment assistant. I can help you with:<br>• Mutual fund investments<br>• SIP & calculators<br>• Account opening & KYC<br>• Portfolio tracking<br>• Expert guidance<br><br>How can I assist you today?',
-    'hi': '<strong>InvestOnline में आपका स्वागत है! 👋</strong><br><br>मैं आपका निवेश सहायक हूं। मैं आपकी मदद कर सकता हूं:<br>• म्यूचुअल फंड निवेश<br>• SIP और कैलकुलेटर<br>• खाता खोलना और KYC<br>• पोर्टफोलियो ट्रैकिंग<br>• विशेषज्ञ मार्गदर्शन<br><br>आज मैं आपकी कैसे मदद कर सकता हूं?',
-    'mr': '<strong>InvestOnline मध्ये आपले स्वागत आहे! 👋</strong><br><br>मी तुमचा गुंतवणूक सहाय्यक आहे। मी तुम्हाला मदत करू शकतो:<br>• म्युच्युअल फंड गुंतवणूक<br>• SIP आणि कॅल्क्युलेटर<br>• खाते उघडणे आणि KYC<br>• पोर्टफोलिओ ट्रॅकिंग<br>• तज्ञ मार्गदर्शन<br><br>आज मी तुम्हाला कशी मदत करू शकतो?',
-    'gu': '<strong>InvestOnline માં તમારું સ્વાગત છે! 👋</strong><br><br>હું તમારો રોકાણ સહાયક છું। હું તમને મદદ કરી શકું છું:<br>• મ્યુચ્યુઅલ ફંડ રોકાણો<br>• SIP અને કેલ્ક્યુલેટર<br>• ખાતું ખોલવું અને KYC<br>• પોર્ટફોલિયો ટ્રેકિંગ<br>• નિષ્ણાત માર્ગદર્શન<br><br>આજે હું તમને કેવી રીતે મદદ કરી શકું?',
-    'ta': '<strong>InvestOnline இல் உங்களை வரவேற்கிறோம்! 👋</strong><br><br>நான் உங்கள் முதலீட்டு உதவியாளர். நான் உங்களுக்கு உதவ முடியும்:<br>• மியூச்சுவல் ஃபண்ட் முதலீடுகள்<br>• SIP மற்றும் கால்குலேட்டர்கள்<br>• கணக்கு திறப்பு மற்றும் KYC<br>• போர்ட்ஃபோலியோ கண்காணிப்பு<br>• நிபுணர் வழிகாட்டுதல்<br><br>இன்று நான் உங்களுக்கு எவ்வாறு உதவ முடியும்?'
-  };
-  
-  // Clear existing messages first
-  var existingWelcome = chatMessages.querySelector('.message.bot');
-  if (existingWelcome) {
-    existingWelcome.remove();
-  }
-  
-  // Add welcome message
-  var welcomeDiv = document.createElement('div');
-  welcomeDiv.className = 'message bot';
-  welcomeDiv.innerHTML = welcomeMessages[lang] || welcomeMessages['en'];
-  chatMessages.appendChild(welcomeDiv);
-  
-  // FIXED: Add translated quick reply buttons
-  var quickReplies = {
-    'en': [
-      '🎯 How to register?',
-      '📝 What is KYC?',
-      '💰 How to start SIP?',
-      '📊 SIP Calculator',
-      '🏆 Top Mutual Funds',
-      '📞 Contact Support'
-    ],
-    'hi': [
-      '🎯 रजिस्टर कैसे करें?',
-      '📝 KYC क्या है?',
-      '💰 SIP कैसे शुरू करें?',
-      '📊 SIP कैलकुलेटर',
-      '🏆 टॉप म्यूचुअल फंड',
-      '📞 सपोर्ट से संपर्क करें'
-    ],
-    'mr': [
-      '🎯 नोंदणी कशी करावी?',
-      '📝 KYC म्हणजे काय?',
-      '💰 SIP कसे सुरू करावे?',
-      '📊 SIP कॅल्क्युलेटर',
-      '🏆 टॉप म्युच्युअल फंड',
-      '📞 सपोर्टशी संपर्क करा'
-    ],
-    'gu': [
-      '🎯 નોંધણી કેવી રીતે કરવી?',
-      '📝 KYC શું છે?',
-      '💰 SIP કેવી રીતે શરૂ કરવું?',
-      '📊 SIP કેલ્ક્યુલેટર',
-      '🏆 ટોપ મ્યુચ્યુઅલ ફંડ',
-      '📞 સપોર્ટનો સંપર્ક કરો'
-    ],
-    'ta': [
-      '🎯 பதிவு எப்படி செய்வது?',
-      '📝 KYC என்றால் என்ன?',
-      '💰 SIP எப்படி தொடங்குவது?',
-      '📊 SIP கால்குலேட்டர்',
-      '🏆 சிறந்த மியூச்சுவல் ஃபண்டுகள்',
-      '📞 ஆதரவை தொடர்பு கொள்ளுங்கள்'
-    ]
-  };
-  
-  setTimeout(function() {
-    addQuickReplies(quickReplies[lang] || quickReplies['en']);
-  }, 500);
-  
-  console.log('✅ Welcome message shown in:', lang);
-}
+      var welcomeMessages = {
+        'en': '<strong>Welcome to InvestOnline! 👋</strong><br><br>I\'m your investment assistant. I can help you with:<br>• Mutual fund investments<br>• SIP & calculators<br>• Account opening & KYC<br>• Portfolio tracking<br>• <strong>Asset Allocation</strong><br>• <strong>Top Funds recommendations</strong><br>• Expert guidance<br><br>How can I assist you today?',
+        'hi': '<strong>InvestOnline में आपका स्वागत है! 👋</strong><br><br>मैं आपका निवेश सहायक हूं। मैं आपकी मदद कर सकता हूं:<br>• म्यूचुअल फंड निवेश<br>• SIP और कैलकुलेटर<br>• खाता खोलना और KYC<br>• पोर्टफोलियो ट्रैकिंग<br>• <strong>एसेट एलोकेशन</strong><br>• <strong>टॉप फंड सिफारिशें</strong><br>• विशेषज्ञ मार्गदर्शन<br><br>आज मैं आपकी कैसे मदद कर सकता हूं?',
+        'mr': '<strong>InvestOnline मध्ये आपले स्वागत आहे! 👋</strong><br><br>मी तुमचा गुंतवणूक सहाय्यक आहे। मी तुम्हाला मदत करू शकतो:<br>• म्युच्युअल फंड गुंतवणूक<br>• SIP आणि कॅल्क्युलेटर<br>• खाते उघडणे आणि KYC<br>• पोर्टफोलिओ ट्रॅकिंग<br>• <strong>मालमत्ता वाटप</strong><br>• <strong>टॉप फंड शिफारसी</strong><br>• तज्ञ मार्गदर्शन<br><br>आज मी तुम्हाला कशी मदत करू शकतो?',
+        'gu': '<strong>InvestOnline માં તમારું સ્વાગત છે! 👋</strong><br><br>હું તમારો રોકાણ સહાયક છું। હું તમને મદદ કરી શકું છું:<br>• મ્યુચ્યુઅલ ફંડ રોકાણો<br>• SIP અને કેલ્ક્યુલેટર<br>• ખાતું ખોલવું અને KYC<br>• પોર્ટફોલિયો ટ્રેકિંગ<br>• <strong>સંપત્તિ ફાળવણી</strong><br>• <strong>ટોપ ફંડ ભલામણો</strong><br>• નિષ્ણાત માર્ગદર્શન<br><br>આજે હું તમને કેવી રીતે મદદ કરી શકું?',
+        'ta': '<strong>InvestOnline இல் உங்களை வரவேற்கிறோம்! 👋</strong><br><br>நான் உங்கள் முதலீட்டு உதவியாளர். நான் உங்களுக்கு உதவ முடியும்:<br>• மியூச்சுவல் ஃபண்ட் முதலீடுகள்<br>• SIP மற்றும் கால்குலேட்டர்கள்<br>• கணக்கு திறப்பு மற்றும் KYC<br>• போர்ட்ஃபோலியோ கண்காணிப்பு<br>• <strong>சொத்து ஒதுக்கீடு</strong><br>• <strong>சிறந்த நிதி பரிந்துரைகள்</strong><br>• நிபுணர் வழிகாட்டுதல்<br><br>இன்று நான் உங்களுக்கு எவ்வாறு உதவ முடியும்?'
+      };
+      
+      // Add welcome message
+      var welcomeDiv = document.createElement('div');
+      welcomeDiv.className = 'message bot';
+      welcomeDiv.innerHTML = welcomeMessages[lang] || welcomeMessages['en'];
+      chatMessages.appendChild(welcomeDiv);
+      
+      // FIXED v7: Add translated quick reply buttons with new features
+      var quickReplies = {
+        'en': [
+          '🎯 How to register?',
+          '📝 What is KYC?',
+          '💰 How to start SIP?',
+          '📊 SIP Calculator',
+          '💼 Asset Allocation',
+          '🏆 Top Mutual Funds'
+        ],
+        'hi': [
+          '🎯 रजिस्टर कैसे करें?',
+          '📝 KYC क्या है?',
+          '💰 SIP कैसे शुरू करें?',
+          '📊 SIP कैलकुलेटर',
+          '💼 एसेट एलोकेशन',
+          '🏆 टॉप म्यूचुअल फंड'
+        ],
+        'mr': [
+          '🎯 नोंदणी कशी करावी?',
+          '📝 KYC म्हणजे काय?',
+          '💰 SIP कसे सुरू करावे?',
+          '📊 SIP कॅल्क्युलेटर',
+          '💼 मालमत्ता वाटप',
+          '🏆 टॉप म्युच्युअल फंड'
+        ],
+        'gu': [
+          '🎯 નોંધણી કેવી રીતે કરવી?',
+          '📝 KYC શું છે?',
+          '💰 SIP કેવી રીતે શરૂ કરવું?',
+          '📊 SIP કેલ્ક્યુલેટર',
+          '💼 સંપત્તિ ફાળવણી',
+          '🏆 ટોપ મ્યુચ્યુઅલ ફંડ'
+        ],
+        'ta': [
+          '🎯 பதிவு எப்படி செய்வது?',
+          '📝 KYC என்றால் என்ன?',
+          '💰 SIP எப்படி தொடங்குவது?',
+          '📊 SIP கால்குலேட்டர்',
+          '💼 சொத்து ஒதுக்கீடு',
+          '🏆 சிறந்த மியூச்சுவல் ஃபண்டுகள்'
+        ]
+      };
+      
+      setTimeout(function() {
+        addQuickReplies(quickReplies[lang] || quickReplies['en']);
+      }, 500);
+      
+      console.log('✅ Welcome message v7 shown in:', lang);
+    }
 
     function initSession() {
       var savedSessionId = getCookie('io_session_id');
@@ -1092,25 +1077,24 @@ app.get("/widget", (req, res) => {
     });
     voiceButton.addEventListener('click', toggleVoiceInput);
     
-    // FIXED: Language change clears chat and shows welcome
-    languageSelect.addEventListener('change', function() {
-  const newLang = this.value;
-  currentLanguage = newLang;
-  
-  // ✅ CRITICAL FIX: Clear chat history on language change
-  const chatMessages = document.getElementById('chat-messages');
-  if (chatMessages) {
-    chatMessages.innerHTML = ''; // Clear all messages
-  }
-  
-  // Show welcome message in new language
-  showWelcomeMessage();
-  
-  // Optional: Save language preference
-  if (typeof(Storage) !== "undefined") {
-    localStorage.setItem('preferred_language', newLang);
-  }
-});
+    // ✅ CRITICAL FIX v7: Language change clears chat and shows welcome
+    languageSelector.addEventListener('change', function() {
+      var newLang = this.value;
+      console.log('🌐 Language changed from', currentLanguage, 'to', newLang);
+      currentLanguage = newLang;
+      
+      // Clear chat history completely
+      chatMessages.innerHTML = '';
+      
+      // Remove quick replies
+      var qr = document.getElementById('quick-replies');
+      if (qr) qr.remove();
+      
+      // Show welcome message in new language
+      showWelcomeMessage(newLang);
+      
+      console.log('✅ Chat cleared and welcome shown in:', newLang);
+    });
 
     window.submitLead = submitLead;
 
@@ -1153,7 +1137,8 @@ setInterval(() => {
 // ====================================
 
 app.listen(PORT, "0.0.0.0", () => {
-  console.log(`✅ InvestOnline Buddy running on ${PORT}`);
+  console.log(`✅ InvestOnline Buddy v7 running on ${PORT}`);
   console.log(`📊 Session TTL: ${SESSION_TTL / (60 * 60 * 1000)} hours`);
   console.log(`🔒 CORS origins: ${ALLOWED_ORIGIN.join(", ")}`);
+  console.log(`🆕 v7 fixes: Language change clears chat, Asset Allocation, Top Funds`);
 });
