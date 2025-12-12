@@ -65,6 +65,42 @@
         "https://www.investonline.in/login"
       ]
     },
+
+    {
+  "intent": "TOP_FUNDS",
+  "keywords": [
+    "top funds", "top mutual funds", "best funds", "best performing funds",
+    "top performing", "highest returns", "best schemes", "top schemes",
+    "टॉप फंड", "बेस्ट फंड", "सर्वोत्तम फंड", "टॉप म्युच्युअल फंड",
+    "सर्वोत्तम योजनाएं", "उच्चतम रिटर्न", "best mutual funds",
+    "top mutual funds kaunse hai", "kaun sa fund accha hai",
+    "highest return fund", "top 5 funds", "top 10 funds",
+    "सर्वश्रेष्ठ फंड", "उत्कृष्ट फंड"
+  ],
+  "response": "**🏆 Top Performing Mutual Funds**\n\nDiscover the best mutual funds across categories:\n\n**By Category:**\n• **Large Cap Funds** - Stable, low risk\n• **Mid Cap Funds** - Balanced growth\n• **Small Cap Funds** - High growth potential\n• **ELSS Funds** - Tax saving + growth\n• **Debt Funds** - Stable returns\n• **Hybrid Funds** - Balanced portfolio\n\n**How to Choose:**\n1. Check 3-year & 5-year returns\n2. Compare with benchmark\n3. Review fund manager track record\n4. Check expense ratio\n5. Analyze portfolio holdings\n\n**⚠️ Important:**\n- Past performance doesn't guarantee future returns\n- Diversify across fund categories\n- Invest based on your goals & risk appetite\n\n**Tools to Help:**\n• [Funds Explorer →](https://www.investonline.in/mutual-funds/funds-explorer) - Search & compare\n• [Fund Comparison →](https://www.investonline.in/mutual-funds/funds-explorer) - Side-by-side analysis\n• [Who Holds What →](https://www.investonline.in/mutual-funds/who-holds-what) - Check holdings\n\n💡 **Tip:** Use SIP Calculator to plan your investments!\n\n**Need Personalized Advice?**\n📞 1800-2222-65\n📧 wealth@investonline.in\n💬 WhatsApp: +91-77770-24447",
+  "suggestions": ["Funds Explorer", "Compare funds", "SIP Calculator", "Large Cap Funds"],
+  "urls": [
+    "https://www.investonline.in/mutual-funds/funds-explorer",
+    "https://www.investonline.in/mutual-funds/who-holds-what"
+  ]
+}
+
+    {
+  "intent": "ASSET_ALLOCATION",
+  "keywords": [
+    "asset allocation", "portfolio allocation", "diversification", "portfolio mix",
+    "equity debt ratio", "asset distribution", "investment allocation",
+    "एसेट एलोकेशन", "पोर्टफोलियो वितरण", "निवेश आवंटन",
+    "मालमत्ता वाटप", "पोर्टफोलियो विभाजन",
+    "asset allocation kya hai", "portfolio balance", "equity debt split",
+    "कैसे diversify करें", "allocation strategy"
+  ],
+  "response": "**Asset Allocation** - The foundation of smart investing! 📊\n\n**What is Asset Allocation?**\nDistribution of your investment across different asset classes to balance risk and returns.\n\n**Common Allocation Strategies:**\n\n1. **Conservative (Low Risk)**\n   - Equity: 20-30%\n   - Debt: 60-70%\n   - Gold/Others: 10%\n\n2. **Moderate (Balanced)**\n   - Equity: 50-60%\n   - Debt: 30-40%\n   - Gold/Others: 10%\n\n3. **Aggressive (High Growth)**\n   - Equity: 70-80%\n   - Debt: 10-20%\n   - Gold/Others: 10%\n\n**Age-Based Rule:**\n- **Equity %** = 100 - Your Age\n- Example: Age 30 → 70% Equity, 30% Debt\n\n**Why Important?**\n• Reduces portfolio volatility\n• Balances risk vs returns\n• Helps achieve financial goals\n• Protects against market crashes\n\n💡 **Tip:** Rebalance your portfolio annually!\n\n**Need Help?** Contact our advisors:\n📞 1800-2222-65\n📧 wealth@investonline.in\n\n[View Portfolio Reports →](https://www.investonline.in/login)\n[Goal-Based Plans →](https://www.investonline.in/features/goal-planning)",
+  "suggestions": ["Goal-based investing", "Portfolio rebalancing", "Risk assessment", "DIY Portfolio"],
+  "urls": [
+    "https://www.investonline.in/features/goal-planning"
+  ]
+}
     {
       "intent": "registration_benefits",
       "keywords": [
