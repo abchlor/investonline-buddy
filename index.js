@@ -810,12 +810,62 @@ app.get("/widget", (req, res) => {
       div.id = 'quick-replies';
       div.className = 'quick-replies';
 
+      // ✅ FIX: Map translated text back to English keywords for backend
+      var reverseTranslationMap = {
+        // Hindi
+        'एसेट एलोकेशन': 'Asset Allocation',
+        'टॉप म्यूचुअल फंड': 'Top Mutual Funds',
+        'SIP कैलकुलेटर': 'SIP Calculator',
+        'रजिस्टर कैसे करें?': 'How to register?',
+        'KYC क्या है?': 'What is KYC?',
+        'SIP कैसे शुरू करें?': 'How to start SIP?',
+        'सपोर्ट से संपर्क करें': 'Contact Support',
+        'फंड तुलना करें': 'Compare Funds',
+        'जोखिम प्रोफ़ाइल': 'Risk Profile',
+        'पोर्टफोलियो समीक्षा': 'Portfolio Review',
+        'रिटायरमेंट प्लानिंग': 'Retirement Planning',
+        'विविधीकरण': 'Diversification',
+        'लार्ज कैप फंड': 'Large Cap funds',
+        'KYC पूरा करें': 'Complete KYC',
+        'पहला SIP': 'First SIP',
+        'निवेश शुरू करें': 'Start investing',
+        'रजिस्ट्रेशन के फायदे': 'Registration benefits',
+        // Marathi
+        'मालमत्ता वाटप': 'Asset Allocation',
+        'टॉप म्युच्युअल फंड': 'Top Mutual Funds',
+        'SIP कॅल्क्युलेटर': 'SIP Calculator',
+        'नोंदणी कशी करावी?': 'How to register?',
+        'KYC म्हणजे काय?': 'What is KYC?',
+        'SIP कसे सुरू करावे?': 'How to start SIP?',
+        'फंड तुलना करा': 'Compare Funds',
+        'सपोर्टशी संपर्क करा': 'Contact Support',
+        'SIP सुरू करा': 'Start SIP',
+        // Gujarati
+        'સંપત્તિ ફાળવણી': 'Asset Allocation',
+        'ટોપ મ્યુચ્યુઅલ ફંડ': 'Top Mutual Funds',
+        'SIP કેલ્ક્યુલેટર': 'SIP Calculator',
+        'નોંધણી કેવી રીતે કરવી?': 'How to register?',
+        'KYC શું છે?': 'What is KYC?',
+        'ફંડ તુલના કરો': 'Compare Funds',
+        'સપોર્ટનો સંપર્ક કરો': 'Contact Support',
+        // Tamil
+        'சொத்து ஒதுக்கீடு': 'Asset Allocation',
+        'சிறந்த மியூச்சுவல் ஃபண்டுகள்': 'Top Mutual Funds',
+        'SIP கால்குலேட்டர்': 'SIP Calculator',
+        'பதிவு எப்படி செய்வது?': 'How to register?',
+        'KYC என்றால் என்ன?': 'What is KYC?',
+        'நிதிகளை ஒப்பிடுங்கள்': 'Compare Funds',
+        'ஆதரவை தொடர்பு கொள்ளுங்கள்': 'Contact Support'
+      };
+
       suggestions.forEach(function(text) {
         var btn = document.createElement('button');
         btn.className = 'quick-reply-btn';
-        btn.textContent = text;
+        btn.textContent = text;  // Display in user's language
         btn.onclick = function() {
-          chatInput.value = text;
+          // ✅ Send English keyword to backend for matching
+          var englishKeyword = reverseTranslationMap[text] || text;
+          chatInput.value = englishKeyword;
           sendMessage();
         };
         div.appendChild(btn);
