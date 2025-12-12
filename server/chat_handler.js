@@ -228,34 +228,59 @@ function translateSuggestions(suggestions, language) {
       'Asset Allocation': 'एसेट एलोकेशन',
       'Risk Profile': 'जोखिम प्रोफ़ाइल',
       'Portfolio Review': 'पोर्टफोलियो समीक्षा',
-      'Retirement Planning': 'रिटायरमेंट प्लानिंग',
+      'Retirement Planning': 'रिटायरमेंट योजना',
       'Diversification': 'विविधीकरण',
       'Large Cap funds': 'लार्ज कैप फंड',
       'Complete KYC': 'KYC पूरा करें',
       'First SIP': 'पहला SIP',
       'Registration benefits': 'रजिस्ट्रेशन के फायदे',
+      'All Calculators': 'सभी कैलकुलेटर',
+      'Invest Guide Magazine': 'इन्वेस्ट गाइड मैगज़ीन',
+      'Retirement calculator': 'रिटायरमेंट कैलकुलेटर',
+      'Goal planning': 'लक्ष्य योजना',
+      'Latest articles': 'नवीनतम लेख',
+      'Investment tips': 'निवेश टिप्स',
+      'Market insights': 'मार्केट इनसाइट्स',
+      'Legal heir': 'कानूनी उत्तराधिकारी',
+      'Top ELSS funds': 'टॉप ELSS फंड',
+      'Tax benefits': 'टैक्स लाभ',
+      'Documents needed': 'आवश्यक दस्तावेज़',
     },
     'mr': {
       'Top Mutual Funds': 'टॉप म्युच्युअल फंड',
       'SIP Calculator': 'SIP कॅल्क्युलेटर',
       'Compare Funds': 'फंड तुलना करा',
-      'Contact Support': 'सपोर्टशी संपर्क करा',
+      'Contact Support': 'सपोर्टशी संपर्क साधा',
       'Asset Allocation': 'मालमत्ता वाटप',
       'Start SIP': 'SIP सुरू करा',
+      'All Calculators': 'सर्व कॅल्क्युलेटर',
+      'Invest Guide Magazine': 'इन्वेस्ट गाइड मॅगझिन',
+      'Retirement Planning': 'रिटायरमेंट नियोजन',
+      'Retirement calculator': 'रिटायरमेंट कॅल्क्युलेटर',
+      'Legal heir': 'कायदेशीर वारस',
+      'Portfolio Review': 'पोर्टफोलिओ पुनरावलोकन',
     },
     'gu': {
       'Top Mutual Funds': 'ટોપ મ્યુચ્યુઅલ ફંડ',
       'SIP Calculator': 'SIP કેલ્ક્યુલેટર',
       'Compare Funds': 'ફંડ તુલના કરો',
       'Contact Support': 'સપોર્ટનો સંપર્ક કરો',
-      'Asset Allocation': 'સંપત્તિ ફાળવણી',
+      'Asset Allocation': 'અસેટ એલોકેશન',
+      'All Calculators': 'બધા કેલ્ક્યુલેટર',
+      'Invest Guide Magazine': 'ઇન્વેસ્ટ ગાઇડ મેગેઝિન',
+      'Retirement Planning': 'રિટાયરમેન્ટ આયોજન',
+      'Legal heir': 'કાનૂની વારસદાર',
     },
     'ta': {
-      'Top Mutual Funds': 'சிறந்த மியூச்சுவல் ஃபண்டுகள்',
-      'SIP Calculator': 'SIP கால்குலேட்டர்',
-      'Compare Funds': 'நிதிகளை ஒப்பிடுங்கள்',
-      'Contact Support': 'ஆதரவை தொடர்பு கொள்ளுங்கள்',
+      'Top Mutual Funds': 'டாப் மியூச்சுவல் ஃபண்டுகள்',
+      'SIP Calculator': 'SIP கணக்கீட்டாளர்',
+      'Compare Funds': 'ஃபண்டுகள் ஒப்பிடு',
+      'Contact Support': 'ஆதரவைத் தொடர்பு கொள்ளவும்',
       'Asset Allocation': 'சொத்து ஒதுக்கீடு',
+      'All Calculators': 'அனைத்து கணக்கீட்டாளர்கள்',
+      'Invest Guide Magazine': 'இன்வெஸ்ட் கைட் பத்திரிகை',
+      'Retirement Planning': 'ஓய்வூதிய திட்டமிடல்',
+      'Legal heir': 'சட்ட வாரிசு',
     }
   };
   
@@ -454,31 +479,9 @@ async function handleChat({ sessionId, message, page, language = 'en', SESSION_S
     };
   }
 
-  // Check if investment-related
-  if (!isInvestmentRelated(message)) {
-    const nonInvestmentMessage = language === 'en'
-      ? "I'm specialized in helping with mutual fund investments, SIPs, account opening, KYC, nominations, and all InvestOnline.in processes. 😊\n\nI can't answer questions outside of investment and finance topics.\n\nHow can I help you with your investments today?"
-      : await translateText("I'm specialized in helping with mutual fund investments, SIPs, account opening, KYC, nominations, and all InvestOnline.in processes. 😊\n\nI can't answer questions outside of investment and finance topics.\n\nHow can I help you with your investments today?", language);
-
-    let suggestions = getContextualSuggestions('general', language, session.conversationHistory);
-    suggestions = translateSuggestions(suggestions, language); // ✅ TRANSLATE
-    
-    // Track suggestions
-    session.conversationHistory.push({
-      role: 'user',
-      content: message,
-    });
-    session.conversationHistory.push({
-      role: 'assistant',
-      content: nonInvestmentMessage,
-      suggestions: suggestions,
-    });
-
-    return {
-      reply: nonInvestmentMessage,
-      suggestions: suggestions,
-    };
-  }
+  // ✅ FIX v7.3: Removed isInvestmentRelated() check
+  // Let flows.json be the source of truth for investment topics
+  // If not found in flows.json, OpenAI fallback will handle it
 
   // PRIORITY 1: Check knowledge base with category awareness
   const matchedIntent = matchIntentWithCategory(message);
@@ -611,7 +614,8 @@ You respond: "टॉप परफॉर्मिंग Large Cap funds के �
     let reply = completion.choices[0].message.content;
 
     // Get contextual suggestions (with history to avoid repetition)
-    const suggestions = getContextualSuggestions('general', language, session.conversationHistory);
+    let suggestions = getContextualSuggestions('general', language, session.conversationHistory);
+    suggestions = translateSuggestions(suggestions, language); // ✅ TRANSLATE
 
     // Add to conversation history with suggestions tracking
     session.conversationHistory.push({
