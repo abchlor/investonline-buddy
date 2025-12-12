@@ -210,6 +210,60 @@ function getContextualSuggestions(intent, language = 'en', conversationHistory =
 }
 
 // ====================================
+// NEW v7: Translate Suggestions to Regional Languages
+// ====================================
+function translateSuggestions(suggestions, language) {
+  if (language === 'en' || !suggestions) return suggestions;
+  
+  const translationMap = {
+    'hi': {
+      'Top Mutual Funds': 'टॉप म्यूचुअल फंड',
+      'SIP Calculator': 'SIP कैलकुलेटर',
+      'Compare Funds': 'फंड तुलना करें',
+      'Contact Support': 'सपोर्ट से संपर्क करें',
+      'How to register?': 'रजिस्टर कैसे करें?',
+      'What is KYC?': 'KYC क्या है?',
+      'Start SIP': 'SIP शुरू करें',
+      'Start investing': 'निवेश शुरू करें',
+      'Asset Allocation': 'एसेट एलोकेशन',
+      'Risk Profile': 'जोखिम प्रोफ़ाइल',
+      'Portfolio Review': 'पोर्टफोलियो समीक्षा',
+      'Retirement Planning': 'रिटायरमेंट प्लानिंग',
+      'Diversification': 'विविधीकरण',
+      'Large Cap funds': 'लार्ज कैप फंड',
+      'Complete KYC': 'KYC पूरा करें',
+      'First SIP': 'पहला SIP',
+      'Registration benefits': 'रजिस्ट्रेशन के फायदे',
+    },
+    'mr': {
+      'Top Mutual Funds': 'टॉप म्युच्युअल फंड',
+      'SIP Calculator': 'SIP कॅल्क्युलेटर',
+      'Compare Funds': 'फंड तुलना करा',
+      'Contact Support': 'सपोर्टशी संपर्क करा',
+      'Asset Allocation': 'मालमत्ता वाटप',
+      'Start SIP': 'SIP सुरू करा',
+    },
+    'gu': {
+      'Top Mutual Funds': 'ટોપ મ્યુચ્યુઅલ ફંડ',
+      'SIP Calculator': 'SIP કેલ્ક્યુલેટર',
+      'Compare Funds': 'ફંડ તુલના કરો',
+      'Contact Support': 'સપોર્ટનો સંપર્ક કરો',
+      'Asset Allocation': 'સંપત્તિ ફાળવણી',
+    },
+    'ta': {
+      'Top Mutual Funds': 'சிறந்த மியூச்சுவல் ஃபண்டுகள்',
+      'SIP Calculator': 'SIP கால்குலேட்டர்',
+      'Compare Funds': 'நிதிகளை ஒப்பிடுங்கள்',
+      'Contact Support': 'ஆதரவை தொடர்பு கொள்ளுங்கள்',
+      'Asset Allocation': 'சொத்து ஒதுக்கீடு',
+    }
+  };
+  
+  const map = translationMap[language] || {};
+  return suggestions.map(s => map[s] || s);
+}
+
+// ====================================
 // FIXED: Enhanced Response with CTAs (Only Valid URLs)
 // ====================================
 function enhanceResponseWithCTA(response, intent, category = null, urls = []) {
@@ -341,9 +395,25 @@ function isInvestmentRelated(message) {
     // NEW v7: Top Funds queries
     'top funds', 'top mutual funds', 'best mutual funds', 'top rated',
     
-    // Hinglish/Hindi
-    'निवेश', 'म्यूचुअल फंड', 'केवाईसी', 'रजिस्टर',
-    'kaise', 'kya hai', 'chahiye', 'banao', 'shuru',
+    // Hindi Keywords (Comprehensive)
+    'निवेश', 'म्यूचुअल फंड', 'म्युचुअल', 'फंड', 'केवाईसी', 'रजिस्टर',
+    'रजिस्ट्रेशन', 'एसआईपी', 'एसेट', 'एलोकेशन', 'आवंटन',
+    'पोर्टफोलियो', 'टॉप', 'सर्वश्रेष्ठ', 'शीर्ष', 'कैलकुलेटर',
+    'खाता', 'खोलना', 'ट्रैकिंग', 'सिफारिशें', 'मार्गदर्शन',
+    
+    // Marathi
+    'गुंतवणूक', 'फंड', 'नोंदणी', 'मालमत्ता', 'वाटप', 'पोर्टफोलिओ',
+    
+    // Gujarati  
+    'રોકાણ', 'ફંડ', 'નોંધણી', 'સંપત્તિ', 'ફાળવણી',
+    
+    // Tamil
+    'முதலீடு', 'நிதி', 'பதிவு', 'சொத்து', 'ஒதுக்கீடு',
+    
+    // Hinglish
+    'kaise', 'kya hai', 'chahiye', 'banao', 'shuru', 'kare',
+    'registration', 'fund', 'sip', 'top', 'best', 'achhe',
+    'portfolio', 'calculator', 'asset', 'allocation',
   ];
 
   return investmentKeywords.some(keyword => msg.includes(keyword));
@@ -390,7 +460,8 @@ async function handleChat({ sessionId, message, page, language = 'en', SESSION_S
       ? "I'm specialized in helping with mutual fund investments, SIPs, account opening, KYC, nominations, and all InvestOnline.in processes. 😊\n\nI can't answer questions outside of investment and finance topics.\n\nHow can I help you with your investments today?"
       : await translateText("I'm specialized in helping with mutual fund investments, SIPs, account opening, KYC, nominations, and all InvestOnline.in processes. 😊\n\nI can't answer questions outside of investment and finance topics.\n\nHow can I help you with your investments today?", language);
 
-    const suggestions = getContextualSuggestions('general', language, session.conversationHistory);
+    let suggestions = getContextualSuggestions('general', language, session.conversationHistory);
+    suggestions = translateSuggestions(suggestions, language); // ✅ TRANSLATE
     
     // Track suggestions
     session.conversationHistory.push({
@@ -429,7 +500,8 @@ async function handleChat({ sessionId, message, page, language = 'en', SESSION_S
     }
     
     // Get contextual suggestions (with history to avoid repetition)
-    const suggestions = getContextualSuggestions(matchedIntent.intent, language, session.conversationHistory);
+    let suggestions = getContextualSuggestions(matchedIntent.intent, language, session.conversationHistory);
+    suggestions = translateSuggestions(suggestions, language); // ✅ TRANSLATE
     
     // Add to conversation history with suggestions tracking
     session.conversationHistory.push({
