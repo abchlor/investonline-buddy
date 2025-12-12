@@ -308,27 +308,42 @@ function isInvestmentRelated(message) {
   const msg = message.toLowerCase();
   
   const investmentKeywords = [
-    // Core Investment Terms
-    'sip', 'mutual fund', 'invest', 'portfolio', 'kyc', 'redemption', 
-    'nav', 'fund', 'elss', 'equity', 'debt', 'registration',
+    // Core investment terms
+    'mutual fund', 'sip', 'invest', 'portfolio', 'return', 'nav', 'aum',
+    'expense ratio', 'exit load', 'scheme', 'fund', 'equity', 'debt',
     
-    // Asset Allocation & Portfolio Terms
+    // Fund categories
+    'large cap', 'mid cap', 'small cap', 'flexi cap', 'index', 'etf',
+    'elss', 'tax saving', 'liquid', 'gilt', 'balanced', 'hybrid',
+    
+    // Investment actions
+    'buy', 'sell', 'redeem', 'switch', 'lumpsum', 'stp', 'swp',
+    'systematic', 'top up', 'pause', 'cancel', 'modify',
+    'redemption', 'transmission', 'withdrawal',
+    
+    // Account & KYC
+    'account', 'kyc', 'register', 'login', 'profile', 'nominee',
+    'bank', 'mandate', 'ekyc', 'aadhar', 'pan', 'document',
+    'registration', 'benefits of registration', 'why register',
+    
+    // Queries
+    'how to', 'what is', 'which fund', 'best fund', 'top fund',
+    'compare', 'calculator', 'status', 'track', 'statement',
+    
+    // Issues
+    'payment', 'failed', 'pending', 'rejected', 'error', 'problem',
+    'help', 'support', 'contact',
+    
+    // NEW v7: Asset Allocation & Portfolio
     'allocation', 'asset allocation', 'diversification', 'diversify',
     'portfolio mix', 'asset mix', 'rebalance', 'rebalancing',
     
-    // Fund Categories & Performance
-    'top funds', 'best funds', 'top mutual funds', 'best mutual funds',
-    'large cap', 'mid cap', 'small cap', 'hybrid', 'balanced',
-    'debt fund', 'liquid fund', 'index fund', 'sector fund',
+    // NEW v7: Top Funds queries
+    'top funds', 'top mutual funds', 'best mutual funds', 'top rated',
     
-    // Hindi Keywords
-    'नोट', 'म्युचुअल', 'निवेश', 'रजिस्ट्रेशन',
-    'संपत्ति', 'आवंटन', 'पोर्टफोलियो', 'फंड',
-    'टॉप', 'सर्वश्रेष्ठ', 'शीर्ष',
-    
-    // Hinglish Keywords
-    'kaise', 'kare', 'invest', 'fund', 'sip', 'portfolio',
-    'top', 'best', 'achhe', 'sabse', 'konse', 'kaunse'
+    // Hinglish/Hindi
+    'निवेश', 'म्यूचुअल फंड', 'केवाईसी', 'रजिस्टर',
+    'kaise', 'kya hai', 'chahiye', 'banao', 'shuru',
   ];
 
   return investmentKeywords.some(keyword => msg.includes(keyword));
