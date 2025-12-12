@@ -133,10 +133,7 @@
         "Check KYC status",
         "e-KYC process"
       ],
-      "urls": [
-        "https://www.investonline.in/kyc",
-        "https://www.investonline.in/registration"
-      ]
+      "urls": [] // ✅ REMOVED - No working KYC page URL
     },
     {
       "intent": "redemption",
@@ -177,9 +174,7 @@
         "Tax on redemption",
         "How long for money?"
       ],
-      "urls": [
-        "https://www.investonline.in/mutual-funds/redemption"
-      ]
+      "urls": []
     },
     {
       "intent": "switch",
@@ -218,9 +213,7 @@
         "Best time to switch",
         "Tax implications"
       ],
-      "urls": [
-        "https://www.investonline.in/mutual-funds/switch"
-      ]
+      "urls": []
     },
     {
       "intent": "transmission",
