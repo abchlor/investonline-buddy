@@ -65,42 +65,6 @@
         "https://www.investonline.in/login"
       ]
     },
-
-    {
-  "intent": "TOP_FUNDS",
-  "keywords": [
-    "top funds", "top mutual funds", "best funds", "best performing funds",
-    "top performing", "highest returns", "best schemes", "top schemes",
-    "टॉप फंड", "बेस्ट फंड", "सर्वोत्तम फंड", "टॉप म्युच्युअल फंड",
-    "सर्वोत्तम योजनाएं", "उच्चतम रिटर्न", "best mutual funds",
-    "top mutual funds kaunse hai", "kaun sa fund accha hai",
-    "highest return fund", "top 5 funds", "top 10 funds",
-    "सर्वश्रेष्ठ फंड", "उत्कृष्ट फंड"
-  ],
-  "response": "**🏆 Top Performing Mutual Funds**\n\nDiscover the best mutual funds across categories:\n\n**By Category:**\n• **Large Cap Funds** - Stable, low risk\n• **Mid Cap Funds** - Balanced growth\n• **Small Cap Funds** - High growth potential\n• **ELSS Funds** - Tax saving + growth\n• **Debt Funds** - Stable returns\n• **Hybrid Funds** - Balanced portfolio\n\n**How to Choose:**\n1. Check 3-year & 5-year returns\n2. Compare with benchmark\n3. Review fund manager track record\n4. Check expense ratio\n5. Analyze portfolio holdings\n\n**⚠️ Important:**\n- Past performance doesn't guarantee future returns\n- Diversify across fund categories\n- Invest based on your goals & risk appetite\n\n**Tools to Help:**\n• [Funds Explorer →](https://www.investonline.in/mutual-funds/funds-explorer) - Search & compare\n• [Fund Comparison →](https://www.investonline.in/mutual-funds/funds-explorer) - Side-by-side analysis\n• [Who Holds What →](https://www.investonline.in/mutual-funds/who-holds-what) - Check holdings\n\n💡 **Tip:** Use SIP Calculator to plan your investments!\n\n**Need Personalized Advice?**\n📞 1800-2222-65\n📧 wealth@investonline.in\n💬 WhatsApp: +91-77770-24447",
-  "suggestions": ["Funds Explorer", "Compare funds", "SIP Calculator", "Large Cap Funds"],
-  "urls": [
-    "https://www.investonline.in/mutual-funds/funds-explorer",
-    "https://www.investonline.in/mutual-funds/who-holds-what"
-  ]
-}
-
-    {
-  "intent": "ASSET_ALLOCATION",
-  "keywords": [
-    "asset allocation", "portfolio allocation", "diversification", "portfolio mix",
-    "equity debt ratio", "asset distribution", "investment allocation",
-    "एसेट एलोकेशन", "पोर्टफोलियो वितरण", "निवेश आवंटन",
-    "मालमत्ता वाटप", "पोर्टफोलियो विभाजन",
-    "asset allocation kya hai", "portfolio balance", "equity debt split",
-    "कैसे diversify करें", "allocation strategy"
-  ],
-  "response": "**Asset Allocation** - The foundation of smart investing! 📊\n\n**What is Asset Allocation?**\nDistribution of your investment across different asset classes to balance risk and returns.\n\n**Common Allocation Strategies:**\n\n1. **Conservative (Low Risk)**\n   - Equity: 20-30%\n   - Debt: 60-70%\n   - Gold/Others: 10%\n\n2. **Moderate (Balanced)**\n   - Equity: 50-60%\n   - Debt: 30-40%\n   - Gold/Others: 10%\n\n3. **Aggressive (High Growth)**\n   - Equity: 70-80%\n   - Debt: 10-20%\n   - Gold/Others: 10%\n\n**Age-Based Rule:**\n- **Equity %** = 100 - Your Age\n- Example: Age 30 → 70% Equity, 30% Debt\n\n**Why Important?**\n• Reduces portfolio volatility\n• Balances risk vs returns\n• Helps achieve financial goals\n• Protects against market crashes\n\n💡 **Tip:** Rebalance your portfolio annually!\n\n**Need Help?** Contact our advisors:\n📞 1800-2222-65\n📧 wealth@investonline.in\n\n[View Portfolio Reports →](https://www.investonline.in/login)\n[Goal-Based Plans →](https://www.investonline.in/features/goal-planning)",
-  "suggestions": ["Goal-based investing", "Portfolio rebalancing", "Risk assessment", "DIY Portfolio"],
-  "urls": [
-    "https://www.investonline.in/features/goal-planning"
-  ]
-}
     {
       "intent": "registration_benefits",
       "keywords": [
@@ -169,7 +133,9 @@
         "Check KYC status",
         "e-KYC process"
       ],
-      "urls": [] // ✅ REMOVED - No working KYC page URL
+      "urls": [
+        "https://www.investonline.in/features/register-with-pan-card"
+      ]
     },
     {
       "intent": "redemption",
@@ -803,7 +769,9 @@
         "NAV meaning",
         "Fund performance"
       ],
-      "urls": []
+      "urls": [
+		"https://www.investonline.in/mutual-funds/new-fund-offer"
+	]
     },
     {
       "intent": "bank_change",
@@ -914,7 +882,7 @@
         "Portfolio tracking"
       ],
       "urls": [
-        "https://www.investonline.in/login"
+        "https://www.investonline.in/features/register-with-pan-card"
       ]
     },
     {
@@ -1224,7 +1192,94 @@
         "KYC process"
       ],
       "urls": [
-        "https://www.investonline.in/login"
+        "https://www.investonline.in/features/register-with-pan-card"
+      ]
+    },
+    {
+      "intent": "asset_allocation",
+      "keywords": [
+        "asset allocation",
+        "allocate assets",
+        "portfolio allocation",
+        "investment allocation",
+        "diversify portfolio",
+        "diversification",
+        "portfolio distribution",
+        "asset distribution",
+        "how to allocate",
+        "allocation strategy",
+        "portfolio mix",
+        "asset mix",
+        "equity debt ratio",
+        "equity debt allocation",
+        "allocation ratio",
+        "asset kaise allocate kare",
+        "portfolio kaise divide kare",
+        "allocation strategy",
+        "diversification kaise kare",
+        "paisa kaise divide kare",
+        "संपत्ति आवंटन",
+        "पोर्टफोलियो आवंटन",
+        "निवेश वितरण",
+        "विविधीकरण"
+      ],
+      "response": "**Asset Allocation** is the strategy of dividing your investment portfolio among different asset categories to balance risk and returns.\n\n📊 **Key Asset Classes:**\n• **Equity Funds** (60-80%): High growth potential, higher risk\n• **Debt Funds** (15-30%): Stable returns, lower risk\n• **Liquid/Money Market** (5-10%): Emergency fund, very low risk\n\n🎯 **Allocation Based on Your Profile:**\n\n**Aggressive (Age 20-35):**\n• Equity: 70-80%\n• Debt: 15-20%\n• Liquid: 5-10%\n\n**Moderate (Age 35-50):**\n• Equity: 50-60%\n• Debt: 30-40%\n• Liquid: 10%\n\n**Conservative (Age 50+):**\n• Equity: 20-30%\n• Debt: 60-70%\n• Liquid: 10%\n\n💡 **InvestOnline Features:**\n• **DIY Portfolio**: Create custom allocations\n• **Goal-Based Portfolios**: Pre-built allocation strategies\n• **Portfolio Reports**: Track your current allocation\n• **Rebalancing Alerts**: Get notified when allocation drifts\n\n📈 **Start Building Your Balanced Portfolio!**",
+      "suggestions": [
+        "Goal-based investing",
+        "DIY Portfolio",
+        "Portfolio Reports",
+        "Risk profiling"
+      ],
+      "urls": [
+        "https://www.investonline.in/features/diy-portfolio",
+        "https://www.investonline.in/features/goal-based-investing",
+        "https://www.investonline.in/my-portfolio"
+      ]
+    },
+    {
+      "intent": "top_funds",
+      "keywords": [
+        "top funds",
+        "best funds",
+        "top mutual funds",
+        "best mutual funds",
+        "top performing funds",
+        "best performing funds",
+        "top rated funds",
+        "recommended funds",
+        "fund recommendations",
+        "which funds to invest",
+        "best funds to invest",
+        "top 10 funds",
+        "best 10 funds",
+        "top funds kaunse hain",
+        "best mutual funds",
+        "top rated funds",
+        "konse fund mein invest kare",
+        "sabse achhe funds",
+        "टॉप म्युचुअल फंड",
+        "सर्वश्रेष्ठ फंड",
+        "शीर्ष फंड",
+        "अच्छे फंड",
+        "टॉप म्युच्युअल फंड",
+        "सर्वोत्तम फंड",
+        "ટોપ મ્યુચ્યુઅલ ફંડ",
+        "શ્રેષ્ઠ ફંડ",
+        "சிறந்த நிதிகள்",
+        "டாப் ஃபண்ட்ஸ்"
+      ],
+      "response": "**Discover Top-Performing Mutual Funds** across different categories:\n\n🏆 **Top Fund Categories:**\n\n**Large Cap Funds** (Stable Growth)\n• Invest in top 100 companies\n• Lower risk, steady returns\n• [View Top Large Cap Funds →](https://www.investonline.in/mutual-funds/large-cap-funds)\n\n**Mid Cap Funds** (High Growth)\n• Invest in mid-sized companies\n• Moderate-high risk, higher returns\n• [View Top Mid Cap Funds →](https://www.investonline.in/mutual-funds/mid-cap-funds)\n\n**Tax Saving ELSS** (Tax + Growth)\n• Save up to ₹46,800 in taxes\n• 3-year lock-in, equity returns\n• [View Top ELSS Funds →](https://www.investonline.in/mutual-funds/tax-saving-elss)\n\n**Hybrid/Balanced Funds** (Balanced)\n• Mix of equity + debt\n• Moderate risk, balanced returns\n• [View Top Hybrid Funds →](https://www.investonline.in/mutual-funds/balanced-funds)\n\n**Debt Funds** (Stable Income)\n• Fixed income securities\n• Low risk, regular returns\n• [View Top Debt Funds →](https://www.investonline.in/mutual-funds/debt-funds)\n\n💡 **InvestOnline Tools:**\n• **Fund Comparison**: Compare top funds side-by-side\n• **Fund Research**: Detailed performance analysis\n• **Expert Recommendations**: Curated fund selections\n• **Portfolio Builder**: Build custom portfolios\n\n📊 **Start Exploring Top Funds Now!**",
+      "suggestions": [
+        "Large Cap Funds",
+        "Tax Saving ELSS",
+        "Compare Funds",
+        "SIP Calculator"
+      ],
+      "urls": [
+        "https://www.investonline.in/mutual-funds/large-cap-funds",
+        "https://www.investonline.in/mutual-funds/mid-cap-funds",
+        "https://www.investonline.in/mutual-funds/tax-saving-elss",
+        "https://www.investonline.in/features/fund-comparison"
       ]
     }
   ],
