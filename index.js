@@ -1093,12 +1093,24 @@ app.get("/widget", (req, res) => {
     voiceButton.addEventListener('click', toggleVoiceInput);
     
     // FIXED: Language change clears chat and shows welcome
-    languageSelector.addEventListener('change', function() {
-      var oldLang = currentLanguage;
-      currentLanguage = this.value;
-      console.log('🌐 Language changed:', oldLang, '→', currentLanguage);
-      showWelcomeMessage(currentLanguage);
-    });
+    languageSelect.addEventListener('change', function() {
+  const newLang = this.value;
+  currentLanguage = newLang;
+  
+  // ✅ CRITICAL FIX: Clear chat history on language change
+  const chatMessages = document.getElementById('chat-messages');
+  if (chatMessages) {
+    chatMessages.innerHTML = ''; // Clear all messages
+  }
+  
+  // Show welcome message in new language
+  showWelcomeMessage();
+  
+  // Optional: Save language preference
+  if (typeof(Storage) !== "undefined") {
+    localStorage.setItem('preferred_language', newLang);
+  }
+});
 
     window.submitLead = submitLead;
 
