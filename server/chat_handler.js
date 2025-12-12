@@ -22,7 +22,7 @@ const QUESTION_WARNING_THRESHOLD = 10;
 
 // InvestOnline URLs
 const INVESTONLINE_URLS = {
-  register: 'https://www.investonline.in/registration',
+  register: 'https://www.investonline.in/features/register-with-pan-card', // ✅ CORRECTED
   login: 'https://www.investonline.in/login',
   topFunds: 'https://www.investonline.in/mutual-funds/top-performing-funds',
   largeCap: 'https://www.investonline.in/mutual-funds/large-cap-funds',
@@ -34,6 +34,12 @@ const INVESTONLINE_URLS = {
   calculators: 'https://www.investonline.in/financial-calculators/calculators',
   magazine: 'https://www.investonline.in/magazine/investguide',
   contact: 'https://www.investonline.in/contact-us',
+  // ✅ NEW FEATURE URLs
+  whoHoldsWhat: 'https://www.investonline.in/mutual-funds/who-holds-what',
+  goalPlanning: 'https://www.investonline.in/features/goal-planning',
+  diyPortfolio: 'https://www.investonline.in/features/do-it-yourself-portfolio',
+  portfolioAlerts: 'https://www.investonline.in/features/portfolio-triggers-and-alerts',
+  fundsExplorer: 'https://www.investonline.in/mutual-funds/funds-explorer',
 };
 
 // FIXED: Correct WhatsApp number
