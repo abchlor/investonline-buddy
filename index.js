@@ -81,7 +81,7 @@ app.use(express.json({ limit: "10kb" }));
 // Initialize Search Module
 // ====================================
 
-console.log("🚀 Starting InvestOnline Buddy v7 - Pure Search Version");
+console.log("🚀 Starting InvestOnline Buddy - Pure Search Version");
 console.log("📌 Searching only InvestOnline.in");
 console.log("⚠️ No AI fallback, No internet knowledge");
 
@@ -301,7 +301,7 @@ app.get("/widget", (req, res) => {
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>InvestOnline Buddy v7</title>
+  <title>InvestOnline Buddy</title>
   <style>
     * { margin: 0; padding: 0; box-sizing: border-box; }
     
@@ -629,7 +629,7 @@ app.get("/widget", (req, res) => {
     <div id="chat-header">
       <div id="chat-header-logo">IO</div>
       <div id="chat-header-text">
-        <div id="chat-header-title">InvestOnline Buddy v7</div>
+        <div id="chat-header-title">InvestOnline Buddy</div>
         <div id="chat-header-subtitle">Your Investment Assistant</div>
       </div>
       <select id="language-selector">
