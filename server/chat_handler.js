@@ -23,12 +23,52 @@ const QUESTION_WARNING_THRESHOLD = 10;
 // InvestOnline URLs
 const INVESTONLINE_URLS = {
   register: 'https://www.investonline.in/features/register-with-pan-card', // ✅ CORRECTED
-  login: 'https://www.investonline.in/login',
+  login: 'https://www.investonline.in/features/register-with-pan-card', // ✅ FIXED: Same as register (no separate login URL)
   topFunds: 'https://www.investonline.in/mutual-funds/top-performing-funds',
-  largeCap: 'https://www.investonline.in/mutual-funds/large-cap-funds',
-  midCap: 'https://www.investonline.in/mutual-funds/mid-cap-funds',
-  smallCap: 'https://www.investonline.in/mutual-funds/small-cap-funds',
-  elss: 'https://www.investonline.in/mutual-funds/tax-saving-elss',
+  // ✅ EQUITY FUNDS - All Categories
+  largeCap: 'https://www.investonline.in/mutual-funds/top-performing-funds/31/equity-large-cap-fund',
+  midCap: 'https://www.investonline.in/mutual-funds/top-performing-funds/32/equity-mid-cap-fund',
+  smallCap: 'https://www.investonline.in/mutual-funds/top-performing-funds/33/equity-small-cap-fund',
+  largeMidCap: 'https://www.investonline.in/mutual-funds/top-performing-funds/61/equity-large-mid-cap-fund',
+  multiCap: 'https://www.investonline.in/mutual-funds/top-performing-funds/49/equity-multi-cap-fund',
+  focusedFund: 'https://www.investonline.in/mutual-funds/top-performing-funds/63/equity-focused-fund',
+  valueFund: 'https://www.investonline.in/mutual-funds/top-performing-funds/62/equity-value-fund',
+  contraFund: 'https://www.investonline.in/mutual-funds/top-performing-funds/36/equity-contra-fund',
+  dividendYield: 'https://www.investonline.in/mutual-funds/top-performing-funds/35/equity-dividend-yield-fund',
+  elss: 'https://www.investonline.in/mutual-funds/top-performing-funds/8/elss',
+  // Sectoral Funds
+  sectoralInfra: 'https://www.investonline.in/mutual-funds/top-performing-funds/42/equity-sectoral-fund-infrastructure',
+  sectoralPharma: 'https://www.investonline.in/mutual-funds/top-performing-funds/10/equity-sectoral-fund-pharma-health-care',
+  sectoralTech: 'https://www.investonline.in/mutual-funds/top-performing-funds/6/equity-sectoral-fund-technology',
+  
+  // ✅ HYBRID FUNDS - All Categories
+  hybridAggressive: 'https://www.investonline.in/mutual-funds/top-performing-funds/12/hybrid-aggressive-hybrid-fund',
+  hybridConservative: 'https://www.investonline.in/mutual-funds/top-performing-funds/14/hybrid-conservative-hybrid-fund',
+  hybridBalanced: 'https://www.investonline.in/mutual-funds/top-performing-funds/75/hybrid-balanced-advantage',
+  hybridDynamic: 'https://www.investonline.in/mutual-funds/top-performing-funds/74/hybrid-dynamic-asset-allocation',
+  hybridEquitySavings: 'https://www.investonline.in/mutual-funds/top-performing-funds/57/hybrid-equity-savings',
+  hybridMultiAsset: 'https://www.investonline.in/mutual-funds/top-performing-funds/54/hybrid-multi-asset-allocation',
+  hybridArbitrage: 'https://www.investonline.in/mutual-funds/top-performing-funds/19/arbitrage-equity',
+  retirementEquity: 'https://www.investonline.in/mutual-funds/top-performing-funds/87/solution-oriented-retirement-fund-equity',
+  retirementDebt: 'https://www.investonline.in/mutual-funds/top-performing-funds/77/solution-oriented-retirement-fund-debt',
+  
+  // ✅ DEBT FUNDS - All Categories
+  liquidFund: 'https://www.investonline.in/mutual-funds/top-performing-funds/24/liquid-fund',
+  ultraShortDuration: 'https://www.investonline.in/mutual-funds/top-performing-funds/17/ultra-short-duration-fund',
+  lowDuration: 'https://www.investonline.in/mutual-funds/top-performing-funds/66/low-duration-fund',
+  moneyMarket: 'https://www.investonline.in/mutual-funds/top-performing-funds/67/money-market-fund',
+  shortDuration: 'https://www.investonline.in/mutual-funds/top-performing-funds/16/short-duration-fund',
+  mediumDuration: 'https://www.investonline.in/mutual-funds/top-performing-funds/45/medium-duration-fund',
+  longDuration: 'https://www.investonline.in/mutual-funds/top-performing-funds/18/long-duration-fund',
+  dynamicBond: 'https://www.investonline.in/mutual-funds/top-performing-funds/71/dynamic-bond',
+  creditRisk: 'https://www.investonline.in/mutual-funds/top-performing-funds/70/credit-risk-fund',
+  bankingPSU: 'https://www.investonline.in/mutual-funds/top-performing-funds/69/banking-and-psu-fund',
+  floaterFund: 'https://www.investonline.in/mutual-funds/top-performing-funds/28/floater-fund',
+  internalMonthly: 'https://www.investonline.in/mutual-funds/top-performing-funds/20/internal-funds-monthly',
+  
+  // ✅ OTHER CATEGORIES
+  fofsEquity: 'https://www.investonline.in/mutual-funds/top-performing-funds/81/fofs-domestic-equity-oriented',
+  fixedMaturity: 'https://www.investonline.in/mutual-funds/top-performing-funds/21/fixed-maturity-plans',
   compareFunds: 'https://www.investonline.in/mutual-funds/compare-schemes',
   sipCalculator: 'https://www.investonline.in/financial-calculators/sip-calculator',
   calculators: 'https://www.investonline.in/financial-calculators/calculators',
@@ -58,11 +98,48 @@ function matchIntentWithCategory(userMessage) {
   
   // Category keywords for fund types
   const categoryMap = {
-    'large cap': ['large cap', 'largecap', 'blue chip', 'large-cap'],
-    'mid cap': ['mid cap', 'midcap', 'mid-cap'],
+    // EQUITY FUNDS
+    'large cap': ['large cap', 'largecap', 'blue chip', 'large-cap', 'big cap'],
+    'mid cap': ['mid cap', 'midcap', 'mid-cap', 'medium cap'],
     'small cap': ['small cap', 'smallcap', 'small-cap'],
-    'flexi cap': ['flexi cap', 'flexicap', 'flexi-cap'],
-    'elss': ['elss', 'tax saving', 'tax saver', '80c'],
+    'large mid cap': ['large mid cap', 'large and mid cap', 'large & mid cap', 'largemidcap'],
+    'multi cap': ['multi cap', 'multicap', 'multi-cap', 'diversified equity'],
+    'flexi cap': ['flexi cap', 'flexicap', 'flexi-cap', 'flexible cap'],
+    'focused fund': ['focused', 'focused fund', 'focus fund', 'concentrated'],
+    'value fund': ['value', 'value fund', 'value investing'],
+    'contra fund': ['contra', 'contra fund', 'contrarian'],
+    'dividend yield': ['dividend yield', 'dividend', 'high dividend'],
+    'elss': ['elss', 'tax saving', 'tax saver', '80c', 'tax benefit'],
+    
+    // SECTORAL FUNDS
+    'sectoral infrastructure': ['infrastructure', 'infra fund', 'construction'],
+    'sectoral pharma': ['pharma', 'pharmaceutical', 'healthcare', 'health care'],
+    'sectoral technology': ['technology', 'tech', 'it fund', 'information technology'],
+    
+    // HYBRID FUNDS
+    'hybrid aggressive': ['aggressive hybrid', 'balanced aggressive', 'equity oriented hybrid'],
+    'hybrid conservative': ['conservative hybrid', 'debt oriented hybrid'],
+    'hybrid balanced': ['balanced advantage', 'balanced hybrid', 'dynamic equity'],
+    'hybrid dynamic': ['dynamic asset allocation', 'asset allocation fund'],
+    'hybrid equity savings': ['equity savings', 'arbitrage equity'],
+    'hybrid multi asset': ['multi asset', 'multi-asset', 'multiple asset'],
+    'hybrid arbitrage': ['arbitrage', 'arbitrage fund'],
+    'retirement': ['retirement', 'retirement fund', 'pension'],
+    
+    // DEBT FUNDS
+    'liquid': ['liquid', 'liquid fund', 'overnight'],
+    'ultra short': ['ultra short', 'ultra-short', 'ultra short duration'],
+    'low duration': ['low duration', 'low-duration'],
+    'money market': ['money market'],
+    'short duration': ['short duration', 'short-duration', 'short term'],
+    'medium duration': ['medium duration', 'medium-duration', 'medium term'],
+    'long duration': ['long duration', 'long-duration', 'long term', 'gilt'],
+    'dynamic bond': ['dynamic bond', 'income fund'],
+    'credit risk': ['credit risk', 'credit opportunities'],
+    'banking psu': ['banking psu', 'banking and psu', 'psu fund'],
+    'floater': ['floater', 'floating rate'],
+    
+    // OTHER
     'debt': ['debt fund', 'debt', 'fixed income'],
     'index': ['index fund', 'index', 'passive'],
     'etf': ['etf', 'exchange traded'],
@@ -296,14 +373,51 @@ function enhanceResponseWithCTA(response, intent, category = null, urls = []) {
   
   // Add category-specific URL if available
   if (category) {
-    if (category === 'large cap' && !enhanced.includes(INVESTONLINE_URLS.largeCap)) {
-      enhanced += `\n\n**[Explore Large Cap Funds →](${INVESTONLINE_URLS.largeCap})**`;
-    } else if (category === 'mid cap' && !enhanced.includes(INVESTONLINE_URLS.midCap)) {
-      enhanced += `\n\n**[Explore Mid Cap Funds →](${INVESTONLINE_URLS.midCap})**`;
-    } else if (category === 'small cap' && !enhanced.includes(INVESTONLINE_URLS.smallCap)) {
-      enhanced += `\n\n**[Explore Small Cap Funds →](${INVESTONLINE_URLS.smallCap})**`;
-    } else if (category === 'elss' && !enhanced.includes(INVESTONLINE_URLS.elss)) {
-      enhanced += `\n\n**[Explore ELSS Funds →](${INVESTONLINE_URLS.elss})**`;
+    const categoryURLMap = {
+      // EQUITY FUNDS
+      'large cap': ['Large Cap', INVESTONLINE_URLS.largeCap],
+      'mid cap': ['Mid Cap', INVESTONLINE_URLS.midCap],
+      'small cap': ['Small Cap', INVESTONLINE_URLS.smallCap],
+      'large mid cap': ['Large & Mid Cap', INVESTONLINE_URLS.largeMidCap],
+      'multi cap': ['Multi Cap', INVESTONLINE_URLS.multiCap],
+      'focused fund': ['Focused', INVESTONLINE_URLS.focusedFund],
+      'value fund': ['Value', INVESTONLINE_URLS.valueFund],
+      'contra fund': ['Contra', INVESTONLINE_URLS.contraFund],
+      'dividend yield': ['Dividend Yield', INVESTONLINE_URLS.dividendYield],
+      'elss': ['ELSS Tax Saving', INVESTONLINE_URLS.elss],
+      
+      // SECTORAL FUNDS
+      'sectoral infrastructure': ['Infrastructure', INVESTONLINE_URLS.sectoralInfra],
+      'sectoral pharma': ['Pharma & Healthcare', INVESTONLINE_URLS.sectoralPharma],
+      'sectoral technology': ['Technology', INVESTONLINE_URLS.sectoralTech],
+      
+      // HYBRID FUNDS
+      'hybrid aggressive': ['Aggressive Hybrid', INVESTONLINE_URLS.hybridAggressive],
+      'hybrid conservative': ['Conservative Hybrid', INVESTONLINE_URLS.hybridConservative],
+      'hybrid balanced': ['Balanced Advantage', INVESTONLINE_URLS.hybridBalanced],
+      'hybrid dynamic': ['Dynamic Asset Allocation', INVESTONLINE_URLS.hybridDynamic],
+      'hybrid equity savings': ['Equity Savings', INVESTONLINE_URLS.hybridEquitySavings],
+      'hybrid multi asset': ['Multi Asset Allocation', INVESTONLINE_URLS.hybridMultiAsset],
+      'hybrid arbitrage': ['Arbitrage', INVESTONLINE_URLS.hybridArbitrage],
+      'retirement': ['Retirement', INVESTONLINE_URLS.retirementEquity],
+      
+      // DEBT FUNDS
+      'liquid': ['Liquid', INVESTONLINE_URLS.liquidFund],
+      'ultra short': ['Ultra Short Duration', INVESTONLINE_URLS.ultraShortDuration],
+      'low duration': ['Low Duration', INVESTONLINE_URLS.lowDuration],
+      'money market': ['Money Market', INVESTONLINE_URLS.moneyMarket],
+      'short duration': ['Short Duration', INVESTONLINE_URLS.shortDuration],
+      'medium duration': ['Medium Duration', INVESTONLINE_URLS.mediumDuration],
+      'long duration': ['Long Duration', INVESTONLINE_URLS.longDuration],
+      'dynamic bond': ['Dynamic Bond', INVESTONLINE_URLS.dynamicBond],
+      'credit risk': ['Credit Risk', INVESTONLINE_URLS.creditRisk],
+      'banking psu': ['Banking & PSU', INVESTONLINE_URLS.bankingPSU],
+      'floater': ['Floater', INVESTONLINE_URLS.floaterFund],
+    };
+    
+    const categoryInfo = categoryURLMap[category];
+    if (categoryInfo && !enhanced.includes(categoryInfo[1])) {
+      enhanced += `\n\n**[Explore ${categoryInfo[0]} Funds →](${categoryInfo[1]})**`;
     }
   }
   
